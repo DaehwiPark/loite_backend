@@ -1,4 +1,4 @@
-package com.boot.loite_ms_back;
+package com.boot.loiteMsBack;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
