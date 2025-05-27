@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.support.entity;
+package com.boot.loiteMsBack.support.faq.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,11 +19,11 @@ public class SupportFaqEntity {
     @Column(name = "FAQ_ID")
     private Long faqId;
 
-    @Column(name = "FAQ_TITLE", nullable = false, length = 255)
-    private String faqTitle;
+    @Column(name = "FAQ_QUESTION", nullable = false, length = 255)
+    private String faqQuestion;
 
-    @Column(name = "FAQ_CONTENT", nullable = false, length = 255)
-    private String faqContent;
+    @Column(name = "FAQ_ANSWER", nullable = false, length = 255)
+    private String faqAnswer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FAQ_CATEGORY_ID")
@@ -35,9 +35,6 @@ public class SupportFaqEntity {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    @Column(name = "DEL_YN")
-    private String delYn;
-
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -48,5 +45,4 @@ public class SupportFaqEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }
