@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/support/faqs")
-@Tag(name = "Support FAQ", description = "자주 묻는 질문(FAQ) 관련 API")
+@Tag(name = "Support FAQ", description = "고객센터 자주 묻는 질문(FAQ) 관련 API")
 public class SupportFaqController {
 
     private final SupportFaqService supportFaqService;
