@@ -34,12 +34,10 @@ public class SupportResourceServiceImpl implements SupportResourceService {
     public SupportResourceDto createResource(SupportResourceRequestDto dto, MultipartFile file) {
         // 1. 파일 저장 처리 (경로 반환)
         FileUploadResult uploadResult = fileService.save(file, uploadCategory);
-
         // 2. 파일 메타 정보 추출
         String fileName = file.getOriginalFilename();
         long fileSize = file.getSize();
         String fileType = file.getContentType();
-
         // 3. Entity 생성
         SupportResourceEntity entity = SupportResourceEntity.builder()
                 .resourceProductName(dto.getResourceProductName())
@@ -79,7 +77,6 @@ public class SupportResourceServiceImpl implements SupportResourceService {
     public SupportResourceDto updateResource(Long id, SupportResourceRequestDto request, MultipartFile file) {
         SupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found with id: " + id));
-
         // 1. 텍스트 정보 업데이트
         entity.setResourceProductName(request.getResourceProductName());
         entity.setResourceModelName(request.getResourceModelName());
@@ -91,10 +88,8 @@ public class SupportResourceServiceImpl implements SupportResourceService {
             if (oldFilePath != null && !oldFilePath.isBlank()) {
                 deletePhysicalFile(oldFilePath);
             }
-
             // 2-2. 새 파일 저장
             FileUploadResult uploadResult = fileService.save(file, uploadCategory);
-
             // 2-3. 엔티티 업데이트
             entity.setResourceFileName(file.getOriginalFilename());
             entity.setResourceFileUrl(uploadResult.getUrlPath());
@@ -111,7 +106,6 @@ public class SupportResourceServiceImpl implements SupportResourceService {
     public void deleteResource(Long id) {
         SupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found with id: " + id));
-
         // 파일 삭제
         if (entity.getResourceFilePath() != null && !entity.getResourceFilePath().isBlank()) {
             deletePhysicalFile(entity.getResourceFilePath());
