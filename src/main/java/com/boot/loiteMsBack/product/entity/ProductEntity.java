@@ -1,5 +1,6 @@
 package com.boot.loiteMsBack.product.entity;
 
+import com.boot.loiteMsBack.support.entity.SupportFaqCategoryEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +21,10 @@ public class ProductEntity {
     @Column(name = "PRODUCT_ID")
     private Long productId;
 
-//    private String brandId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BRAND_ID")
+    private ProductBrandEntity productBrand;
+
 //    private String creatorId;
 //    private int categoryId;
 
@@ -46,16 +50,16 @@ public class ProductEntity {
     private String activeYn;
 
     @Column(name = "PRODUCT_PRICE")
-    private int productPrice;
+    private BigDecimal productPrice;
 
     @Column(name = "PRODUCT_SUPPLY_PRICE")
-    private int productSupplyPrice;
+    private BigDecimal productSupplyPrice;
 
     @Column(name = "PRODUCT_STOCK")
     private int productStock;
 
     @Column(name = "RECOMMENDED_YN")
-    private int recommendedYn;
+    private String recommendedYn;
 
     @Column(name = "PRODUCT_DELIVERY_CHARGE")
     private BigDecimal productDeliveryCharge;

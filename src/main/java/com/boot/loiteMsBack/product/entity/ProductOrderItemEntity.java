@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_product")
+@Table(name = "tb_product_order_item")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,72 +17,34 @@ public class ProductOrderItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PRODUCT_ID")
-    private Long productId;
+    @Column(name = "ORDER_ITEM_ID")
+    private Long orderItemId;
 
-//    private String brandId;
-//    private String creatorId;
-//    private int categoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ORDER_ID", nullable = false)
+    private ProductOrderEntity order;
 
-    @Column(name = "PRODUCT_SERIAL_NUMBER", nullable = false, length = 20)
-    private String productSerialNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_ID", nullable = false)
+    private ProductEntity product;
 
-    @Column(name = "PRODUCT_NAME", nullable = false, length = 100)
-    private String productName;
+    @Column(name = "ORDER_QUANTITY")
+    private Integer orderQuantity;
 
-    @Column(name = "PRODUCT_MODEL_NAME" )
-    private String productModelName;
+    @Column(name = "ORDER_UNIT_PRICE", nullable = false, precision = 15, scale = 2)
+    private BigDecimal orderUnitPrice;
 
-    @Column(name = "PRODUCT_SUMMARY")
-    private String productSummary;
+    @Column(name = "ORDER_TOTAL_PRICE", nullable = false, precision = 15, scale = 2)
+    private BigDecimal orderTotalPrice;
 
-    @Column(name = "PRODUCT_DESCRIPTION")
-    private String productDescription;
-
-    @Column(name = "DELETE_YN")
-    private String delYn;
-
-    @Column(name = "ACTIVE_YN")
-    private String activeYn;
-
-    @Column(name = "PRODUCT_PRICE")
-    private int productPrice;
-
-    @Column(name = "PRODUCT_SUPPLY_PRICE")
-    private int productSupplyPrice;
-
-    @Column(name = "PRODUCT_STOCK")
-    private int productStock;
-
-    @Column(name = "RECOMMENDED_YN")
-    private int recommendedYn;
-
-    @Column(name = "PRODUCT_DELIVERY_CHARGE")
-    private BigDecimal productDeliveryCharge;
-
-    @Column(name = "PRODUCT_FREE_DELIVERY")
-    private BigDecimal productFreeDelivery;
-
-    @Column(name = "VIEW_COUNT")
-    private int viewCount;
-
-    @Column(name = "SALES_COUNT")
-    private int salesCount;
+    @Column(name = "ORDER_OPTION_TEXT", length = 255)
+    private String orderOptionText;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 
-    @Column(name = "UPDATED_AT")
-    private LocalDateTime updatedAt;
-
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 }

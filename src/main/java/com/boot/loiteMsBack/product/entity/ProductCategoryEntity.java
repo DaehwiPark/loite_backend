@@ -1,13 +1,16 @@
 package com.boot.loiteMsBack.product.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.Fetch;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "tb_product")
+@Table(name = "tb_product_category")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,57 +20,36 @@ public class ProductCategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PRODUCT_ID")
-    private Long productId;
+    @Column(name = "CATEGORY_ID")
+    private Long categoryId;
 
-//    private String brandId;
-//    private String creatorId;
-//    private int categoryId;
+    // 자기 자신을 참조하는 상위 카테고리
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CATEGORY_PARENT_ID")
+    private ProductCategoryEntity parentCategory;
 
-    @Column(name = "PRODUCT_SERIAL_NUMBER", nullable = false, length = 20)
-    private String productSerialNumber;
+    // 자식 카테고리 목록 (양방향 매핑 시 사용)
+    @OneToMany(mappedBy = "parentCategory")
+    private List<ProductCategoryEntity> childCategories = new ArrayList<>();
 
-    @Column(name = "PRODUCT_NAME", nullable = false, length = 100)
-    private String productName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BRAND_ID")
+    private ProductBrandEntity productBrand;
 
-    @Column(name = "PRODUCT_MODEL_NAME" )
-    private String productModelName;
+    @Column(name = "CATEGORY_NAME", nullable = false, length = 100)
+    private String categoryName;
 
-    @Column(name = "PRODUCT_SUMMARY")
-    private String productSummary;
+    @Column(name = "CATEGORY_DEPTH")
+    private int categoryDepth;
 
-    @Column(name = "PRODUCT_DESCRIPTION")
-    private String productDescription;
-
-    @Column(name = "DELETE_YN")
-    private String delYn;
+    @Column(name = "SORT_ORDER")
+    private int sortOrder;
 
     @Column(name = "ACTIVE_YN")
     private String activeYn;
 
-    @Column(name = "PRODUCT_PRICE")
-    private int productPrice;
-
-    @Column(name = "PRODUCT_SUPPLY_PRICE")
-    private int productSupplyPrice;
-
-    @Column(name = "PRODUCT_STOCK")
-    private int productStock;
-
-    @Column(name = "RECOMMENDED_YN")
-    private int recommendedYn;
-
-    @Column(name = "PRODUCT_DELIVERY_CHARGE")
-    private BigDecimal productDeliveryCharge;
-
-    @Column(name = "PRODUCT_FREE_DELIVERY")
-    private BigDecimal productFreeDelivery;
-
-    @Column(name = "VIEW_COUNT")
-    private int viewCount;
-
-    @Column(name = "SALES_COUNT")
-    private int salesCount;
+    @Column(name = "DELETE_YN")
+    private String deleteYn;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
@@ -86,3 +68,4 @@ public class ProductCategoryEntity {
         this.updatedAt = LocalDateTime.now();
     }
 }
+

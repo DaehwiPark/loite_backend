@@ -1,5 +1,6 @@
 package com.boot.loiteMsBack.product.entity;
 
+import com.boot.loiteMsBack.user.Entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_product")
+@Table(name = "tb_product_cart_item")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,57 +18,25 @@ public class ProductCartItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PRODUCT_ID")
-    private Long productId;
+    @Column(name = "CART_ITEM_ID")
+    private Long cartItemId;
 
-//    private String brandId;
-//    private String creatorId;
-//    private int categoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private UserEntity USER;
 
-    @Column(name = "PRODUCT_SERIAL_NUMBER", nullable = false, length = 20)
-    private String productSerialNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_ID")
+    private ProductEntity product;
 
-    @Column(name = "PRODUCT_NAME", nullable = false, length = 100)
-    private String productName;
+    @Column(name = "CART_ITEM_QUANTITY", nullable = false, length = 20)
+    private String cartItemQuantity;
 
-    @Column(name = "PRODUCT_MODEL_NAME" )
-    private String productModelName;
+    @Column(name = "CART_ITEM_OPTION_TEXT", nullable = false, length = 100)
+    private String cartItemOptionText;
 
-    @Column(name = "PRODUCT_SUMMARY")
-    private String productSummary;
-
-    @Column(name = "PRODUCT_DESCRIPTION")
-    private String productDescription;
-
-    @Column(name = "DELETE_YN")
-    private String delYn;
-
-    @Column(name = "ACTIVE_YN")
-    private String activeYn;
-
-    @Column(name = "PRODUCT_PRICE")
-    private int productPrice;
-
-    @Column(name = "PRODUCT_SUPPLY_PRICE")
-    private int productSupplyPrice;
-
-    @Column(name = "PRODUCT_STOCK")
-    private int productStock;
-
-    @Column(name = "RECOMMENDED_YN")
-    private int recommendedYn;
-
-    @Column(name = "PRODUCT_DELIVERY_CHARGE")
-    private BigDecimal productDeliveryCharge;
-
-    @Column(name = "PRODUCT_FREE_DELIVERY")
-    private BigDecimal productFreeDelivery;
-
-    @Column(name = "VIEW_COUNT")
-    private int viewCount;
-
-    @Column(name = "SALES_COUNT")
-    private int salesCount;
+    @Column(name = "CHECKED_YN" )
+    private String checkedYn;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

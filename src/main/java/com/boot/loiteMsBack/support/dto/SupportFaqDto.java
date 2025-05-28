@@ -20,5 +20,4 @@ public class SupportFaqDto {
         this.faqCategoryName = entity.getFaqCategory().getFaqCategoryName();
         this.delYn = entity.getDelYn();
     }
-
 }
