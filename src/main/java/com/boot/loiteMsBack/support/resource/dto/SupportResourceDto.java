@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Schema(description = "제품 리소스 응답 DTO")
 @Getter
 @Setter
 public class SupportResourceDto {

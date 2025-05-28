@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+@Schema(description = "제품 리소스 등록 요청 DTO")
 @Getter
 @Setter
 public class SupportResourceRequestDto {
