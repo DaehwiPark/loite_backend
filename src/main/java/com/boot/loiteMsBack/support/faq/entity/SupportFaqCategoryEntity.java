@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.support.entity;
+package com.boot.loiteMsBack.support.faq.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
