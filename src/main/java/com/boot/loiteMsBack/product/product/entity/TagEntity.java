@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.product.entity;
+package com.boot.loiteMsBack.product.product.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

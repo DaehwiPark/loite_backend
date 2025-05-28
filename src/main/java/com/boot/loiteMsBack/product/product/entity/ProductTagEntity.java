@@ -1,6 +1,8 @@
-package com.boot.loiteMsBack.product.entity;
+package com.boot.loiteMsBack.product.product.entity;
 
 import com.boot.loiteMsBack.product.common.ProductTagId;
+import com.boot.loiteMsBack.product.entity.ProductEntity;
+import com.boot.loiteMsBack.product.entity.TagEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

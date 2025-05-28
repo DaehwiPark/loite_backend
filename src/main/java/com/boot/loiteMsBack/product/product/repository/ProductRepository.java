@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.product.repository;
+package com.boot.loiteMsBack.product.product.repository;
 
 import com.boot.loiteMsBack.product.entity.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
