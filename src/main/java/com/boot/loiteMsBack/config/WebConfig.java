@@ -2,15 +2,35 @@ package com.boot.loiteMsBack.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.io.File;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    private final FileStorageProperties fileProps;
+
+    public WebConfig(FileStorageProperties fileProps) {
+        this.fileProps = fileProps;
+    }
+
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // API 경로 설정
-                .allowedOrigins("http://localhost:5173") // React 주소
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 메서드
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String projectRoot = System.getProperty("user.dir");
+        File uploadsDir = new File(projectRoot, fileProps.getUploadDir());
+        String absolutePath = uploadsDir.getAbsolutePath().replace("\\", "/");
+        registry.addResourceHandler(fileProps.getUploadUrlPrefix() + "/**")
+                .addResourceLocations("file:" + absolutePath + "/");
     }
 }
