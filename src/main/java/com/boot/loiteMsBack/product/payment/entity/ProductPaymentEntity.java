@@ -1,8 +1,8 @@
-package com.boot.loiteMsBack.product.product.entity;
+package com.boot.loiteMsBack.product.payment.entity;
 
-import com.boot.loiteMsBack.product.entity.ProductOrderEntity;
-import com.boot.loiteMsBack.product.enums.PaymentMethodType;
-import com.boot.loiteMsBack.product.enums.PaymentStatusType;
+import com.boot.loiteMsBack.product.order.entity.ProductOrderEntity;
+import com.boot.loiteMsBack.product.payment.enums.PaymentMethodType;
+import com.boot.loiteMsBack.product.payment.enums.PaymentStatusType;
 import jakarta.persistence.*;
 import lombok.*;
 

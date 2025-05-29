@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.product.product.enums;
+package com.boot.loiteMsBack.product.payment.enums;
 
 public enum PaymentStatusType {
     PENDING,

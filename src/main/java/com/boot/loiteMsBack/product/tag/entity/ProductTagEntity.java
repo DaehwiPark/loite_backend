@@ -1,13 +1,9 @@
-package com.boot.loiteMsBack.product.product.entity;
+package com.boot.loiteMsBack.product.tag.entity;
 
 import com.boot.loiteMsBack.product.common.ProductTagId;
-import com.boot.loiteMsBack.product.entity.ProductEntity;
-import com.boot.loiteMsBack.product.entity.TagEntity;
+import com.boot.loiteMsBack.product.product.entity.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_product_tag")

@@ -1,11 +1,10 @@
-package com.boot.loiteMsBack.product.product.entity;
+package com.boot.loiteMsBack.product.review.entity;
 
-import com.boot.loiteMsBack.product.entity.ProductEntity;
+import com.boot.loiteMsBack.product.product.entity.ProductEntity;
 import com.boot.loiteMsBack.user.Entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity

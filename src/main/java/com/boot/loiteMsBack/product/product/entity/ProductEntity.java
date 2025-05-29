@@ -1,7 +1,7 @@
 package com.boot.loiteMsBack.product.product.entity;
 
-import com.boot.loiteMsBack.product.entity.ProductBrandEntity;
-import com.boot.loiteMsBack.support.entity.SupportFaqCategoryEntity;
+import com.boot.loiteMsBack.product.brand.entity.ProductBrandEntity;
+import com.boot.loiteMsBack.product.category.entity.ProductCategoryEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,10 +24,13 @@ public class ProductEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BRAND_ID")
-    private ProductBrandEntity productBrand;
+    private ProductBrandEntity productBrandId;
 
-//    private String creatorId;
-//    private int categoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CATEGORY_ID")
+    private ProductCategoryEntity productCategory;
+
+    //CREATOR_ID 추가
 
     @Column(name = "PRODUCT_SERIAL_NUMBER", nullable = false, length = 20)
     private String productSerialNumber;

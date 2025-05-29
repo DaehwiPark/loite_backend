@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ProductRequestDto {
     private Long productId;
-    private String productBrand;
+    private Long productBrandId;
     private String productSerialNumber;
     private String productName;
     private String productModelName;

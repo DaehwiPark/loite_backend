@@ -1,7 +1,7 @@
-package com.boot.loiteMsBack.product.product.entity;
+package com.boot.loiteMsBack.product.discount.entity;
 
-import com.boot.loiteMsBack.product.entity.ProductEntity;
-import com.boot.loiteMsBack.product.enums.DiscountType;
+import com.boot.loiteMsBack.product.product.entity.ProductEntity;
+import com.boot.loiteMsBack.product.discount.enums.DiscountType;
 import jakarta.persistence.*;
 import lombok.*;
 

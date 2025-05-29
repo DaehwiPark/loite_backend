@@ -1,14 +1,13 @@
-package com.boot.loiteMsBack.product.product.entity;
+package com.boot.loiteMsBack.product.category.entity;
 
-import com.boot.loiteMsBack.product.entity.ProductBrandEntity;
+import com.boot.loiteMsBack.product.brand.entity.ProductBrandEntity;
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.Fetch;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 @Table(name = "tb_product_category")
@@ -30,6 +29,7 @@ public class ProductCategoryEntity {
     private ProductCategoryEntity parentCategory;
 
     // 자식 카테고리 목록 (양방향 매핑 시 사용)
+    @Builder.Default
     @OneToMany(mappedBy = "parentCategory")
     private List<ProductCategoryEntity> childCategories = new ArrayList<>();
 

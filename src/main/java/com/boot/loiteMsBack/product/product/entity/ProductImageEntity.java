@@ -1,7 +1,8 @@
 package com.boot.loiteMsBack.product.product.entity;
 
-import com.boot.loiteMsBack.product.entity.ProductEntity;
-import com.boot.loiteMsBack.product.enums.DiscountType;
+import com.boot.loiteMsBack.product.product.entity.ProductEntity;
+import com.boot.loiteMsBack.product.discount.enums.DiscountType;
+import com.boot.loiteMsBack.product.product.enums.ImageType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,7 +32,7 @@ public class ProductImageEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "IMAGE_TYPE", nullable = false, length = 20)
-    private DiscountType imageType;
+    private ImageType imageType;
 
     @Column(name = "MAIN_YN", length = 100)
     private String mainYn;

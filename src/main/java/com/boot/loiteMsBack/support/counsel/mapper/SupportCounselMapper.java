@@ -14,6 +14,7 @@ public class SupportCounselMapper {
 
     public SupportCounselDto toDto(SupportCounselEntity entity) {
         return modelMapper.map(entity, SupportCounselDto.class);
+
     }
 
     public SupportCounselEntity toEntity(SupportCounselDto dto) {

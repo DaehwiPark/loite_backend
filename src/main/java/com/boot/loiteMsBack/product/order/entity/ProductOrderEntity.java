@@ -1,6 +1,6 @@
-package com.boot.loiteMsBack.product.product.entity;
+package com.boot.loiteMsBack.product.order.entity;
 
-import com.boot.loiteMsBack.product.enums.OrderStatusType;
+import com.boot.loiteMsBack.product.order.enums.OrderStatusType;
 import com.boot.loiteMsBack.user.Entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
