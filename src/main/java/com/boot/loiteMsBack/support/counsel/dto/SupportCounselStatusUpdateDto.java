@@ -1,13 +1,11 @@
 package com.boot.loiteMsBack.support.counsel.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Schema(description = "1:1 문의 상태 변경 요청 DTO")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class SupportCounselStatusUpdateDto {
 

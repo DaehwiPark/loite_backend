@@ -2,17 +2,18 @@ package com.boot.loiteMsBack.support.resource.dto;
 
 import com.boot.loiteMsBack.support.resource.entity.SupportResourceEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "제품 리소스 응답 DTO")
-@Getter
-@Setter
+@Schema(description = "제품 리소스 DTO")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SupportResourceDto {
 
-    @Schema(description = "Resource unique ID", example = "1")
+    @Schema(description = "resource ID", example = "1")
     private Long resourceId;
 
     @Schema(description = "Product name", example = "Air Conditioner")
@@ -41,17 +42,4 @@ public class SupportResourceDto {
 
     @Schema(description = "Last updated date", example = "2025-05-27T15:00:00")
     private LocalDateTime updatedAt;
-
-    public SupportResourceDto(SupportResourceEntity entity) {
-        this.resourceId = entity.getResourceId();
-        this.resourceProductName = entity.getResourceProductName();
-        this.resourceModelName = entity.getResourceModelName();
-        this.resourceFileName = entity.getResourceFileName();
-        this.resourceFileUrl = entity.getResourceFileUrl();
-        this.resourceFilePath = entity.getResourceFilePath();
-        this.resourceFileSize = entity.getResourceFileSize();
-        this.resourceFileType = entity.getResourceFileType();
-        this.createdAt = entity.getCreatedAt();
-        this.updatedAt = entity.getUpdatedAt();
-    }
 }

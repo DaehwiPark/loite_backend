@@ -6,21 +6,19 @@ import com.boot.loiteMsBack.support.counsel.dto.SupportCounselStatusUpdateDto;
 import com.boot.loiteMsBack.support.counsel.service.SupportCounselService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/support/counsel")
 @Tag(name = "counsel 1:1 문의", description = "고객센터 1:1 게시판 문의 관련 API")
 public class SupportCounselController {
 
     private final SupportCounselService supportCounselService;
-
-    public SupportCounselController(SupportCounselService supportCounselService) {
-        this.supportCounselService = supportCounselService;
-    }
 
     @Operation(summary = "전체 문의 목록 조회", description = "관리자 또는 사용자 권한으로 전체 문의글 목록을 조회합니다. 삭제된 항목은 제외됩니다.")
     @GetMapping
