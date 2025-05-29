@@ -1,12 +1,10 @@
 package com.boot.loiteMsBack.support.resource.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Schema(description = "제품 리소스 등록 요청 DTO")
-@Getter
-@Setter
+@Data
 public class SupportResourceRequestDto {
 
     @Schema(description = "제품 이름", example = "Air Conditioner", required = true)
