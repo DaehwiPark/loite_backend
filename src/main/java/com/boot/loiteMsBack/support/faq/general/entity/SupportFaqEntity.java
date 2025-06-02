@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.support.faq.question.entity;
+package com.boot.loiteMsBack.support.faq.general.entity;
 
 import com.boot.loiteMsBack.support.faq.category.entity.SupportFaqCategoryEntity;
 import jakarta.persistence.*;

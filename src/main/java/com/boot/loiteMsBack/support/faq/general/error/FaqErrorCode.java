@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.support.faq.question.error;
+package com.boot.loiteMsBack.support.faq.general.error;
 
 import com.boot.loiteMsBack.global.error.ErrorCode;
 import lombok.Getter;

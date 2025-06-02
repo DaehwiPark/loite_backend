@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.support.faq.question.dto;
+package com.boot.loiteMsBack.support.faq.general.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/support/faqs/category")
-@Tag(name = "Support FAQ Category", description = "고객센터 자주 묻는 질문(FAQ) 카테고리 관련 API")
+@Tag(name = "고객센터 자주 묻는 질문 카테고리 API", description = "고객센터 자주 묻는 질문(FAQ) 카테고리 관련 API")
 public class SupportFaqCategoryController {
 
     private final SupportFaqCategoryService supportFaqCategoryService;

@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/support/counsel")
-@Tag(name = "counsel 1:1 문의", description = "고객센터 1:1 게시판 문의 관련 API")
+@Tag(name = "고객센터 1:1 문의 API", description = "고객센터 1:1 게시판 문의 관련 API")
 public class SupportCounselController {
 
     private final SupportCounselService supportCounselService;

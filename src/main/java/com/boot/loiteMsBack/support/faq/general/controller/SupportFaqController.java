@@ -1,8 +1,8 @@
-package com.boot.loiteMsBack.support.faq.question.controller;
+package com.boot.loiteMsBack.support.faq.general.controller;
 
-import com.boot.loiteMsBack.support.faq.question.dto.SupportFaqDto;
-import com.boot.loiteMsBack.support.faq.question.dto.SupportFaqRequestDto;
-import com.boot.loiteMsBack.support.faq.question.service.SupportFaqService;
+import com.boot.loiteMsBack.support.faq.general.dto.SupportFaqDto;
+import com.boot.loiteMsBack.support.faq.general.dto.SupportFaqRequestDto;
+import com.boot.loiteMsBack.support.faq.general.service.SupportFaqService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/support/faqs")
-@Tag(name = "Support FAQ", description = "고객센터 자주 묻는 질문(FAQ) 관련 API")
+@Tag(name = "고객센터 자주 묻는 질문 API", description = "고객센터 자주 묻는 질문(FAQ) 관련 API")
 public class SupportFaqController {
 
     private final SupportFaqService supportFaqService;

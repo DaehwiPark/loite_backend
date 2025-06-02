@@ -1,8 +1,8 @@
-package com.boot.loiteMsBack.support.faq.question.service;
+package com.boot.loiteMsBack.support.faq.general.service;
 
 
-import com.boot.loiteMsBack.support.faq.question.dto.SupportFaqDto;
-import com.boot.loiteMsBack.support.faq.question.dto.SupportFaqRequestDto;
+import com.boot.loiteMsBack.support.faq.general.dto.SupportFaqDto;
+import com.boot.loiteMsBack.support.faq.general.dto.SupportFaqRequestDto;
 
 import java.util.List;
 

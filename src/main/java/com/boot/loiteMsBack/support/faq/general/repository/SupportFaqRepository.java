@@ -1,6 +1,6 @@
-package com.boot.loiteMsBack.support.faq.question.repository;
+package com.boot.loiteMsBack.support.faq.general.repository;
 
-import com.boot.loiteMsBack.support.faq.question.entity.SupportFaqEntity;
+import com.boot.loiteMsBack.support.faq.general.entity.SupportFaqEntity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

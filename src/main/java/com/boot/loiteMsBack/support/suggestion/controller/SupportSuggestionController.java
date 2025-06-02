@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/support/suggestion")
-@Tag(name = "Support Suggestion", description = "고객센터 경영진에게 제안 내역 관련 API")
+@Tag(name = "고객센터 경영진에게 제안 API", description = "고객센터 경영진에게 제안 내역 관련 API")
 public class SupportSuggestionController {
 
     private final SupportSuggestionService suggestionService;
