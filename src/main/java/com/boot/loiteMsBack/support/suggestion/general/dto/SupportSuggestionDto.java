@@ -1,5 +1,7 @@
-package com.boot.loiteMsBack.support.suggestion.dto;
+package com.boot.loiteMsBack.support.suggestion.general.dto;
 
+import com.boot.loiteMsBack.support.suggestion.file.dto.SupportSuggestionFileSummaryDto;
+import com.boot.loiteMsBack.user.dto.UserSummaryDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -30,11 +33,14 @@ public class SupportSuggestionDto {
     @Schema(description = "제안자 이메일", example = "user@example.com")
     private String suggestionEmail;
 
-    @Schema(description = "메일 발송 여부 (0: 미발송, 1: 발송됨)", example = "true")
-    private Boolean suggestionSendEmail;
+    @Schema(description = "검토 상태 (검토중, 검토완료)", example = "검토중")
+    private String suggestionReviewStatus;
 
-    @Schema(description = "메일 발송 일시", example = "2025-05-28T10:30:00")
-    private LocalDateTime suggestionSentAt;
+    @Schema(description = "검토자 이름 또는 ID", example = "admin01")
+    private String suggestionReviewer;
+
+    @Schema(description = "검토 완료 일시", example = "2025-05-30T14:00:00")
+    private LocalDateTime suggestionReviewedAt;
 
     @Schema(description = "제안 등록 일시", example = "2025-05-28T10:00:00")
     private LocalDateTime createdAt;
@@ -44,4 +50,11 @@ public class SupportSuggestionDto {
 
     @Schema(description = "삭제 여부 (N: 정상, Y: 삭제됨)", example = "N")
     private String delYn;
+
+    @Schema(description = "첨부파일 목록")
+    private List<SupportSuggestionFileSummaryDto> filesSummaryDto;
+
+    @Schema(description = "제안자 정보 (이름, 이메일, 권한 등)")
+    private UserSummaryDto userSummaryDto;
+
 }

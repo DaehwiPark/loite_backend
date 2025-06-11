@@ -1,5 +1,6 @@
-package com.boot.loiteMsBack.support.suggestion.entity;
+package com.boot.loiteMsBack.support.suggestion.general.entity;
 
+import com.boot.loiteMsBack.user.Entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,11 +32,14 @@ public class SupportSuggestionEntity {
     @Column(name = "SUGGESTION_EMAIL")
     private String suggestionEmail;
 
-    @Column(name = "SUGGESTION_SEND_EMAIL")
-    private Boolean suggestionSendEmail;
+    @Column(name = "SUGGESTION_REVIEW_STATUS")
+    private String suggestionReviewStatus;
 
-    @Column(name = "SUGGESTION_SENT_AT")
-    private LocalDateTime suggestionSentAt;
+    @Column(name = "SUGGESTION_REVIEWER")
+    private String suggestionReviewer;
+
+    @Column(name = "SUGGESTION_REVIEWED_AT")
+    private LocalDateTime suggestionReviewedAt;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
@@ -44,5 +48,9 @@ public class SupportSuggestionEntity {
     private LocalDateTime updatedAt;
 
     @Column(name = "DEL_YN", nullable = false)
-    private String delYn = "N";
+    private String delYn;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SUGGESTION_USER_ID", insertable = false, updatable = false)
+    private UserEntity user;
 }

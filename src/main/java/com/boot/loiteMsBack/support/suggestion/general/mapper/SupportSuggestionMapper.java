@@ -1,7 +1,7 @@
-package com.boot.loiteMsBack.support.suggestion.mapper;
+package com.boot.loiteMsBack.support.suggestion.general.mapper;
 
-import com.boot.loiteMsBack.support.suggestion.dto.SupportSuggestionDto;
-import com.boot.loiteMsBack.support.suggestion.entity.SupportSuggestionEntity;
+import com.boot.loiteMsBack.support.suggestion.general.dto.SupportSuggestionDto;
+import com.boot.loiteMsBack.support.suggestion.general.entity.SupportSuggestionEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
