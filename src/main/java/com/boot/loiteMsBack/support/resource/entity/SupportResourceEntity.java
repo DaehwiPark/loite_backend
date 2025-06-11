@@ -39,6 +39,9 @@ public class SupportResourceEntity {
     @Column(name = "RESOURCE_FILE_TYPE", length = 255)
     private String resourceFileType;
 
+    @Column (name="DISPLAY_YN", length=1)
+    private String displayYn;
+
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 

@@ -12,4 +12,7 @@ public class SupportResourceRequestDto {
 
     @Schema(description = "제품 모델 명", example = "AC-1234X", required = false)
     private String resourceModelName;
+
+    @Schema(description = "노출 여부", example = " Y", required = false)
+    private String displayYn;
 }

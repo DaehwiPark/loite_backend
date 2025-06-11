@@ -6,13 +6,16 @@ import com.boot.loiteMsBack.support.resource.service.SupportResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -50,17 +53,28 @@ public class SupportResourceController {
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    @Operation(summary = "자료 전체 조회", description = "등록된 모든 자료를 조회합니다.")
+    @Operation(summary = "자료 목록 페이징 조회", description = "등록된 모든 자료를 조회합니다.")
     @GetMapping
-    public ResponseEntity<List<SupportResourceDto>> getAllResources() {
-        List<SupportResourceDto> list = supportResourceService.getAllResources();
-        return ResponseEntity.ok(list);
+    public ResponseEntity<Page<SupportResourceDto>> getPagesResources(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<SupportResourceDto> result = supportResourceService.getPagesResources(keyword, pageable);
+        return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "자료 단건 조회", description = "ID를 기준으로 자료를 조회합니다.")
+    @Operation(summary = "자료 상세 조회", description = "ID를 기준으로 자료를 조회합니다.")
     @GetMapping("/{id}")
     public ResponseEntity<SupportResourceDto> getResourceById(@PathVariable Long id) {
         SupportResourceDto dto = supportResourceService.getResourceById(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "첨부파일 다운로드", description = "첨부파일 ID를 통해 서버에 저장된 파일을 다운로드합니다. 실제 파일 경로를 사용하여 다운로드 응답을 생성합니다.")
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long id) {
+        return supportResourceService.fileDownload(id);
     }
 }

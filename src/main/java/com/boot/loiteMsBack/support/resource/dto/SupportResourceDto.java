@@ -37,6 +37,9 @@ public class SupportResourceDto {
     @Schema(description = "File type", example = "application/pdf")
     private String resourceFileType;
 
+    @Schema(description="노출 여부", example = "Y")
+    private String displayYn;
+
     @Schema(description = "Created date", example = "2025-05-27T14:30:00")
     private LocalDateTime createdAt;
 

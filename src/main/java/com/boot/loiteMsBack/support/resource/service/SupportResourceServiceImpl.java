@@ -11,13 +11,25 @@ import com.boot.loiteMsBack.support.resource.repository.SupportResourceRepositor
 import com.boot.loiteMsBack.util.file.FileService;
 import com.boot.loiteMsBack.util.file.FileUploadResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -48,6 +60,7 @@ public class SupportResourceServiceImpl implements SupportResourceService {
             SupportResourceEntity entity = SupportResourceEntity.builder()
                     .resourceProductName(dto.getResourceProductName())
                     .resourceModelName(dto.getResourceModelName())
+                    .displayYn(dto.getDisplayYn())
                     .resourceFileName(file.getOriginalFilename())
                     .resourceFileUrl(uploadResult.getUrlPath())
                     .resourceFilePath(uploadResult.getPhysicalPath())
@@ -64,10 +77,15 @@ public class SupportResourceServiceImpl implements SupportResourceService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SupportResourceDto> getAllResources() {
-        return resourceRepository.findAll().stream()
-                .map(supportResourceMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<SupportResourceDto> getPagesResources(String keyword, Pageable pageable) {
+        Page<SupportResourceEntity> page;
+
+        if (StringUtils.hasText(keyword)) {
+            page = resourceRepository.findByKeyword(keyword, pageable);
+        } else {
+            page = resourceRepository.findAll(pageable);
+        }
+        return page.map(supportResourceMapper::toDto);
     }
 
     @Override
@@ -86,15 +104,14 @@ public class SupportResourceServiceImpl implements SupportResourceService {
 
         entity.setResourceProductName(request.getResourceProductName());
         entity.setResourceModelName(request.getResourceModelName());
+        entity.setDisplayYn(request.getDisplayYn());
 
         if (file != null && !file.isEmpty()) {
             if (entity.getResourceFilePath() != null && !entity.getResourceFilePath().isBlank()) {
                 deletePhysicalFile(entity.getResourceFilePath());
             }
-
             try {
                 FileUploadResult uploadResult = fileService.save(file, uploadCategory);
-
                 entity.setResourceFileName(file.getOriginalFilename());
                 entity.setResourceFileUrl(uploadResult.getUrlPath());
                 entity.setResourceFilePath(uploadResult.getPhysicalPath());
@@ -129,6 +146,32 @@ public class SupportResourceServiceImpl implements SupportResourceService {
         File targetFile = new File(physicalPath);
         if (targetFile.exists() && !targetFile.delete()) {
             throw new CustomException(ResourceErrorCode.FILE_DELETE_FAILED);
+        }
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<Resource> fileDownload(Long id) {
+        SupportResourceEntity entity = resourceRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ResourceErrorCode.NOT_FOUND));
+
+        try {
+            Path filePath = Paths.get(entity.getResourceFilePath()).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists()) {
+                throw new CustomException(ResourceErrorCode.NOT_FOUND); // 또는 FILE_DELETE_FAILED로 정의해도 무방
+            }
+
+            String encodedFileName = URLEncoder.encode(entity.getResourceFileName(), StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20"); // 공백 변환
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                    .body(resource);
+
+        } catch (MalformedURLException e) {
+            throw new CustomException(ResourceErrorCode.FILE_UPLOAD_FAILED); // 또는 새로 FILE_READ_FAILED 등 추가 정의 가능
         }
     }
 }
