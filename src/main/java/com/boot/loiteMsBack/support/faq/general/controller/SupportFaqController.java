@@ -4,8 +4,13 @@ import com.boot.loiteMsBack.support.faq.general.dto.SupportFaqDto;
 import com.boot.loiteMsBack.support.faq.general.dto.SupportFaqRequestDto;
 import com.boot.loiteMsBack.support.faq.general.service.SupportFaqService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,17 +18,20 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/support/faqs")
+@RequestMapping("/api/support/faq")
 @Tag(name = "고객센터 자주 묻는 질문 API", description = "고객센터 자주 묻는 질문(FAQ) 관련 API")
 public class SupportFaqController {
 
     private final SupportFaqService supportFaqService;
 
-    @Operation(summary = "FAQ 전체 조회", description = "등록된 모든 FAQ 목록을 반환합니다.")
+    @Operation(summary = "FAQ 목록 조회 (검색 & 페이지네이션)", description = "검색 키워드와 페이지 정보를 기반으로 FAQ 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<List<SupportFaqDto>> getAllFaq() {
-        List<SupportFaqDto> faqs = supportFaqService.getAllFaq();
-        return ResponseEntity.ok(faqs); // 200 OK
+    public ResponseEntity<Page<SupportFaqDto>> getPagesFaqs(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @Parameter(description = "검색 키워드") @RequestParam(required = false) String keyword
+    ) {
+        Page<SupportFaqDto> result = supportFaqService.getPagedFaqs(keyword, pageable);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "FAQ 단건 조회", description = "주어진 ID에 해당 하는 FAQ 항목을 반환합니다.")

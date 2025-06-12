@@ -84,9 +84,8 @@ public class SupportResourceServiceImpl implements SupportResourceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<SupportResourceDto> getPagesResources(String keyword, Pageable pageable) {
+    public Page<SupportResourceDto> getPagedResources(String keyword, Pageable pageable) {
         Page<SupportResourceEntity> page;
-
         if (StringUtils.hasText(keyword)) {
             page = resourceRepository.findByKeyword(keyword, pageable);
         } else {

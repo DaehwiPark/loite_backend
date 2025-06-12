@@ -7,8 +7,13 @@ import com.boot.loiteMsBack.support.faq.general.entity.SupportFaqEntity;
 import com.boot.loiteMsBack.support.faq.general.error.FaqErrorCode;
 import com.boot.loiteMsBack.support.faq.general.repository.SupportFaqRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,11 +26,16 @@ public class SupportFaqServiceImpl implements SupportFaqService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SupportFaqDto> getAllFaq() {
-        return supportFaqRepository.findAll().stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<SupportFaqDto> getPagedFaqs(String keyword, Pageable pageable) {
+        Page<SupportFaqEntity> page;
+        if (StringUtils.hasText(keyword)) {
+            page = supportFaqRepository.findByKeyword(keyword, pageable);
+        } else {
+            page = supportFaqRepository.findAll(pageable);
+        }
+        return page.map(this::toDto);
     }
+
 
     @Override
     public SupportFaqDto getFaqById(Long id) {

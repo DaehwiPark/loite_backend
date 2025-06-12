@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,17 +66,16 @@ public class SupportResourceController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "자료 목록 페이징 조회", description = "등록된 모든 자료를 페이징 조회합니다.")
+    @Operation(summary = "자료 목록 페이징 조회 (검색 & 페이지네이션)", description = "검색 키워드와 페이지 정보를 기반으로 자료 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<Page<SupportResourceDto>> getPagesResources(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+    public ResponseEntity<Page<SupportResourceDto>> getPagedResources(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false) String keyword
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<SupportResourceDto> result = supportResourceService.getPagesResources(keyword, pageable);
+        Page<SupportResourceDto> result = supportResourceService.getPagedResources(keyword, pageable);
         return ResponseEntity.ok(result);
     }
+
 
     @Operation(summary = "자료 상세 조회", description = "자료 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{id}")

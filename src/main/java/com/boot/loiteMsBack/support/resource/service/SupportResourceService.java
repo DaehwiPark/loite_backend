@@ -20,7 +20,7 @@ public interface SupportResourceService {
 
     void deleteResource(Long id);
 
-    Page<SupportResourceDto> getPagesResources(String keyword, Pageable pageable);
+    Page<SupportResourceDto> getPagedResources(String keyword, Pageable pageable);
 
     SupportResourceDto getResourceById(Long id);
 
