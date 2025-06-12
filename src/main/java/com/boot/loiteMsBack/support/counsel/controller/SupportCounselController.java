@@ -56,7 +56,7 @@ public class SupportCounselController {
         return ResponseEntity.ok(supportCounselService.updateReply(id, replyDto));
     }
 
-    @Operation(summary = "문의 삭제 (소프트 삭제)", description = "DEL_YN 컬럼을 'Y'로 설정하여 문의를 삭제 처리합니다.")
+    @Operation(summary = "문의 삭제 (소프트 삭제)", description = "DELETE_YN 컬럼을 'Y'로 설정하여 문의를 삭제 처리합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCounsel(@PathVariable Long id) {
         supportCounselService.softDeleteCounsel(id);

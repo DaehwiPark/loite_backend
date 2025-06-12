@@ -48,9 +48,9 @@ public class SupportSuggestionServiceImpl implements SupportSuggestionService {
         Page<SupportSuggestionEntity> page;
 
         if (StringUtils.hasText(keyword)) {
-            page = suggestionRepository.findByKeywordAndDelYn(keyword, "N", pageable);
+            page = suggestionRepository.findByKeywordAndDeleteYn(keyword, "N", pageable);
         } else {
-            page = suggestionRepository.findByDelYn("N", pageable);
+            page = suggestionRepository.findByDeleteYn("N", pageable);
         }
 
         return page.map(entity -> {
@@ -114,7 +114,7 @@ public class SupportSuggestionServiceImpl implements SupportSuggestionService {
     public void deleteSuggestion(Long id) {
         SupportSuggestionEntity entity = getEntityOrThrow(id);
         try {
-            entity.setDelYn("Y");
+            entity.setDeleteYn("Y");
             suggestionRepository.save(entity);
         } catch (Exception e) {
             throw new CustomException(SuggestionErrorCode.DELETE_FAILED);
@@ -122,7 +122,7 @@ public class SupportSuggestionServiceImpl implements SupportSuggestionService {
     }
 
     private SupportSuggestionEntity getEntityOrThrow(Long id) {
-        return suggestionRepository.findBySuggestionIdAndDelYn(id, "N")
+        return suggestionRepository.findBySuggestionIdAndDeleteYn(id, "N")
                 .orElseThrow(() -> new CustomException(SuggestionErrorCode.NOT_FOUND));
     }
 

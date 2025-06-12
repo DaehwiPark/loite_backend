@@ -24,8 +24,8 @@ public class NoticeServiceImpl implements NoticeService {
         NoticeEntity entity = NoticeEntity.builder()
                 .noticeTitle(requestDto.getNoticeTitle())
                 .noticeContent(requestDto.getNoticeContent())
-                .viewCount(0)
-                .delYn("N")
+                .noticeViewCount(0)
+                .deleteYn("N")
                 .build();
         noticeRepository.save(entity);
         return new NoticeDto(entity);
@@ -45,14 +45,14 @@ public class NoticeServiceImpl implements NoticeService {
     public void deleteNotice(Long id) {
         NoticeEntity entity = noticeRepository.findById(id)
                 .orElseThrow(() -> new CustomException(NoticeErrorCode.NOT_FOUND));
-        entity.setDelYn("Y");
+        entity.setDeleteYn("Y");
         noticeRepository.save(entity);
     }
 
     @Transactional(readOnly = true)
     public List<NoticeDto> getAllNotices() {
         return noticeRepository.findAll().stream()
-                .filter(n -> "N".equals(n.getDelYn()))
+                .filter(n -> "N".equals(n.getDeleteYn()))
                 .map(NoticeDto::new)
                 .collect(Collectors.toList());
     }
@@ -60,7 +60,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional(readOnly = true)
     public NoticeDto getNoticeById(Long id) {
         NoticeEntity entity = noticeRepository.findById(id)
-                .filter(n -> "N".equals(n.getDelYn()))
+                .filter(n -> "N".equals(n.getDeleteYn()))
                 .orElseThrow(() -> new CustomException(NoticeErrorCode.NOT_FOUND));
         return new NoticeDto(entity);
     }

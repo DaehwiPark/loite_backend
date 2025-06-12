@@ -47,8 +47,8 @@ public class SupportSuggestionEntity {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    @Column(name = "DEL_YN", nullable = false)
-    private String delYn;
+    @Column(name = "DELETE_YN", nullable = false)
+    private String deleteYn;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SUGGESTION_USER_ID", insertable = false, updatable = false)

@@ -23,7 +23,10 @@ public class NoticeDto {
     private String noticeContent;
 
     @Schema(description = "조회수", example = "120")
-    private Integer viewCount;
+    private Integer noticeViewCount;
+
+    @Schema(description = "삭제 여부", example = "Y/N")
+    private String deleteYn;
 
     @Schema(description = "등록일", example = "2025-05-29T10:00:00")
     private LocalDateTime createdAt;
@@ -35,7 +38,8 @@ public class NoticeDto {
         this.noticeId = entity.getNoticeId();
         this.noticeTitle = entity.getNoticeTitle();
         this.noticeContent = entity.getNoticeContent();
-        this.viewCount = entity.getViewCount();
+        this.noticeViewCount = entity.getNoticeViewCount();
+        this.deleteYn = entity.getDeleteYn();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
     }

@@ -49,7 +49,7 @@ public class SupportSuggestionDto {
     private LocalDateTime updatedAt;
 
     @Schema(description = "삭제 여부 (N: 정상, Y: 삭제됨)", example = "N")
-    private String delYn;
+    private String deleteYn;
 
     @Schema(description = "첨부파일 목록")
     private List<SupportSuggestionFileSummaryDto> filesSummaryDto;

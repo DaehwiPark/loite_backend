@@ -50,8 +50,8 @@ public class SupportCounselEntity {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    @Column(name = "DEL_YN", nullable = false)
-    private String delYn;
+    @Column(name = "DELETE_YN", nullable = false)
+    private String deleteYn;
 
     @PrePersist
     public void onCreate() {

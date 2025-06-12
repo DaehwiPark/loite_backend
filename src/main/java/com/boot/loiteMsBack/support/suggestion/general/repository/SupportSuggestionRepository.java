@@ -12,11 +12,11 @@ import java.util.Optional;
 
 public interface SupportSuggestionRepository extends JpaRepository<SupportSuggestionEntity, Long> {
     @Query("SELECT s FROM SupportSuggestionEntity s " +
-            "WHERE s.delYn = :delYn " +
+            "WHERE s.deleteYn = :deleteYn " +
             "AND (s.suggestionTitle LIKE %:keyword% OR s.suggestionContent LIKE %:keyword%)")
-    Page<SupportSuggestionEntity> findByKeywordAndDelYn(@Param("keyword") String keyword,
-                                                        @Param("delYn") String delYn,
+    Page<SupportSuggestionEntity> findByKeywordAndDeleteYn(@Param("keyword") String keyword,
+                                                        @Param("deleteYn") String deleteYn,
                                                         Pageable pageable);
-    Page<SupportSuggestionEntity> findByDelYn(String delYn, Pageable pageable);
-    Optional<SupportSuggestionEntity> findBySuggestionIdAndDelYn(Long suggestionId, String delYn);
+    Page<SupportSuggestionEntity> findByDeleteYn(String deleteYn, Pageable pageable);
+    Optional<SupportSuggestionEntity> findBySuggestionIdAndDeleteYn(Long suggestionId, String deleteYn);
 }

@@ -44,7 +44,7 @@ public class SupportSuggestionController {
         return ResponseEntity.ok(suggestion);
     }
 
-    @Operation(summary = "제안 삭제", description = "제안 ID를 기준으로 해당 제안을 삭제 처리합니다. (실제 삭제가 아닌 delYn='Y' 처리)")
+    @Operation(summary = "제안 삭제", description = "제안 ID를 기준으로 해당 제안을 삭제 처리합니다. (실제 삭제가 아닌 deleteYn='Y' 처리)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSuggestion(@PathVariable Long id) {
         suggestionService.deleteSuggestion(id);
