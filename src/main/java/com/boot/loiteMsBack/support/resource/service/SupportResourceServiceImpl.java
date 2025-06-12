@@ -2,6 +2,9 @@ package com.boot.loiteMsBack.support.resource.service;
 
 import com.boot.loiteMsBack.config.FileStorageProperties;
 import com.boot.loiteMsBack.global.error.exception.CustomException;
+import com.boot.loiteMsBack.product.product.dto.ProductSummaryDto;
+import com.boot.loiteMsBack.product.product.entity.ProductEntity;
+import com.boot.loiteMsBack.product.product.repository.ProductRepository;
 import com.boot.loiteMsBack.support.resource.dto.SupportResourceDto;
 import com.boot.loiteMsBack.support.resource.dto.SupportResourceRequestDto;
 import com.boot.loiteMsBack.support.resource.entity.SupportResourceEntity;
@@ -30,12 +33,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class SupportResourceServiceImpl implements SupportResourceService {
 
     private final SupportResourceRepository resourceRepository;
+    private final ProductRepository productRepository;
     private final FileService fileService;
     private final FileStorageProperties fileProps;
     private final SupportResourceMapper supportResourceMapper;
@@ -57,9 +62,11 @@ public class SupportResourceServiceImpl implements SupportResourceService {
         }
 
         try {
+            ProductEntity product = productRepository.findById(dto.getProductId())
+                    .orElseThrow(() -> new CustomException(ResourceErrorCode.INVALID_PRODUCT));
+
             SupportResourceEntity entity = SupportResourceEntity.builder()
-                    .resourceProductName(dto.getResourceProductName())
-                    .resourceModelName(dto.getResourceModelName())
+                    .product(product)
                     .displayYn(dto.getDisplayYn())
                     .resourceFileName(file.getOriginalFilename())
                     .resourceFileUrl(uploadResult.getUrlPath())
@@ -102,8 +109,10 @@ public class SupportResourceServiceImpl implements SupportResourceService {
         SupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ResourceErrorCode.NOT_FOUND));
 
-        entity.setResourceProductName(request.getResourceProductName());
-        entity.setResourceModelName(request.getResourceModelName());
+        ProductEntity product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new CustomException(ResourceErrorCode.INVALID_PRODUCT));
+
+        entity.setProduct(product);
         entity.setDisplayYn(request.getDisplayYn());
 
         if (file != null && !file.isEmpty()) {
@@ -148,6 +157,7 @@ public class SupportResourceServiceImpl implements SupportResourceService {
             throw new CustomException(ResourceErrorCode.FILE_DELETE_FAILED);
         }
     }
+
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<Resource> fileDownload(Long id) {
@@ -159,11 +169,11 @@ public class SupportResourceServiceImpl implements SupportResourceService {
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists()) {
-                throw new CustomException(ResourceErrorCode.NOT_FOUND); // 또는 FILE_DELETE_FAILED로 정의해도 무방
+                throw new CustomException(ResourceErrorCode.NOT_FOUND);
             }
 
             String encodedFileName = URLEncoder.encode(entity.getResourceFileName(), StandardCharsets.UTF_8)
-                    .replaceAll("\\+", "%20"); // 공백 변환
+                    .replaceAll("\\+", "%20");
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -171,7 +181,21 @@ public class SupportResourceServiceImpl implements SupportResourceService {
                     .body(resource);
 
         } catch (MalformedURLException e) {
-            throw new CustomException(ResourceErrorCode.FILE_UPLOAD_FAILED); // 또는 새로 FILE_READ_FAILED 등 추가 정의 가능
+            throw new CustomException(ResourceErrorCode.FILE_UPLOAD_FAILED);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductSummaryDto> getProductsList() {
+        List<ProductEntity> products = productRepository.findProductsWithoutResource();
+
+        return products.stream()
+                .map(p -> ProductSummaryDto.builder()
+                        .productId(p.getProductId())
+                        .productName(p.getProductName())
+                        .productModelName(p.getProductModelName())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

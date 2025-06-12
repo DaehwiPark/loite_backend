@@ -1,5 +1,6 @@
 package com.boot.loiteMsBack.support.resource.controller;
 
+import com.boot.loiteMsBack.product.product.dto.ProductSummaryDto;
 import com.boot.loiteMsBack.support.resource.dto.SupportResourceDto;
 import com.boot.loiteMsBack.support.resource.dto.SupportResourceRequestDto;
 import com.boot.loiteMsBack.support.resource.service.SupportResourceService;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/support/resource")
@@ -25,14 +28,23 @@ public class SupportResourceController {
 
     private final SupportResourceService supportResourceService;
 
-    @Operation(summary = "자료 등록", description = "파일과 정보를 함께 등록합니다.")
+
+    @Operation(summary = "설명서 미등록 제품 목록 조회", description = "아직 제품 설명서가 등록되지 않은 상품 목록을 조회합니다.")
+    @GetMapping("/product")
+    public ResponseEntity<List<ProductSummaryDto>> getProductListWithoutResource() {
+        List<ProductSummaryDto> productList = supportResourceService.getProductsList();
+        return ResponseEntity.ok(productList);
+    }
+
+
+    @Operation(summary = "자료 등록", description = "파일과 제품 ID를 함께 등록합니다.")
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SupportResourceDto> uploadResource(
             @RequestPart("file") MultipartFile file,
             @RequestPart("info") SupportResourceRequestDto request
     ) {
         SupportResourceDto result = supportResourceService.createResource(request, file);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result); // 201 Created
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @Operation(summary = "자료 수정", description = "기존 자료를 수정합니다.")
@@ -43,17 +55,17 @@ public class SupportResourceController {
             @RequestPart("info") SupportResourceRequestDto request
     ) {
         SupportResourceDto result = supportResourceService.updateResource(id, request, file);
-        return ResponseEntity.ok(result); // 200 OK
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "자료 삭제", description = "자료를 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
         supportResourceService.deleteResource(id);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "자료 목록 페이징 조회", description = "등록된 모든 자료를 조회합니다.")
+    @Operation(summary = "자료 목록 페이징 조회", description = "등록된 모든 자료를 페이징 조회합니다.")
     @GetMapping
     public ResponseEntity<Page<SupportResourceDto>> getPagesResources(
             @RequestParam(defaultValue = "0") int page,
@@ -65,14 +77,14 @@ public class SupportResourceController {
         return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "자료 상세 조회", description = "ID를 기준으로 자료를 조회합니다.")
+    @Operation(summary = "자료 상세 조회", description = "자료 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{id}")
     public ResponseEntity<SupportResourceDto> getResourceById(@PathVariable Long id) {
         SupportResourceDto dto = supportResourceService.getResourceById(id);
         return ResponseEntity.ok(dto);
     }
 
-    @Operation(summary = "첨부파일 다운로드", description = "첨부파일 ID를 통해 서버에 저장된 파일을 다운로드합니다. 실제 파일 경로를 사용하여 다운로드 응답을 생성합니다.")
+    @Operation(summary = "첨부파일 다운로드", description = "설명서 ID를 통해 첨부파일을 다운로드합니다.")
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long id) {
         return supportResourceService.fileDownload(id);

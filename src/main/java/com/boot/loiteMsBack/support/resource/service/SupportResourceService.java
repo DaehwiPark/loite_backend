@@ -1,5 +1,6 @@
 package com.boot.loiteMsBack.support.resource.service;
 
+import com.boot.loiteMsBack.product.product.dto.ProductSummaryDto;
 import com.boot.loiteMsBack.support.resource.dto.SupportResourceDto;
 import com.boot.loiteMsBack.support.resource.dto.SupportResourceRequestDto;
 import org.springframework.core.io.Resource;
@@ -11,10 +12,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface SupportResourceService {
+    List<ProductSummaryDto> getProductsList();
+
     SupportResourceDto createResource(SupportResourceRequestDto requestDto, MultipartFile file);
+
     SupportResourceDto updateResource(Long id, SupportResourceRequestDto request, MultipartFile file);
+
     void deleteResource(Long id);
+
     Page<SupportResourceDto> getPagesResources(String keyword, Pageable pageable);
+
     SupportResourceDto getResourceById(Long id);
+
     ResponseEntity<Resource> fileDownload(Long id);
 }

@@ -7,12 +7,9 @@ import lombok.Data;
 @Data
 public class SupportResourceRequestDto {
 
-    @Schema(description = "제품 이름", example = "Air Conditioner", required = true)
-    private String resourceProductName;
+    @Schema(description = "상품 ID", example = "1001", required = true)
+    private Long productId;
 
-    @Schema(description = "제품 모델 명", example = "AC-1234X", required = false)
-    private String resourceModelName;
-
-    @Schema(description = "노출 여부", example = " Y", required = false)
+    @Schema(description = "노출 여부", example = "Y", required = false)
     private String displayYn;
 }

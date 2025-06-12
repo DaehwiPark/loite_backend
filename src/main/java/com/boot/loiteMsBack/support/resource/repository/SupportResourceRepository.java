@@ -9,12 +9,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface SupportResourceRepository extends JpaRepository<SupportResourceEntity, Long> {
 
-    @Query("SELECT r FROM SupportResourceEntity r " +
-            "WHERE (:keyword IS NULL OR :keyword = '' " +
-            "OR r.resourceProductName LIKE %:keyword% " +
-            "OR r.resourceModelName LIKE %:keyword%)")
-    Page<SupportResourceEntity> findByKeyword(
-            @Param("keyword") String keyword,
-            Pageable pageable
-    );
+    @Query("""
+        SELECT r FROM SupportResourceEntity r
+        WHERE LOWER(r.product.productName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(r.resourceFileName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    """)
+    Page<SupportResourceEntity> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
