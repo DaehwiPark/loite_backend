@@ -1,7 +1,9 @@
 package com.boot.loiteMsBack.support.resource.entity;
 
+import com.boot.loiteMsBack.product.product.entity.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,11 +20,9 @@ public class SupportResourceEntity {
     @Column(name = "RESOURCE_ID")
     private Long resourceId;
 
-    @Column(name = "RESOURCE_PRODUCT_NAME", nullable = false, length = 255)
-    private String resourceProductName;
-
-    @Column(name = "RESOURCE_MODEL_NAME", length = 255)
-    private String resourceModelName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_ID", referencedColumnName = "PRODUCT_ID")
+    private ProductEntity product;
 
     @Column(name = "RESOURCE_FILE_NAME", nullable = false, length = 255)
     private String resourceFileName;
@@ -30,7 +30,7 @@ public class SupportResourceEntity {
     @Column(name = "RESOURCE_FILE_URL", nullable = false, length = 255)
     private String resourceFileUrl;
 
-    @Column(name = "RESOURCE_FILE_PATH",  nullable = false, length = 1024)
+    @Column(name = "RESOURCE_FILE_PATH", length = 1024)
     private String resourceFilePath;
 
     @Column(name = "RESOURCE_FILE_SIZE")
@@ -38,6 +38,9 @@ public class SupportResourceEntity {
 
     @Column(name = "RESOURCE_FILE_TYPE", length = 255)
     private String resourceFileType;
+
+    @Column(name = "DISPLAY_YN", length = 1, nullable = false)
+    private String displayYn;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
@@ -47,8 +50,9 @@ public class SupportResourceEntity {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     @PreUpdate

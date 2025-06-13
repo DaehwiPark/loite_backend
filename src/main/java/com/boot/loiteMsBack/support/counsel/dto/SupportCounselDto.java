@@ -50,5 +50,5 @@ public class SupportCounselDto {
     private LocalDateTime updatedAt;
 
     @Schema(description = "삭제 여부 (N=정상, Y=삭제됨)")
-    private String delYn;
+    private String deleteYn;
 }

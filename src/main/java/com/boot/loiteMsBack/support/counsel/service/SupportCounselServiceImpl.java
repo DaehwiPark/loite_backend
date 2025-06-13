@@ -26,7 +26,7 @@ public class SupportCounselServiceImpl implements SupportCounselService {
     @Override
     @Transactional(readOnly = true)
     public List<SupportCounselDto> getAllCounsel() {
-        return counselRepository.findByDelYn("N").stream()
+        return counselRepository.findByDeleteYn("N").stream()
                 .map(supportCounselMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -40,7 +40,7 @@ public class SupportCounselServiceImpl implements SupportCounselService {
     @Override
     @Transactional(readOnly = true)
     public List<SupportCounselDto> getUnansweredCounsel() {
-        return counselRepository.findByDelYnAndCounselReplyContentIsNull("N").stream()
+        return counselRepository.findByDeleteYnAndCounselReplyContentIsNull("N").stream()
                 .map(supportCounselMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -68,7 +68,7 @@ public class SupportCounselServiceImpl implements SupportCounselService {
     @Transactional
     public void softDeleteCounsel(Long id) {
         SupportCounselEntity entity = getEntityOrThrow(id);
-        entity.setDelYn("Y");
+        entity.setDeleteYn("Y");
     }
 
     @Override
@@ -80,7 +80,7 @@ public class SupportCounselServiceImpl implements SupportCounselService {
     }
 
     private SupportCounselEntity getEntityOrThrow(Long id) {
-        return counselRepository.findByCounselIdAndDelYn(id, "N")
+        return counselRepository.findByCounselIdAndDeleteYn(id, "N")
                 .orElseThrow(() -> new CustomException(CounselErrorCode.NOT_FOUND));
     }
 
