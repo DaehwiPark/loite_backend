@@ -19,4 +19,5 @@ public interface SupportFaqService {
 
     void deleteFaqById(Long id);
 
+    SupportFaqDto createFaq(SupportFaqRequestDto request);
 }
