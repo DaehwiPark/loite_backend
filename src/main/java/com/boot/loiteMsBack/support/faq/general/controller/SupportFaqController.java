@@ -26,7 +26,7 @@ public class SupportFaqController {
 
     @Operation(summary = "FAQ 목록 조회 (검색 & 페이지네이션)", description = "검색 키워드와 페이지 정보를 기반으로 FAQ 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<Page<SupportFaqDto>> getPagesFaqs(
+    public ResponseEntity<Page<SupportFaqDto>> getPagedFaqs(
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @Parameter(description = "검색 키워드") @RequestParam(required = false) String keyword
     ) {
@@ -39,6 +39,13 @@ public class SupportFaqController {
     public ResponseEntity<SupportFaqDto> getFaqById(@PathVariable Long id) {
         SupportFaqDto faq = supportFaqService.getFaqById(id);
         return ResponseEntity.ok(faq); // 200 OK
+    }
+
+    @Operation(summary = "FAQ 등록", description = "새로운 FAQ 항목을 등록합니다.")
+    @PostMapping
+    public ResponseEntity<SupportFaqDto> createFaq(@RequestBody SupportFaqRequestDto request) {
+        SupportFaqDto created = supportFaqService.createFaq(request);
+        return ResponseEntity.status(201).body(created); // 201 Created
     }
 
     @Operation(summary = "FAQ 수정", description = "기존에 등록된 FAQ 내용을 수정합니다.")
@@ -57,4 +64,5 @@ public class SupportFaqController {
         supportFaqService.deleteFaqById(id);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
+
 }

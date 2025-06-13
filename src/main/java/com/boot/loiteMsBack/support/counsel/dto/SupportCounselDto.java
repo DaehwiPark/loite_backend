@@ -1,6 +1,5 @@
 package com.boot.loiteMsBack.support.counsel.dto;
 
-import com.boot.loiteMsBack.support.counsel.entity.SupportCounselEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +30,7 @@ public class SupportCounselDto {
     @Schema(description = "답변 수신 이메일")
     private String counselEmail;
 
-    @Schema(description = "문의 상태 (예: 대기, 처리중, 완료)")
+    @Schema(description = "문의 상태 (예: 대기, 완료)")
     private String counselStatus;
 
     @Schema(description = "관리자 답변 내용")
@@ -51,4 +50,10 @@ public class SupportCounselDto {
 
     @Schema(description = "삭제 여부 (N=정상, Y=삭제됨)")
     private String deleteYn;
+
+    @Schema(description = "비밀글 여부 (Y: 비밀글, N: 일반글)")
+    private String counselPrivateYn;
+
+    @Schema(description = "비밀글 비밀번호 (암호화된 값)")
+    private String counselPrivatePassword;
 }

@@ -53,6 +53,12 @@ public class SupportCounselEntity {
     @Column(name = "DELETE_YN", nullable = false)
     private String deleteYn;
 
+    @Column(name = "COUNSEL_PRIVATE_YN", nullable = false)
+    private String counselPrivateYn;
+
+    @Column(name = "COUNSEL_Private_PASSWORD")
+    private String counselPrivatePassword;
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();

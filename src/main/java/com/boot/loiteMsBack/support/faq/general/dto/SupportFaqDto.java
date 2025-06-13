@@ -1,14 +1,18 @@
 package com.boot.loiteMsBack.support.faq.general.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Schema(description = "FAQ 응답 DTO")
-@Builder
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SupportFaqDto {
 
     @Schema(description = "FAQ ID", example = "1")
@@ -20,6 +24,9 @@ public class SupportFaqDto {
     @Schema(description = "답변", example = "마이페이지 > 보안 설정에서 변경 가능합니다.")
     private String faqAnswer;
 
+    @Schema(description = "FAQ 카테고리 ID", example = "1")
+    private Long faqCategoryId;
+
     @Schema(description = "FAQ 카테고리 이름", example = "계정 관련")
     private String faqCategoryName;
 
@@ -28,4 +35,11 @@ public class SupportFaqDto {
 
     @Schema(description = "수정일시", example = "2025-05-29T12:00:00")
     private LocalDateTime updatedAt;
+
+    @Schema(description = "노출 여부", example = "Y")
+    private String displayYn;
+
+    @Schema(description = "삭제 여부", example = "N")
+    private String deleteYn;
+
 }
