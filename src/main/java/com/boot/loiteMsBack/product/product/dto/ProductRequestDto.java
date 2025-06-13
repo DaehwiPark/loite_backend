@@ -1,10 +1,12 @@
 package com.boot.loiteMsBack.product.product.dto;
 
+import com.boot.loiteMsBack.product.option.dto.ProductOptionRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,12 +14,11 @@ import java.math.BigDecimal;
 public class ProductRequestDto {
     private Long productId;
     private Long productBrandId;
-    private String productSerialNumber;
     private String productName;
     private String productModelName;
     private String productSummary;
     private String productDescription;
-    private String delYn;
+    private String deleteYn;
     private String activeYn;
     private BigDecimal productPrice;
     private BigDecimal productSupplyPrice;
@@ -27,4 +28,16 @@ public class ProductRequestDto {
     private BigDecimal productFreeDelivery;
     private int viewCount;
     private int salesCount;
+
+    List<ImageDto> productImages;
+    List<ProductOptionRequestDto> productOptions;
+
+    @Getter
+    @Setter
+    public static class ImageDto{
+        private String imageUrl;
+        private String imageType;
+        private int imageSortOrder;
+        private String activeYn;
+    }
 }

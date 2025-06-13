@@ -1,4 +1,4 @@
-package com.boot.loiteMsBack.product.common;
+package com.boot.loiteMsBack.product.general;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

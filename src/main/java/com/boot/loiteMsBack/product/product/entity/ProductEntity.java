@@ -24,16 +24,13 @@ public class ProductEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BRAND_ID")
-    private ProductBrandEntity productBrandId;
+    private ProductBrandEntity productBrand;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CATEGORY_ID")
     private ProductCategoryEntity productCategory;
 
     //CREATOR_ID 추가
-
-    @Column(name = "PRODUCT_SERIAL_NUMBER", nullable = false, length = 20)
-    private String productSerialNumber;
 
     @Column(name = "PRODUCT_NAME", nullable = false, length = 100)
     private String productName;
@@ -48,7 +45,7 @@ public class ProductEntity {
     private String productDescription;
 
     @Column(name = "DELETE_YN")
-    private String delYn;
+    private String deleteYn;
 
     @Column(name = "ACTIVE_YN")
     private String activeYn;

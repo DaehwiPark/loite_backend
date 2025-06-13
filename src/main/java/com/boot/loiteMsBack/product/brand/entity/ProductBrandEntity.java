@@ -29,10 +29,10 @@ public class ProductBrandEntity {
     private String brandLogoUrl;
 
     @Column(name = "BRAND_DESCRIPTION")
-    private String BrandDescription;
+    private String brandDescription;
 
     @Column(name = "ACTIVE_YN")
-    private String ActiveYn;
+    private String activeYn;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

@@ -1,6 +1,6 @@
 package com.boot.loiteMsBack.product.tag.entity;
 
-import com.boot.loiteMsBack.product.common.ProductTagId;
+import com.boot.loiteMsBack.product.general.ProductTagId;
 import com.boot.loiteMsBack.product.product.entity.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,15 +15,15 @@ import lombok.*;
 public class ProductTagEntity {
 
     @EmbeddedId
-    private ProductTagId id;
+    private ProductTagId productTagId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("productId")
     @JoinColumn(name = "PRODUCT_ID")
-    private ProductEntity product;
+    private ProductEntity productId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tagId")
     @JoinColumn(name = "TAG_ID")
-    private TagEntity tag;
+    private TagEntity tagId;
 }

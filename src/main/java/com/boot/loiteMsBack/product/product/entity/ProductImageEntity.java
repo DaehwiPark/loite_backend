@@ -30,15 +30,15 @@ public class ProductImageEntity {
     @Column(name = "IMAGE_URL", nullable = false, length = 1000)
     private String imageUrl;
 
+    @Column(name = "IMAGE_PATH", nullable = false, length = 1000)
+    private String imagePath;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "IMAGE_TYPE", nullable = false, length = 20)
     private ImageType imageType;
 
-    @Column(name = "MAIN_YN", length = 100)
-    private String mainYn;
-
     @Column(name = "IMAGE_SORT_ORDER")
-    private String imageSortOrder;
+    private int imageSortOrder;
 
     @Column(name = "ACTIVE_YN", length = 100)
     private String activeYn;
