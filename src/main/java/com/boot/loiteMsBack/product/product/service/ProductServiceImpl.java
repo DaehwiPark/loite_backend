@@ -2,7 +2,10 @@ package com.boot.loiteMsBack.product.product.service;
 
 import com.boot.loiteMsBack.product.brand.entity.ProductBrandEntity;
 import com.boot.loiteMsBack.product.brand.repository.ProductBrandRepository;
+import com.boot.loiteMsBack.product.category.entity.ProductCategoryEntity;
+import com.boot.loiteMsBack.product.category.repository.ProductCategoryRepository;
 import com.boot.loiteMsBack.product.general.FileUploadUtil;
+import com.boot.loiteMsBack.product.general.ProductTagId;
 import com.boot.loiteMsBack.product.option.dto.ProductOptionRequestDto;
 import com.boot.loiteMsBack.product.option.entity.ProductOptionEntity;
 import com.boot.loiteMsBack.product.option.mapper.ProductOptionMapper;
@@ -16,6 +19,10 @@ import com.boot.loiteMsBack.product.product.mapper.ProductImageMapper;
 import com.boot.loiteMsBack.product.product.mapper.ProductMapper;
 import com.boot.loiteMsBack.product.product.repository.ProductImageRepository;
 import com.boot.loiteMsBack.product.product.repository.ProductRepository;
+import com.boot.loiteMsBack.product.tag.entity.ProductTagEntity;
+import com.boot.loiteMsBack.product.tag.entity.TagEntity;
+import com.boot.loiteMsBack.product.tag.repository.ProductTagRepository;
+import com.boot.loiteMsBack.product.tag.repository.TagRepository;
 import com.boot.loiteMsBack.util.file.FileService;
 import com.boot.loiteMsBack.util.file.FileUploadResult;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +44,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageRepository productImageRepository;
     private final ProductBrandRepository productBrandRepository;
     private final ProductOptionRepository productOptionRepository;
+    private final ProductTagRepository productTagRepository;
+    private final ProductCategoryRepository productCategoryRepository;
+    private final TagRepository tagRepository;
     private final ProductMapper productMapper;
     private final ProductImageMapper productImageMapper;
     private final ProductOptionMapper productOptionMapper;
@@ -44,16 +54,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Long saveProduct(ProductRequestDto dto, List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages, Integer mainIndex) throws IOException {
+        //브랜드 조회
         ProductBrandEntity brand = productBrandRepository.findById(dto.getProductBrandId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 브랜드가 존재하지 않습니다."));
 
+        //카테고리 조회
+        ProductCategoryEntity category = productCategoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(()-> new IllegalArgumentException("해당 카테고리가 존재하지 않습니다."));
+
+        //상품 등록
         ProductEntity product = productMapper.toEntity(dto);
         product.setProductBrand(brand);
         ProductEntity savedProduct = productRepository.save(product);
 
         // 이미지 등록
         List<ProductImageEntity> imageEntities = new ArrayList<>();
-        // 썸네일 이미지 저장
         for (int i = 0; i < thumbnailImages.size(); i++) {
             MultipartFile file = thumbnailImages.get(i);
             FileUploadResult result = fileService.save(file, "product");
@@ -71,9 +86,6 @@ public class ProductServiceImpl implements ProductService {
             imageEntity.setProduct(savedProduct);
             imageEntities.add(imageEntity);
         }
-
-
-        // 상세 이미지 저장
         for (int i = 0; i < detailImages.size(); i++) {
             MultipartFile file = detailImages.get(i);
             FileUploadResult result = fileService.save(file, "product");
@@ -91,7 +103,7 @@ public class ProductServiceImpl implements ProductService {
         }
         productImageRepository.saveAll(imageEntities);
 
-        //옵션 등록
+        //옵션 연결
         List<ProductOptionEntity> optionEntities = dto.getProductOptions().stream()
                 .map(optionDto -> {
                     ProductOptionEntity option = productOptionMapper.toEntity(optionDto);
@@ -100,6 +112,30 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
         productOptionRepository.saveAll(optionEntities);
+
+        //태그 연결
+        if (dto.getTagIdList() != null && !dto.getTagIdList().isEmpty()) {
+            List<TagEntity> tagEntities = tagRepository.findAllById(dto.getTagIdList());
+
+            List<ProductTagEntity> tagMaps = tagEntities.stream()
+                    .map(tag -> {
+                        ProductTagEntity map = new ProductTagEntity();
+
+                        // 1. 복합키 객체 생성해서 값 넣기
+                        ProductTagId id = new ProductTagId();
+                        id.setProductId(savedProduct.getProductId());
+                        id.setTagId(tag.getTagId());
+
+                        // 2. 엔티티 세팅
+                        map.setProductTagId(id);
+                        map.setProduct(savedProduct);
+                        map.setTag(tag);
+
+                        return map;
+                    }).toList();
+
+            productTagRepository.saveAll(tagMaps);
+        }
 
         return savedProduct.getProductId();
     }

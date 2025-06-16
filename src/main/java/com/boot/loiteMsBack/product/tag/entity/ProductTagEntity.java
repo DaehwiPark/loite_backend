@@ -20,10 +20,10 @@ public class ProductTagEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("productId")
     @JoinColumn(name = "PRODUCT_ID")
-    private ProductEntity productId;
+    private ProductEntity product;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tagId")
     @JoinColumn(name = "TAG_ID")
-    private TagEntity tagId;
+    private TagEntity tag;
 }

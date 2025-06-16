@@ -14,6 +14,7 @@ import java.util.List;
 public class ProductRequestDto {
     private Long productId;
     private Long productBrandId;
+    private Long categoryId;
     private String productName;
     private String productModelName;
     private String productSummary;
@@ -28,9 +29,11 @@ public class ProductRequestDto {
     private BigDecimal productFreeDelivery;
     private int viewCount;
     private int salesCount;
+    private List<Long> tagIdList;
 
     List<ImageDto> productImages;
     List<ProductOptionRequestDto> productOptions;
+
 
     @Getter
     @Setter

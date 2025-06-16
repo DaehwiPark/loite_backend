@@ -1,5 +1,6 @@
 package com.boot.loiteMsBack.product.general;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +17,10 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ProductTagId implements Serializable {
 
+    @Column(name = "PRODUCT_ID")
     private Long productId;
+
+    @Column(name = "TAG_ID")
     private Long tagId;
 
     @Override
