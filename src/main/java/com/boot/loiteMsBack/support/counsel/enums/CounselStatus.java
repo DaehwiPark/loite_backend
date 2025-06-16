@@ -4,9 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum CounselStatus {
-    대기("대기"),
-    처리중("처리중"),
-    완료("완료");
+    WAITING("대기"),
+    COMPLETE("완료");
 
     private final String label;
 
@@ -16,7 +15,7 @@ public enum CounselStatus {
 
     public static CounselStatus from(String value) {
         for (CounselStatus status : values()) {
-            if (status.name().equalsIgnoreCase(value) || status.getLabel().equalsIgnoreCase(value)) {
+            if (status.name().equalsIgnoreCase(value) || status.label.equalsIgnoreCase(value)) {
                 return status;
             }
         }
