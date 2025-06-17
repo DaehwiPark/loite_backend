@@ -26,10 +26,10 @@ public class NoticeEntity {
     private String noticeContent;
 
     @Column(name = "NOTICE_VIEW_COUNT")
-    private Integer noticeViewCount = 0;
+    private Integer noticeViewCount;
 
     @Column(name = "DELETE_YN", length = 1)
-    private String deleteYn = "N";
+    private String deleteYn;
 
     @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt;
