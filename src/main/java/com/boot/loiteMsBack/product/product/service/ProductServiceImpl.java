@@ -19,6 +19,7 @@ import com.boot.loiteMsBack.product.product.mapper.ProductImageMapper;
 import com.boot.loiteMsBack.product.product.mapper.ProductMapper;
 import com.boot.loiteMsBack.product.product.repository.ProductImageRepository;
 import com.boot.loiteMsBack.product.product.repository.ProductRepository;
+import com.boot.loiteMsBack.product.product.spec.ProductSpecification;
 import com.boot.loiteMsBack.product.tag.entity.ProductTagEntity;
 import com.boot.loiteMsBack.product.tag.entity.TagEntity;
 import com.boot.loiteMsBack.product.tag.repository.ProductTagRepository;
@@ -26,8 +27,12 @@ import com.boot.loiteMsBack.product.tag.repository.TagRepository;
 import com.boot.loiteMsBack.util.file.FileService;
 import com.boot.loiteMsBack.util.file.FileUploadResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -279,22 +284,35 @@ public class ProductServiceImpl implements ProductService {
 
     //상품 목록 조회
     @Override
-    public List<ProductListResponseDto> getAllProductsSimple() {
-        List<ProductEntity> products = productRepository.findAll(); // 혹은 deleteYn = 'N' 조건으로 필터해도 OK
+    @Transactional(readOnly = true)
+    public Page<ProductListResponseDto> getPagedProducts(String keyword, Pageable pageable) {
+        Specification<ProductEntity> spec = ProductSpecification.isNotDeleted();
 
-        return products.stream().map(product -> {
+        if (StringUtils.hasText(keyword)) {
+            spec = spec.and(ProductSpecification.containsKeyword(keyword));
+        }
+
+        Page<ProductEntity> page = productRepository.findAll(spec, pageable);
+
+        return page.map(product -> {
             ProductListResponseDto dto = new ProductListResponseDto();
             dto.setProductName(product.getProductName());
-            dto.setBrandName(product.getProductBrand().getBrandName());
+            dto.setActiveYn(product.getActiveYn());
+            dto.setCreatedAt(product.getCreatedAt());
             dto.setProductPrice(product.getProductPrice());
             dto.setProductStock(product.getProductStock());
-            dto.setCreatedAt(product.getCreatedAt());
-            dto.setActiveYn(product.getActiveYn());
-            dto.setViewCount(product.getViewCount());
             dto.setSalesCount(product.getSalesCount());
+            dto.setViewCount(product.getViewCount());
+
+            // 연관 엔티티 null 방지
+            if (product.getProductBrand() != null) {
+                dto.setBrandName(product.getProductBrand().getBrandName());
+            }
+
             return dto;
-        }).toList();
+        });
     }
+
 
     //상품 상세 조회
     @Override

@@ -3,6 +3,8 @@ package com.boot.loiteMsBack.product.product.service;
 import com.boot.loiteMsBack.product.product.dto.ProductDetailResponseDto;
 import com.boot.loiteMsBack.product.product.dto.ProductRequestDto;
 import com.boot.loiteMsBack.product.product.dto.ProductListResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,7 +15,8 @@ public interface ProductService {
 
     void updateProduct(ProductRequestDto dto, List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages, Integer mainIndex) throws IOException;
 
-    List<ProductListResponseDto> getAllProductsSimple();
+    Page<ProductListResponseDto> getPagedProducts(String keyword, Pageable pageable);
+
     ProductDetailResponseDto getAllProductDetail(Long productId);
 
     void deleteProduct(Long productId);
