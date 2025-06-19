@@ -2,11 +2,15 @@ package com.boot.loiteMsBack.product.product.entity;
 
 import com.boot.loiteMsBack.product.brand.entity.ProductBrandEntity;
 import com.boot.loiteMsBack.product.category.entity.ProductCategoryEntity;
+import com.boot.loiteMsBack.product.option.entity.ProductOptionEntity;
+import com.boot.loiteMsBack.product.tag.entity.ProductTagEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_product")
@@ -31,6 +35,15 @@ public class ProductEntity {
     private ProductCategoryEntity productCategory;
 
     //CREATOR_ID 추가
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImageEntity> productImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductOptionEntity> productOptions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductTagEntity> productTags = new ArrayList<>();
 
     @Column(name = "PRODUCT_NAME", nullable = false, length = 100)
     private String productName;

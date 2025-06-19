@@ -14,4 +14,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
           AND p.deleteYn = 'N'
     """)
     List<ProductEntity> findProductsWithoutResource();
+
+    List<ProductEntity> findByDeleteYn(String deleteYn);
 }

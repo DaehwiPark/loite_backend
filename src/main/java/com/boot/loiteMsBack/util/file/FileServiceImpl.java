@@ -19,49 +19,45 @@ public class FileServiceImpl implements FileService {
         this.fileProps = fileProps;
     }
 
-
     @Override
     public FileUploadResult save(MultipartFile file, String category) {
         try {
-            // 원본 파일명 정리 (공백 -> 언더스코어)
+            if (file == null || file.isEmpty()) {
+                throw new IllegalArgumentException("파일이 비어있거나 존재하지 않습니다.");
+            }
+
             String originalName = file.getOriginalFilename();
-            if (originalName == null) {
-                throw new IllegalArgumentException("파일 이름이 없습니다.");
-            }
-            String cleanName = originalName.replaceAll("\\s+", "_");
-
-            // 최종 파일명 생성
-            String fileName = UUID.randomUUID() + "_" + cleanName;
-
-            // 저장 경로 생성: 프로젝트 루트 기준 ./uploads/{category}
-            String projectRoot = System.getProperty("user.dir");
-            File uploadDir = new File(projectRoot, fileProps.getUploadDir() + "/" + category);
-
-            // 폴더가 존재하지 않으면 생성
-            if (!uploadDir.exists()) {
-                boolean created = uploadDir.mkdirs();
-                if (!created) {
-                    throw new IOException("업로드 디렉토리 생성 실패: " + uploadDir.getAbsolutePath());
-                }
+            if (originalName == null || !originalName.contains(".")) {
+                throw new IllegalArgumentException("파일 확장자가 유효하지 않습니다.");
             }
 
-            // 실제 파일 저장
-            File dest = new File(uploadDir, fileName);
-            file.transferTo(dest);
-
-            // 접근 가능한 URL 경로 반환: 예) /uploads/product/파일명
-            String urlPath = fileProps.getUploadUrlPrefix() + "/" + category + "/" + fileName;
-            String physicalPath = dest.getAbsolutePath();
-
-            //파일 형식 유효성 검사
             String extension = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
             if (!ALLOWED_EXTENSIONS.contains(extension)) {
                 throw new IllegalArgumentException("지원하지 않는 파일 형식입니다: " + extension);
             }
 
+            // 파일 이름 정리 및 경로 설정
+            String cleanName = originalName.replaceAll("\\s+", "_");
+            String fileName = UUID.randomUUID() + "_" + cleanName;
+
+            String projectRoot = System.getProperty("user.dir");
+            File uploadDir = new File(projectRoot, fileProps.getUploadDir() + "/" + category);
+
+            if (!uploadDir.exists() && !uploadDir.mkdirs()) {
+                throw new IOException("업로드 디렉토리 생성 실패: " + uploadDir.getAbsolutePath());
+            }
+
+            File dest = new File(uploadDir, fileName);
+            file.transferTo(dest);
+
+            String urlPath = fileProps.getUploadUrlPrefix() + "/" + category + "/" + fileName;
+            String physicalPath = dest.getAbsolutePath();
+
             return new FileUploadResult(urlPath, physicalPath);
+
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패", e);
         }
     }
 }
+

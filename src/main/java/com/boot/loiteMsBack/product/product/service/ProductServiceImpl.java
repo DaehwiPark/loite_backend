@@ -4,13 +4,13 @@ import com.boot.loiteMsBack.product.brand.entity.ProductBrandEntity;
 import com.boot.loiteMsBack.product.brand.repository.ProductBrandRepository;
 import com.boot.loiteMsBack.product.category.entity.ProductCategoryEntity;
 import com.boot.loiteMsBack.product.category.repository.ProductCategoryRepository;
-import com.boot.loiteMsBack.product.general.FileUploadUtil;
 import com.boot.loiteMsBack.product.general.ProductTagId;
-import com.boot.loiteMsBack.product.option.dto.ProductOptionRequestDto;
 import com.boot.loiteMsBack.product.option.entity.ProductOptionEntity;
 import com.boot.loiteMsBack.product.option.mapper.ProductOptionMapper;
 import com.boot.loiteMsBack.product.option.repository.ProductOptionRepository;
+import com.boot.loiteMsBack.product.product.dto.ProductDetailResponseDto;
 import com.boot.loiteMsBack.product.product.dto.ProductImageRequestDto;
+import com.boot.loiteMsBack.product.product.dto.ProductListResponseDto;
 import com.boot.loiteMsBack.product.product.dto.ProductRequestDto;
 import com.boot.loiteMsBack.product.product.entity.ProductEntity;
 import com.boot.loiteMsBack.product.product.entity.ProductImageEntity;
@@ -69,45 +69,61 @@ public class ProductServiceImpl implements ProductService {
 
         // 이미지 등록
         List<ProductImageEntity> imageEntities = new ArrayList<>();
-        for (int i = 0; i < thumbnailImages.size(); i++) {
-            MultipartFile file = thumbnailImages.get(i);
-            FileUploadResult result = fileService.save(file, "product");
 
-            ImageType type = (i == mainIndex) ? ImageType.MAIN : ImageType.THUMBNAIL;
+        // 썸네일
+        if (thumbnailImages != null && !thumbnailImages.isEmpty()) {
+            for (int i = 0; i < thumbnailImages.size(); i++) {
+                MultipartFile file = thumbnailImages.get(i);
+                if (file == null || file.isEmpty()) continue;
 
-            ProductImageRequestDto imageDto = new ProductImageRequestDto();
-            imageDto.setImageUrl(result.getUrlPath());
-            imageDto.setImagePath(result.getPhysicalPath());
-            imageDto.setImageType(type.name());
-            imageDto.setImageSortOrder(i + 1);
-            imageDto.setActiveYn("Y");
+                FileUploadResult result = fileService.save(file, "product");
+                if (result == null) continue;
 
-            ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
-            imageEntity.setProduct(savedProduct);
-            imageEntities.add(imageEntity);
+                ImageType type = (i == mainIndex) ? ImageType.MAIN : ImageType.THUMBNAIL;
+
+                ProductImageRequestDto imageDto = new ProductImageRequestDto();
+                imageDto.setImageUrl(result.getUrlPath());
+                imageDto.setImagePath(result.getPhysicalPath());
+                imageDto.setImageType(type.name());
+                imageDto.setImageSortOrder(i + 1);
+                imageDto.setActiveYn("Y");
+
+                ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
+                imageEntity.setProduct(savedProduct);
+                imageEntities.add(imageEntity);
+            }
         }
-        for (int i = 0; i < detailImages.size(); i++) {
-            MultipartFile file = detailImages.get(i);
-            FileUploadResult result = fileService.save(file, "product");
 
-            ProductImageRequestDto imageDto = new ProductImageRequestDto();
-            imageDto.setImageUrl(result.getUrlPath());
-            imageDto.setImagePath(result.getPhysicalPath());
-            imageDto.setImageType(ImageType.DETAIL.name());
-            imageDto.setImageSortOrder(i + 1);
-            imageDto.setActiveYn("Y");
+        // 상세
+        if (detailImages != null && !detailImages.isEmpty()) {
+            for (int i = 0; i < detailImages.size(); i++) {
+                MultipartFile file = detailImages.get(i);
+                if (file == null || file.isEmpty()) continue;
 
-            ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
-            imageEntity.setProduct(savedProduct); // 연관관계 설정
-            imageEntities.add(imageEntity);
+                FileUploadResult result = fileService.save(file, "product");
+                if (result == null) continue;
+
+                ProductImageRequestDto imageDto = new ProductImageRequestDto();
+                imageDto.setImageUrl(result.getUrlPath());
+                imageDto.setImagePath(result.getPhysicalPath());
+                imageDto.setImageType(ImageType.DETAIL.name());
+                imageDto.setImageSortOrder(i + 1);
+                imageDto.setActiveYn("Y");
+
+                ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
+                imageEntity.setProduct(savedProduct);
+                imageEntities.add(imageEntity);
+            }
         }
-        productImageRepository.saveAll(imageEntities);
+        if (!imageEntities.isEmpty()) {
+            productImageRepository.saveAll(imageEntities);
+        }
 
         //옵션 연결
         List<ProductOptionEntity> optionEntities = dto.getProductOptions().stream()
                 .map(optionDto -> {
                     ProductOptionEntity option = productOptionMapper.toEntity(optionDto);
-                    option.setProduct(savedProduct); // 연관관계 설정
+                    option.setProduct(savedProduct);
                     return option;
                 })
                 .collect(Collectors.toList());
@@ -121,12 +137,10 @@ public class ProductServiceImpl implements ProductService {
                     .map(tag -> {
                         ProductTagEntity map = new ProductTagEntity();
 
-                        // 1. 복합키 객체 생성해서 값 넣기
                         ProductTagId id = new ProductTagId();
                         id.setProductId(savedProduct.getProductId());
                         id.setTagId(tag.getTagId());
 
-                        // 2. 엔티티 세팅
                         map.setProductTagId(id);
                         map.setProduct(savedProduct);
                         map.setTag(tag);
@@ -141,7 +155,219 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateProduct(Long productId, ProductRequestDto dto) {
+    public void updateProduct(ProductRequestDto dto, List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages, Integer mainIndex) throws IOException {
+        //상품 연결
+        ProductEntity product = productRepository.findById(dto.getProductId())
+                .orElseThrow(()-> new IllegalArgumentException("상품이 존재하지 않습니다."));
 
+        //카테고리 연결
+        ProductCategoryEntity category = productCategoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(()-> new IllegalArgumentException("해당 카테고리가 존재하지 않습니다."));
+
+        //브랜드 연결
+        ProductBrandEntity brand = productBrandRepository.findById(dto.getProductBrandId())
+                .orElseThrow(()-> new IllegalArgumentException("해당 브랜드가 존재하지 않습니다."));
+
+        //브랜드 id 수정
+        product.setProductBrand(brand);
+
+        //카테고리 id 수정
+        product.setProductCategory(category);
+
+        //상품 필드 수정
+        product.setProductName(dto.getProductName());
+        product.setProductModelName(dto.getProductModelName());
+        product.setProductSummary(dto.getProductSummary());
+        product.setProductDescription(dto.getProductDescription());
+        product.setProductPrice(dto.getProductPrice());
+        product.setProductSupplyPrice(dto.getProductSupplyPrice());
+        product.setProductStock(dto.getProductStock());
+        product.setProductDeliveryCharge(dto.getProductDeliveryCharge());
+        product.setProductFreeDelivery(dto.getProductFreeDelivery());
+        product.setActiveYn(dto.getActiveYn());
+        product.setDeleteYn(dto.getDeleteYn());
+
+        productRepository.save(product);
+
+        //기존 옵션 삭제 후 재삽입
+        productOptionRepository.deleteByProduct(product);
+        List<ProductOptionEntity> optionEntities = dto.getProductOptions().stream()
+                .map(optionDto -> {
+                    ProductOptionEntity option = productOptionMapper.toEntity(optionDto);
+                    option.setProduct(product);
+                    return option;
+                }).toList();
+        productOptionRepository.saveAll(optionEntities);
+
+        //기존 태그 삭제 후 재삽입
+        productTagRepository.deleteByProduct(product);
+        if (dto.getTagIdList() != null && !dto.getTagIdList().isEmpty()) {
+            List<TagEntity> tagEntities = tagRepository.findAllById(dto.getTagIdList());
+            List<ProductTagEntity> tagMaps = tagEntities.stream()
+                    .map(tag -> {
+                        ProductTagEntity map = new ProductTagEntity();
+                        map.setProduct(product);
+                        map.setTag(tag);
+                        map.setProductTagId(new ProductTagId(product.getProductId(), tag.getTagId()));
+                        return map;
+                    }).toList();
+            productTagRepository.saveAll(tagMaps);
+        }
+
+        //기존 이미지 삭제 후 재삽입
+        productImageRepository.deleteByProduct(product);
+        List<ProductImageEntity> imageEntities = new ArrayList<>();
+
+        // 썸네일
+        if (thumbnailImages != null && !thumbnailImages.isEmpty()) {
+            for (int i = 0; i < thumbnailImages.size(); i++) {
+                MultipartFile file = thumbnailImages.get(i);
+                if (file == null || file.isEmpty()) continue;
+
+                FileUploadResult result = fileService.save(file, "product");
+                if (result == null) continue;
+
+                ImageType type = (i == mainIndex) ? ImageType.MAIN : ImageType.THUMBNAIL;
+
+                ProductImageRequestDto imageDto = new ProductImageRequestDto();
+                imageDto.setImageUrl(result.getUrlPath());
+                imageDto.setImagePath(result.getPhysicalPath());
+                imageDto.setImageType(type.name());
+                imageDto.setImageSortOrder(i + 1);
+                imageDto.setActiveYn("Y");
+
+                ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
+                imageEntity.setProduct(product);
+                imageEntities.add(imageEntity);
+            }
+        }
+
+        // 상세
+        if (detailImages != null && !detailImages.isEmpty()) {
+            for (int i = 0; i < detailImages.size(); i++) {
+                MultipartFile file = detailImages.get(i);
+                if (file == null || file.isEmpty()) continue;
+
+                FileUploadResult result = fileService.save(file, "product");
+                if (result == null) continue;
+
+                ProductImageRequestDto imageDto = new ProductImageRequestDto();
+                imageDto.setImageUrl(result.getUrlPath());
+                imageDto.setImagePath(result.getPhysicalPath());
+                imageDto.setImageType(ImageType.DETAIL.name());
+                imageDto.setImageSortOrder(i + 1);
+                imageDto.setActiveYn("Y");
+
+                ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
+                imageEntity.setProduct(product);
+                imageEntities.add(imageEntity);
+            }
+        }
+        if (!imageEntities.isEmpty()) {
+            productImageRepository.saveAll(imageEntities);
+        }
     }
+
+    @Override
+    public void deleteProduct(Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다."));
+
+        product.setDeleteYn("Y");
+        productRepository.save(product);
+    }
+
+    //상품 목록 조회
+    @Override
+    public List<ProductListResponseDto> getAllProductsSimple() {
+        List<ProductEntity> products = productRepository.findAll(); // 혹은 deleteYn = 'N' 조건으로 필터해도 OK
+
+        return products.stream().map(product -> {
+            ProductListResponseDto dto = new ProductListResponseDto();
+            dto.setProductName(product.getProductName());
+            dto.setBrandName(product.getProductBrand().getBrandName());
+            dto.setProductPrice(product.getProductPrice());
+            dto.setProductStock(product.getProductStock());
+            dto.setCreatedAt(product.getCreatedAt());
+            dto.setActiveYn(product.getActiveYn());
+            dto.setViewCount(product.getViewCount());
+            dto.setSalesCount(product.getSalesCount());
+            return dto;
+        }).toList();
+    }
+
+    //상품 상세 조회
+    @Override
+    @Transactional(readOnly = true)
+    public ProductDetailResponseDto getAllProductDetail(Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
+
+        ProductDetailResponseDto dto = new ProductDetailResponseDto();
+        dto.setProductId(product.getProductId());
+        dto.setProductName(product.getProductName());
+        dto.setProductModelName(product.getProductModelName());
+        dto.setProductSummary(product.getProductSummary());
+        dto.setProductDescription(product.getProductDescription());
+        dto.setProductPrice(product.getProductPrice());
+        dto.setProductSupplyPrice(product.getProductSupplyPrice());
+        dto.setProductStock(product.getProductStock());
+        dto.setProductDeliveryCharge(product.getProductDeliveryCharge());
+        dto.setProductFreeDelivery(product.getProductFreeDelivery());
+        dto.setDeleteYn(product.getDeleteYn());
+        dto.setActiveYn(product.getActiveYn());
+        dto.setRecommendedYn(product.getRecommendedYn());
+
+        // 브랜드
+        if (product.getProductBrand() != null) {
+            dto.setProductBrandId(product.getProductBrand().getBrandId());
+            dto.setBrandName(product.getProductBrand().getBrandName());
+        }
+
+        // 카테고리
+        if (product.getProductCategory() != null) {
+            dto.setCategoryId(product.getProductCategory().getCategoryId());
+            dto.setCategoryName(product.getProductCategory().getCategoryName());
+        }
+
+        // 이미지
+        List<ProductDetailResponseDto.ImageDto> imageDtos = product.getProductImages().stream()
+                .map(img -> {
+                    ProductDetailResponseDto.ImageDto imageDto = new ProductDetailResponseDto.ImageDto();
+                    imageDto.setImageUrl(img.getImageUrl());
+                    imageDto.setImageType(img.getImageType().name());
+                    imageDto.setImageSortOrder(img.getImageSortOrder());
+                    imageDto.setActiveYn(img.getActiveYn());
+                    return imageDto;
+                }).toList();
+        dto.setProductImages(imageDtos);
+
+        // 옵션
+        List<ProductDetailResponseDto.ProductOptionDto> optionDtos = product.getProductOptions().stream()
+                .map(opt -> {
+                    ProductDetailResponseDto.ProductOptionDto optDto = new ProductDetailResponseDto.ProductOptionDto();
+                    optDto.setOptionType(opt.getOptionType());
+                    optDto.setOptionValue(opt.getOptionValue());
+                    optDto.setOptionAdditionalPrice(opt.getOptionAdditionalPrice());
+                    optDto.setOptionStock(opt.getOptionStock());
+                    optDto.setOptionStyleType(opt.getOptionStyleType().name());
+                    optDto.setActiveYn(opt.getActiveYn());
+                    optDto.setOptionSortOrder(opt.getOptionSortOrder());
+                    return optDto;
+                }).toList();
+        dto.setProductOptions(optionDtos);
+
+        // 태그
+        List<ProductDetailResponseDto.TagDto> tagDtos = product.getProductTags().stream()
+                .map(tagMap -> {
+                    ProductDetailResponseDto.TagDto tagDto = new ProductDetailResponseDto.TagDto();
+                    tagDto.setTagId(tagMap.getTag().getTagId());
+                    tagDto.setTagName(tagMap.getTag().getTagName());
+                    return tagDto;
+                }).toList();
+        dto.setTags(tagDtos);
+
+        return dto;
+    }
+
 }
