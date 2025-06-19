@@ -2,12 +2,12 @@ package com.boot.loiteMsBack.support.counsel.repository;
 
 import com.boot.loiteMsBack.support.counsel.entity.SupportCounselEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface SupportCounselRepository extends JpaRepository<SupportCounselEntity, Long> {
-    List<SupportCounselEntity> findByDeleteYn(String deleteYn);
-    List<SupportCounselEntity> findByDeleteYnAndCounselReplyContentIsNull(String deleteYn);
+public interface SupportCounselRepository extends JpaRepository<SupportCounselEntity, Long>, JpaSpecificationExecutor<SupportCounselEntity> {
+
     Optional<SupportCounselEntity> findByCounselIdAndDeleteYn(Long counselId, String deleteYn);
+
 }

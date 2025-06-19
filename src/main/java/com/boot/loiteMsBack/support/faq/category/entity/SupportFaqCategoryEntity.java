@@ -23,7 +23,7 @@ public class SupportFaqCategoryEntity {
     private String faqCategoryName;
 
     @Column(name = "FAQ_CATEGORY_ORDER")
-    private Integer faqCategoryOrder = 0;
+    private Integer faqCategoryOrder;
 
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
     private LocalDateTime createdAt;
