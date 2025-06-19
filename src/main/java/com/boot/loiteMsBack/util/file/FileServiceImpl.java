@@ -6,16 +6,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class FileServiceImpl implements FileService {
 
     private final FileStorageProperties fileProps;
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
 
     public FileServiceImpl(FileStorageProperties fileProps) {
         this.fileProps = fileProps;
     }
+
 
     @Override
     public FileUploadResult save(MultipartFile file, String category) {
@@ -49,6 +52,12 @@ public class FileServiceImpl implements FileService {
             // 접근 가능한 URL 경로 반환: 예) /uploads/product/파일명
             String urlPath = fileProps.getUploadUrlPrefix() + "/" + category + "/" + fileName;
             String physicalPath = dest.getAbsolutePath();
+
+            //파일 형식 유효성 검사
+            String extension = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+                throw new IllegalArgumentException("지원하지 않는 파일 형식입니다: " + extension);
+            }
 
             return new FileUploadResult(urlPath, physicalPath);
         } catch (IOException e) {

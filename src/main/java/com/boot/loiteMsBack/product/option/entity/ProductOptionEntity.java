@@ -32,10 +32,10 @@ public class ProductOptionEntity {
     private String optionValue;
 
     @Column(name = "OPTION_ADDITIONAL_PRICE")
-    private Integer optionAdditionalPrice;
+    private int optionAdditionalPrice;
 
     @Column(name = "OPTION_STOCK")
-    private Integer optionStock;
+    private int optionStock;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "OPTION_STYLE_TYPE", length = 30)
@@ -45,7 +45,7 @@ public class ProductOptionEntity {
     private String activeYn;
 
     @Column(name = "OPTION_SORT_ORDER")
-    private Integer optionSortOrder;
+    private int optionSortOrder;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

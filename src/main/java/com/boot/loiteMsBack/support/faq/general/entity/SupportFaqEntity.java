@@ -31,10 +31,10 @@ public class SupportFaqEntity {
     private SupportFaqCategoryEntity faqCategory;
 
     @Column(name = "DISPLAY_YN", nullable = false, length = 1, columnDefinition = "CHAR(1) DEFAULT 'Y' COMMENT '노출 여부'")
-    private String displayYn = "Y";
+    private String displayYn;
 
     @Column(name = "DELETE_YN", nullable = false, length = 1, columnDefinition = "CHAR(1) DEFAULT 'N' COMMENT '삭제 여부'")
-    private String deleteYn = "N";
+    private String deleteYn;
 
     @Column(name = "CREATED_AT", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '등록일'")
     private LocalDateTime createdAt;

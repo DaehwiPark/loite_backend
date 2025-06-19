@@ -26,11 +26,11 @@ public class ProductCategoryEntity {
     // 자기 자신을 참조하는 상위 카테고리
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CATEGORY_PARENT_ID")
-    private ProductCategoryEntity parentCategory;
+    private ProductCategoryEntity categoryParentId;
 
     // 자식 카테고리 목록 (양방향 매핑 시 사용)
     @Builder.Default
-    @OneToMany(mappedBy = "parentCategory")
+    @OneToMany(mappedBy = "categoryParentId")
     private List<ProductCategoryEntity> childCategories = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,10 +41,10 @@ public class ProductCategoryEntity {
     private String categoryName;
 
     @Column(name = "CATEGORY_DEPTH")
-    private int categoryDepth;
+    private Integer categoryDepth;
 
-    @Column(name = "SORT_ORDER")
-    private int sortOrder;
+    @Column(name = "CATEGORY_SORT_ORDER")
+    private int categorySortOrder;
 
     @Column(name = "ACTIVE_YN")
     private String activeYn;

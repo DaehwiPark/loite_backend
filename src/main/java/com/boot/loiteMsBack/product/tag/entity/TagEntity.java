@@ -19,4 +19,7 @@ public class TagEntity {
 
     @Column(name = "TAG_NAME", nullable = false, length = 100)
     private String tagName;
+
+    @Column(name = "ACTIVE_YN")
+    private String activeYn;
 }
