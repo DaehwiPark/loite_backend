@@ -8,16 +8,16 @@ import com.boot.loiteMsBack.support.counsel.error.CounselErrorCode;
 import com.boot.loiteMsBack.support.counsel.mapper.SupportCounselMapper;
 import com.boot.loiteMsBack.support.counsel.repository.SupportCounselRepository;
 import com.boot.loiteMsBack.global.error.exception.CustomException;
+import com.boot.loiteMsBack.support.counsel.spec.SupportCounselSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,27 +29,29 @@ public class SupportCounselServiceImpl implements SupportCounselService {
     @Override
     @Transactional(readOnly = true)
     public Page<SupportCounselDto> getPagedCounsel(String keyword, Pageable pageable) {
-        Page<SupportCounselEntity> page;
+        Specification<SupportCounselEntity> spec = SupportCounselSpecification.isNotDeleted();
+
         if (StringUtils.hasText(keyword)) {
-            page = supportCounselRepository.findByKeyword(keyword, pageable);
-        } else {
-            page = supportCounselRepository.findByDeleteYn("N", pageable);
+            spec = spec.and(SupportCounselSpecification.containsKeyword(keyword));
         }
+
+        Page<SupportCounselEntity> page = supportCounselRepository.findAll(spec, pageable);
         return page.map(supportCounselMapper::toDto);
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public Page<SupportCounselDto> getUnansweredPagedCounsel(String keyword, Pageable pageable) {
-        Page<SupportCounselEntity> page;
+        Specification<SupportCounselEntity> spec = SupportCounselSpecification.isNotDeleted()
+                .and(SupportCounselSpecification.isUnanswered());
 
-        if (keyword == null || keyword.trim().isEmpty()) {
-            page = supportCounselRepository.findUnansweredWithoutKeyword(pageable);
-        } else {
-            page = supportCounselRepository.findUnansweredWithKeyword(keyword, pageable);
+        if (StringUtils.hasText(keyword)) {
+            spec = spec.and(SupportCounselSpecification.containsKeyword(keyword));
         }
 
+        Page<SupportCounselEntity> page = supportCounselRepository.findAll(spec, pageable);
         return page.map(supportCounselMapper::toDto);
     }
-
 
     @Override
     @Transactional(readOnly = true)
