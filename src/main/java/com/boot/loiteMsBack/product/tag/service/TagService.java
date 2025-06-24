@@ -8,4 +8,5 @@ import java.util.List;
 public interface TagService {
     void saveTag(List<TagRequestDto> tagRequestDtoList);
     List<TagResponseDto> findAll();
+    void deleteTag(Long tagId);
 }

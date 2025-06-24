@@ -36,12 +36,15 @@ public class ProductEntity {
 
     //CREATOR_ID 추가
 
+    @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImageEntity> productImages = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductOptionEntity> productOptions = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductTagEntity> productTags = new ArrayList<>();
 
@@ -57,8 +60,9 @@ public class ProductEntity {
     @Column(name = "PRODUCT_DESCRIPTION")
     private String productDescription;
 
+    @Builder.Default
     @Column(name = "DELETE_YN")
-    private String deleteYn;
+    private String deleteYn = "N";
 
     @Column(name = "ACTIVE_YN")
     private String activeYn;

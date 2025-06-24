@@ -49,8 +49,9 @@ public class ProductCategoryEntity {
     @Column(name = "ACTIVE_YN")
     private String activeYn;
 
+    @Builder.Default
     @Column(name = "DELETE_YN")
-    private String deleteYn;
+    private String deleteYn = "N";
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

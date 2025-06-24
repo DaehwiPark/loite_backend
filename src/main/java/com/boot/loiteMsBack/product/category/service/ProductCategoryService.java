@@ -8,4 +8,5 @@ import java.util.List;
 public interface ProductCategoryService {
     Long saveCategory(ProductCategoryRequestDto dto);
     List<ProductCategoryResponseDto> getAllCategory();
+    void deleteCategory(Long categoryId);
 }

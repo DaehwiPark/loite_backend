@@ -9,12 +9,12 @@ import java.util.List;
 
 public class ProductSpecification {
 
-    // 삭제 안 된 상품
+    // 삭제 여부 필터
     public static Specification<ProductEntity> isNotDeleted() {
         return (root, query, cb) -> cb.equal(root.get("deleteYn"), "N");
     }
 
-    // 키워드 검색: 상품명, 모델명, 요약 설명 중 하나라도 포함
+    // 키워드로 제목 또는 내용 검색
     public static Specification<ProductEntity> containsKeyword(String keyword) {
         return (root, query, cb) -> {
             if (keyword == null || keyword.isBlank()) return null;

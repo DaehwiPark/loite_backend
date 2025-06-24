@@ -5,6 +5,7 @@ import com.boot.loiteMsBack.product.brand.dto.ProductBrandResponseDto;
 import com.boot.loiteMsBack.product.brand.service.ProductBrandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +30,17 @@ public class ProductBrandController {
     @GetMapping
     public List<ProductBrandResponseDto> getBrands(){
         return productBrandService.getAllBrands();
+    }
+
+    @PutMapping("/{brandId}")
+    public ResponseEntity<Void> updateBrand(@PathVariable Long brandId, @RequestBody @Valid ProductBrandRequestDto dto) {
+        productBrandService.updateBrand(brandId, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{brandId}")
+    public ResponseEntity<String> deleteBrand(@PathVariable Long brandId){
+        productBrandService.deleteBrand(brandId);
+        return ResponseEntity.ok("브랜드가 삭제되었습니다.");
     }
 }

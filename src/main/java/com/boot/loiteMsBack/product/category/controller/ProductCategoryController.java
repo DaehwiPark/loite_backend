@@ -29,4 +29,11 @@ public class ProductCategoryController {
     public List<ProductCategoryResponseDto> getCategory(){
         return productCategoryService.getAllCategory();
     }
+
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId){
+        productCategoryService.deleteCategory(categoryId);
+        return ResponseEntity.ok("카테고리가 삭제되었습니다.");
+    }
+
 }

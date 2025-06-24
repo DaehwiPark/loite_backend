@@ -58,6 +58,7 @@ public class ProductController {
         return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
 
+    //상품 리스트 조회
     @GetMapping("/list")
     public ResponseEntity<Page<ProductListResponseDto>> getPagedProducts(
             @RequestParam(required = false) String keyword,

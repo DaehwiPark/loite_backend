@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/product/tag")
-@Tag(name = "Product Tag", description = "상품 태그 관리 API")
+@Tag(name = "Tag Management", description = "상품 태그 관리 API")
 public class TagController {
     private final TagService tagService;
 
@@ -27,4 +27,11 @@ public class TagController {
     public ResponseEntity<List<TagResponseDto>> getAll(){
         return ResponseEntity.ok(tagService.findAll());
     }
+
+    @DeleteMapping("/{tagId}")
+    public ResponseEntity<String> deleteTag(@PathVariable Long tagId){
+        tagService.deleteTag(tagId);
+        return ResponseEntity.ok("태그가 삭제되었습니다.");
+    }
+
 }

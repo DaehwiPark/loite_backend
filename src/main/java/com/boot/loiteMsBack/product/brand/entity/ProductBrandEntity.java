@@ -34,6 +34,10 @@ public class ProductBrandEntity {
     @Column(name = "ACTIVE_YN")
     private String activeYn;
 
+    @Builder.Default
+    @Column(name = "delete_yn", nullable = false, length = 1)
+    private String deleteYn = "N";
+
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 
