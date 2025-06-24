@@ -3,8 +3,12 @@ package com.boot.loiteMsBack.terms.controller;
 import com.boot.loiteMsBack.terms.dto.TermsDto;
 import com.boot.loiteMsBack.terms.service.TermsService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,10 +44,15 @@ public class TermsController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "이용약관 전체 조회", description = "모든 이용약관 목록을 조회합니다.")
+    @Operation(summary = "이용약관 목록 조회", description = "검색 키워드와 페이지네이션을 포함한 이용약관 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<List<TermsDto>> getAllTerms() {
-        return ResponseEntity.ok(termsService.getAllTerms());
+    public ResponseEntity<Page<TermsDto>> getPagedTerms(
+            @Parameter(description = "검색 키워드")
+            @RequestParam(required = false) String keyword,
+            @ParameterObject Pageable pageable) {
+
+        Page<TermsDto> result = termsService.getPagedTerms(keyword, pageable);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "이용약관 단일 조회", description = "지정한 ID의 이용약관을 조회합니다.")

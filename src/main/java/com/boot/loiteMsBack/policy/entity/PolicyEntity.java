@@ -16,25 +16,22 @@ public class PolicyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "POLICY_ID")
-    private Long id;
+    @Column(name = "POLICY_ID", columnDefinition = "BIGINT(20) COMMENT '정책 ID'")
+    private Long policyId;
 
-    @Column(name = "POLICY_TITLE", nullable = false)
-    private String title;
+    @Column(name = "POLICY_TITLE", nullable = false, columnDefinition = "VARCHAR(255) COMMENT '정책 제목'")
+    private String policyTitle;
 
-    @Column(name = "POLICY_CONTENT", nullable = false, columnDefinition = "TEXT")
-    private String content;
+    @Column(name = "POLICY_CONTENT", nullable = false, columnDefinition = "TEXT COMMENT '정책 본문 (HTML 포함)'")
+    private String policyContent;
 
-    @Column(name = "POLICY_VERSION", nullable = false, length = 20)
-    private String version;
+    @Column(name = "DISPLAY_YN", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y' COMMENT '노출 여부 (Y:노출/N:비노출)'")
+    private String displayYn;
 
-    @Column(name = "POLICY_IS_ACTIVE", nullable = false)
-    private Boolean isActive;
-
-    @Column(name = "CREATED_AT", updatable = false)
+    @Column(name = "CREATED_AT", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시'")
     private LocalDateTime createdAt;
 
-    @Column(name = "UPDATED_AT")
+    @Column(name = "UPDATED_AT", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시'")
     private LocalDateTime updatedAt;
 
     @PrePersist

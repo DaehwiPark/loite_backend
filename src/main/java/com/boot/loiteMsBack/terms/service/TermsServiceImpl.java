@@ -6,11 +6,10 @@ import com.boot.loiteMsBack.terms.entity.TermsEntity;
 import com.boot.loiteMsBack.terms.error.TermsErrorCode;
 import com.boot.loiteMsBack.terms.repository.TermsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -35,9 +34,8 @@ public class TermsServiceImpl implements TermsService {
         TermsEntity entity = termsRepository.findById(id)
                 .orElseThrow(() -> new CustomException(TermsErrorCode.NOT_FOUND));
 
-        entity.setTitle(dto.getTitle());
-        entity.setContent(dto.getContent());
-        entity.setVersion(dto.getVersion());
+        entity.setTermsTitle(dto.getTermsTitle());
+        entity.setTermsContent(dto.getTermsContent());
 
         TermsEntity updated = termsRepository.save(entity);
         return TermsDto.fromEntity(updated);
@@ -54,11 +52,11 @@ public class TermsServiceImpl implements TermsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TermsDto> getAllTerms() {
-        return termsRepository.findAll().stream()
-                .map(TermsDto::fromEntity)
-                .collect(Collectors.toList());
+    public Page<TermsDto> getPagedTerms(String keyword, Pageable pageable) {
+        Page<TermsEntity> termsPage = termsRepository.findByKeyword(keyword, pageable);
+        return termsPage.map(TermsDto::fromEntity);
     }
+
 
     @Override
     @Transactional(readOnly = true)
