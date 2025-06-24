@@ -14,19 +14,16 @@ import java.time.LocalDateTime;
 public class PolicyDto {
 
     @Schema(description = "정책 ID", example = "1")
-    private Long id;
+    private Long policyId;
 
     @Schema(description = "정책 제목", example = "개인정보 처리방침 동의서")
-    private String title;
+    private String policyTitle;
 
     @Schema(description = "정책 본문 (HTML 가능)", example = "<p>귀하의 개인정보는 다음과 같이 처리됩니다.</p>")
-    private String content;
+    private String policyContent;
 
-    @Schema(description = "정책 버전", example = "v1.0")
-    private String version;
-
-    @Schema(description = "현재 사용 여부", example = "true")
-    private Boolean isActive;
+    @Schema(description = "노출여부 (노출:Y/비노출:N")
+    private String displayYn;
 
     @Schema(description = "생성일시", example = "2024-06-01T10:00:00")
     private LocalDateTime createdAt;
@@ -36,11 +33,10 @@ public class PolicyDto {
 
     public static PolicyDto fromEntity(PolicyEntity entity) {
         return PolicyDto.builder()
-                .id(entity.getId())
-                .title(entity.getTitle())
-                .content(entity.getContent())
-                .version(entity.getVersion())
-                .isActive(entity.getIsActive())
+                .policyId(entity.getPolicyId())
+                .policyTitle(entity.getPolicyTitle())
+                .policyContent(entity.getPolicyContent())
+                .displayYn(entity.getDisplayYn())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -48,10 +44,9 @@ public class PolicyDto {
 
     public PolicyEntity toEntity() {
         return PolicyEntity.builder()
-                .title(this.title)
-                .content(this.content)
-                .version(this.version)
-                .isActive(this.isActive != null ? this.isActive : true)
+                .policyTitle(this.policyTitle)
+                .policyContent(this.policyContent)
+                .displayYn(this.displayYn)
                 .build();
     }
 }

@@ -6,9 +6,12 @@ import com.boot.loiteMsBack.policy.error.PolicyErrorCode;
 import com.boot.loiteMsBack.policy.repository.PolicyRepository;
 import com.boot.loiteMsBack.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Policy;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,10 +38,9 @@ public class PolicyServiceImpl implements PolicyService {
         PolicyEntity entity = policyRepository.findById(id)
                 .orElseThrow(() -> new CustomException(PolicyErrorCode.NOT_FOUND));
 
-        entity.setTitle(dto.getTitle());
-        entity.setContent(dto.getContent());
-        entity.setVersion(dto.getVersion());
-        entity.setIsActive(dto.getIsActive());
+        entity.setPolicyTitle(dto.getPolicyTitle());
+        entity.setPolicyContent(dto.getPolicyContent());
+        entity.setDisplayYn(dto.getDisplayYn());
 
         return PolicyDto.fromEntity(policyRepository.save(entity));
     }
@@ -62,10 +64,9 @@ public class PolicyServiceImpl implements PolicyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PolicyDto> getAll() {
-        return policyRepository.findAll()
-                .stream()
-                .map(PolicyDto::fromEntity)
-                .collect(Collectors.toList());
+    public Page<PolicyDto> getPagedPolicy(String keyword, Pageable pageable) {
+        Page<PolicyEntity> policyPage = policyRepository.findByKeyword(keyword, pageable);
+        return policyPage.map(PolicyDto::fromEntity);
     }
+
 }
