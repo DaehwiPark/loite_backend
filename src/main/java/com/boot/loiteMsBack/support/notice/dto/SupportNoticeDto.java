@@ -1,6 +1,6 @@
-package com.boot.loiteMsBack.notice.dto;
+package com.boot.loiteMsBack.support.notice.dto;
 
-import com.boot.loiteMsBack.notice.entity.NoticeEntity;
+import com.boot.loiteMsBack.support.notice.entity.SupportNoticeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "공지사항 DTO")
-public class NoticeDto {
+public class SupportNoticeDto {
 
     @Schema(description = "공지 ID", example = "1")
     private Long noticeId;
@@ -25,8 +25,11 @@ public class NoticeDto {
     @Schema(description = "조회수", example = "120")
     private Integer noticeViewCount;
 
-    @Schema(description = "삭제 여부", example = "Y/N")
-    private String deleteYn;
+    @Schema(description = "노출 여부", example = "Y")
+    private String displayYn;
+
+    @Schema(description = "상단 고정 여부", example = "Y")
+    private String pinnedYn;
 
     @Schema(description = "등록일", example = "2025-05-29T10:00:00")
     private LocalDateTime createdAt;
@@ -34,12 +37,13 @@ public class NoticeDto {
     @Schema(description = "수정일", example = "2025-05-29T10:00:00")
     private LocalDateTime updatedAt;
 
-    public NoticeDto(NoticeEntity entity) {
+    public SupportNoticeDto(SupportNoticeEntity entity) {
         this.noticeId = entity.getNoticeId();
         this.noticeTitle = entity.getNoticeTitle();
         this.noticeContent = entity.getNoticeContent();
         this.noticeViewCount = entity.getNoticeViewCount();
-        this.deleteYn = entity.getDeleteYn();
+        this.displayYn = entity.getDisplayYn();
+        this.pinnedYn = entity.getPinnedYn();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
     }
