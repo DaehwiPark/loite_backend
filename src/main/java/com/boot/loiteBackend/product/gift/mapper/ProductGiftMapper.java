@@ -2,7 +2,6 @@ package com.boot.loiteBackend.product.gift.mapper;
 
 import com.boot.loiteBackend.product.gift.entity.GiftEntity;
 import com.boot.loiteBackend.product.gift.entity.ProductGiftEntity;
-
 import com.boot.loiteBackend.product.product.entity.ProductEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
