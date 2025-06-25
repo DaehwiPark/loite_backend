@@ -1,0 +1,28 @@
+package com.boot.loiteBackend.support.resource.service;
+
+import com.boot.loiteBackend.product.product.dto.ProductSummaryDto;
+import com.boot.loiteBackend.support.resource.dto.SupportResourceDto;
+import com.boot.loiteBackend.support.resource.dto.SupportResourceRequestDto;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+public interface SupportResourceService {
+    List<ProductSummaryDto> getProductsList();
+
+    SupportResourceDto createResource(SupportResourceRequestDto requestDto, MultipartFile file);
+
+    SupportResourceDto updateResource(Long id, SupportResourceRequestDto request, MultipartFile file);
+
+    void deleteResource(Long id);
+
+    Page<SupportResourceDto> getPagedResources(String keyword, Pageable pageable);
+
+    SupportResourceDto getResourceById(Long id);
+
+    ResponseEntity<Resource> fileDownload(Long id);
+}
