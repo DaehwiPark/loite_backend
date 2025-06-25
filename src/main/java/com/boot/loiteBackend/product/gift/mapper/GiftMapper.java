@@ -1,8 +1,8 @@
-package com.boot.loiteMsBack.product.gift.mapper;
+package com.boot.loiteBackend.product.gift.mapper;
 
-import com.boot.loiteMsBack.product.gift.dto.GiftRequestDto;
-import com.boot.loiteMsBack.product.gift.dto.GiftResponseDto;
-import com.boot.loiteMsBack.product.gift.entity.GiftEntity;
+import com.boot.loiteBackend.product.gift.dto.GiftRequestDto;
+import com.boot.loiteBackend.product.gift.dto.GiftResponseDto;
+import com.boot.loiteBackend.product.gift.entity.GiftEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
