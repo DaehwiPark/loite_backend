@@ -1,6 +1,5 @@
 package com.boot.loiteBackend.product.gift.entity;
 
-
 import com.boot.loiteBackend.product.product.entity.ProductEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
