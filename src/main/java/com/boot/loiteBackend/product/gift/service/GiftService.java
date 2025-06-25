@@ -1,7 +1,7 @@
-package com.boot.loiteMsBack.product.gift.service;
+package com.boot.loiteBackend.product.gift.service;
 
-import com.boot.loiteMsBack.product.gift.dto.GiftRequestDto;
-import com.boot.loiteMsBack.product.gift.dto.GiftResponseDto;
+import com.boot.loiteBackend.product.gift.dto.GiftRequestDto;
+import com.boot.loiteBackend.product.gift.dto.GiftResponseDto;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-package com.boot.loiteMsBack.product.gift.controller;
+package com.boot.loiteBackend.product.gift.controller;
 
-import com.boot.loiteMsBack.product.gift.dto.GiftRequestDto;
-import com.boot.loiteMsBack.product.gift.dto.GiftResponseDto;
-import com.boot.loiteMsBack.product.gift.service.GiftService;
+import com.boot.loiteBackend.product.gift.dto.GiftRequestDto;
+import com.boot.loiteBackend.product.gift.dto.GiftResponseDto;
+import com.boot.loiteBackend.product.gift.service.GiftService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
