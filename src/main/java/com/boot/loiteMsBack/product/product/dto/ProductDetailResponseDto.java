@@ -20,6 +20,8 @@ public class ProductDetailResponseDto {
     private String productDescription;
     private BigDecimal productPrice;
     private BigDecimal productSupplyPrice;
+    private Integer discountRate;
+    private BigDecimal discountedPrice;
     private int productStock;
     private BigDecimal productDeliveryCharge;
     private BigDecimal productFreeDelivery;

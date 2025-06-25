@@ -5,6 +5,11 @@ import com.boot.loiteMsBack.product.brand.repository.ProductBrandRepository;
 import com.boot.loiteMsBack.product.category.entity.ProductCategoryEntity;
 import com.boot.loiteMsBack.product.category.repository.ProductCategoryRepository;
 import com.boot.loiteMsBack.product.general.ProductTagId;
+import com.boot.loiteMsBack.product.gift.entity.GiftEntity;
+import com.boot.loiteMsBack.product.gift.entity.ProductGiftEntity;
+import com.boot.loiteMsBack.product.gift.mapper.ProductGiftMapper;
+import com.boot.loiteMsBack.product.gift.repository.GiftRepository;
+import com.boot.loiteMsBack.product.gift.repository.ProductGiftRepository;
 import com.boot.loiteMsBack.product.option.entity.ProductOptionEntity;
 import com.boot.loiteMsBack.product.option.mapper.ProductOptionMapper;
 import com.boot.loiteMsBack.product.option.repository.ProductOptionRepository;
@@ -36,6 +41,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,9 +59,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductTagRepository productTagRepository;
     private final ProductCategoryRepository productCategoryRepository;
     private final TagRepository tagRepository;
+    private final GiftRepository giftRepository;
+    private final ProductGiftRepository productGiftRepository;
     private final ProductMapper productMapper;
     private final ProductImageMapper productImageMapper;
     private final ProductOptionMapper productOptionMapper;
+    private final ProductGiftMapper productGiftMapper;
     private final FileService fileService;
 
     @Override
@@ -70,7 +80,30 @@ public class ProductServiceImpl implements ProductService {
         //상품 등록
         ProductEntity product = productMapper.toEntity(dto);
         product.setProductBrand(brand);
+        product.setProductCategory(category);
+        product.setProductOptions(null);
+
+        BigDecimal price = dto.getProductPrice();
+        Integer rate = dto.getDiscountRate();
+        if (price != null && rate != null) {
+            BigDecimal discounted = price
+                    .multiply(BigDecimal.valueOf(100 - rate))
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            product.setDiscountedPrice(discounted);
+        }
+
         ProductEntity savedProduct = productRepository.save(product);
+
+        //사은품 연결
+        if (dto.getGiftIdList() != null && !dto.getGiftIdList().isEmpty()) {
+            List<GiftEntity> giftEntities = giftRepository.findAllById(dto.getGiftIdList());
+
+            List<ProductGiftEntity> giftMaps = giftEntities.stream()
+                    .map(gift -> productGiftMapper.toEntity(gift, savedProduct))
+                    .toList();
+
+            productGiftRepository.saveAll(giftMaps);
+        }
 
         // 이미지 등록
         List<ProductImageEntity> imageEntities = new ArrayList<>();
@@ -132,6 +165,7 @@ public class ProductServiceImpl implements ProductService {
                     return option;
                 })
                 .collect(Collectors.toList());
+
         productOptionRepository.saveAll(optionEntities);
 
         //태그 연결
@@ -186,11 +220,21 @@ public class ProductServiceImpl implements ProductService {
         product.setProductDescription(dto.getProductDescription());
         product.setProductPrice(dto.getProductPrice());
         product.setProductSupplyPrice(dto.getProductSupplyPrice());
+        product.setDiscountRate(dto.getDiscountRate());
         product.setProductStock(dto.getProductStock());
         product.setProductDeliveryCharge(dto.getProductDeliveryCharge());
         product.setProductFreeDelivery(dto.getProductFreeDelivery());
         product.setActiveYn(dto.getActiveYn());
         product.setDeleteYn(dto.getDeleteYn());
+
+        BigDecimal price = dto.getProductPrice();
+        Integer rate = dto.getDiscountRate();
+        if (price != null && rate != null) {
+            BigDecimal discounted = price
+                    .multiply(BigDecimal.valueOf(100 - rate))
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            product.setDiscountedPrice(discounted);
+        }
 
         productRepository.save(product);
 
@@ -300,6 +344,8 @@ public class ProductServiceImpl implements ProductService {
             dto.setActiveYn(product.getActiveYn());
             dto.setCreatedAt(product.getCreatedAt());
             dto.setProductPrice(product.getProductPrice());
+            dto.setDiscountRate(product.getDiscountRate());
+            dto.setDiscountedPrice(product.getDiscountedPrice());
             dto.setProductStock(product.getProductStock());
             dto.setSalesCount(product.getSalesCount());
             dto.setViewCount(product.getViewCount());
@@ -329,6 +375,8 @@ public class ProductServiceImpl implements ProductService {
         dto.setProductDescription(product.getProductDescription());
         dto.setProductPrice(product.getProductPrice());
         dto.setProductSupplyPrice(product.getProductSupplyPrice());
+        dto.setDiscountRate(product.getDiscountRate());
+        dto.setDiscountedPrice(product.getDiscountedPrice());
         dto.setProductStock(product.getProductStock());
         dto.setProductDeliveryCharge(product.getProductDeliveryCharge());
         dto.setProductFreeDelivery(product.getProductFreeDelivery());

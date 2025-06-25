@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/product/tag")
+@RequestMapping("api/admin/product/tag")
 @Tag(name = "Tag Management", description = "상품 태그 관리 API")
 public class TagController {
     private final TagService tagService;

@@ -23,6 +23,8 @@ public class ProductRequestDto {
     private String activeYn;
     private BigDecimal productPrice;
     private BigDecimal productSupplyPrice;
+    private Integer discountRate;
+    private BigDecimal discountedPrice;
     private int productStock;
     private String recommendedYn;
     private BigDecimal productDeliveryCharge;
@@ -30,6 +32,7 @@ public class ProductRequestDto {
     private int viewCount;
     private int salesCount;
 
+    private List<Long> giftIdList;
     private List<Long> tagIdList;
     List<ImageDto> productImages;
     List<ProductOptionRequestDto> productOptions;

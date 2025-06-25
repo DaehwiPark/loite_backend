@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/product/brand")
+@RequestMapping("/api/admin/product/brand")
 @Tag(name = "Brand Management", description = "브랜드 관리 API")
 public class ProductBrandController {
     private final ProductBrandService productBrandService;
@@ -27,17 +27,20 @@ public class ProductBrandController {
         return ResponseEntity.ok(savedId);
     }
 
+    @Operation(summary = "브랜드 조회", description = "브랜드를 조회합니다.")
     @GetMapping
     public List<ProductBrandResponseDto> getBrands(){
         return productBrandService.getAllBrands();
     }
 
+    @Operation(summary = "브랜드 수정", description = "브랜드를 수정합니다.")
     @PutMapping("/{brandId}")
     public ResponseEntity<Void> updateBrand(@PathVariable Long brandId, @RequestBody @Valid ProductBrandRequestDto dto) {
         productBrandService.updateBrand(brandId, dto);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "브랜드 삭제", description = "브랜드를 삭제합니다.")
     @DeleteMapping("/{brandId}")
     public ResponseEntity<String> deleteBrand(@PathVariable Long brandId){
         productBrandService.deleteBrand(brandId);

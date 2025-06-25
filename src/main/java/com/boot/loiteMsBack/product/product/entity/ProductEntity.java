@@ -73,6 +73,12 @@ public class ProductEntity {
     @Column(name = "PRODUCT_SUPPLY_PRICE")
     private BigDecimal productSupplyPrice;
 
+    @Column(name = "discount_rate")
+    private Integer discountRate;
+
+    @Column(name = "discounted_price")
+    private BigDecimal discountedPrice;
+
     @Column(name = "PRODUCT_STOCK")
     private int productStock;
 

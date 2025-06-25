@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/product/category")
+@RequestMapping("/api/admin/product/category")
 @Tag(name = "Category Management", description = "카테고리 관리 API")
 public class ProductCategoryController {
     private final ProductCategoryService productCategoryService;

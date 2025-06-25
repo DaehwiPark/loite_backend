@@ -18,6 +18,8 @@ public class ProductListResponseDto {
     private String productName;
     private String brandName;
     private BigDecimal productPrice;
+    private Integer discountRate;
+    private BigDecimal discountedPrice;
     private int productStock;
     private int viewCount;
     private int salesCount;
