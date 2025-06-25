@@ -1,0 +1,14 @@
+package com.boot.loiteBackend.admin.product.tag.dto;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class TagResponseDto {
+    private Long tagId;
+    private String tagName;
+    private String activeYn;
+}

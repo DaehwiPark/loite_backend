@@ -1,0 +1,14 @@
+package com.boot.loiteBackend.admin.support.counsel.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Schema(description = "1:1 문의 상태 변경 요청 DTO")
+@Data
+@NoArgsConstructor
+public class AdminSupportCounselStatusUpdateDto {
+
+    @Schema(description = "변경할 상태값", example = "완료")
+    private String status;
+}
