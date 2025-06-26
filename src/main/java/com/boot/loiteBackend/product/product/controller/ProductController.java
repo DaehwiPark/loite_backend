@@ -1,10 +1,9 @@
 package com.boot.loiteBackend.product.product.controller;
 
-import com.boot.loiteBackend.product.product.dto.ProductDetailResponseDto;
-import com.boot.loiteBackend.product.product.dto.ProductListResponseDto;
-import com.boot.loiteBackend.product.product.dto.ProductRequestDto;
-import com.boot.loiteBackend.product.product.dto.ProductUpdateRequestDto;
-import com.boot.loiteBackend.product.product.service.ProductService;
+import com.boot.loiteBackend.product.product.dto.AdminProductDetailResponseDto;
+import com.boot.loiteBackend.product.product.dto.AdminProductListResponseDto;
+import com.boot.loiteBackend.product.product.dto.AdminProductRequestDto;
+import com.boot.loiteBackend.product.product.service.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +24,17 @@ import java.util.List;
 @RequestMapping("/api/admin/product/product")
 @Tag(name = "Product Management", description = "상품 관리 API")
 public class ProductController {
-    private final ProductService productService;
+    private final AdminProductService adminProductService;
 
     @Operation(summary = "상품 등록", description = "상품을 등록합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerProduct(
-            @RequestPart("product") ProductRequestDto dto,
+            @RequestPart("product") AdminProductRequestDto dto,
             @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages,
             @RequestPart(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
     ) throws IOException {
         System.out.println(">>>> 컨트롤러 진입 확인");
-        Long savedId = productService.saveProduct(dto, thumbnailImages, mainThumbnailIndex);
+        Long savedId = adminProductService.saveProduct(dto, thumbnailImages, mainThumbnailIndex);
         return ResponseEntity.ok("ID가 " + savedId + "인 상품이 등록되었습니다.");
     }
 
@@ -43,36 +42,36 @@ public class ProductController {
     @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateProduct(
             @PathVariable Long productId,
-            @RequestPart("product") ProductRequestDto dto,
+            @RequestPart("product") AdminProductRequestDto dto,
             @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages,
             @RequestPart(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
     ) throws IOException {
         dto.setProductId(productId);
-        productService.updateProduct(dto, thumbnailImages, mainThumbnailIndex);
+        adminProductService.updateProduct(dto, thumbnailImages, mainThumbnailIndex);
         return ResponseEntity.ok("ID가 " + productId + "인 상품이 수정되었습니다.");
     }
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
-        productService.deleteProduct(productId);
+        adminProductService.deleteProduct(productId);
         return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
 
     //상품 리스트 조회
     @GetMapping("/list")
-    public ResponseEntity<Page<ProductListResponseDto>> getPagedProducts(
+    public ResponseEntity<Page<AdminProductListResponseDto>> getPagedProducts(
             @RequestParam(required = false) String keyword,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<ProductListResponseDto> result = productService.getPagedProducts(keyword, pageable);
+        Page<AdminProductListResponseDto> result = adminProductService.getPagedProducts(keyword, pageable);
         return ResponseEntity.ok(result);
     }
 
     // 상품 상세 조회
     @Operation(summary = "상품 상세 조회", description = "상품 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDetailResponseDto> getProductDetail(@PathVariable Long productId) {
-        ProductDetailResponseDto productDetail = productService.getAllProductDetail(productId);
+    public ResponseEntity<AdminProductDetailResponseDto> getProductDetail(@PathVariable Long productId) {
+        AdminProductDetailResponseDto productDetail = adminProductService.getAllProductDetail(productId);
         return ResponseEntity.ok(productDetail);
     }
 }

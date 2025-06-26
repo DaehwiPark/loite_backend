@@ -1,51 +1,45 @@
-package com.boot.loiteBackend.product.option.entity;
+package com.boot.loiteBackend.product.review.entity;
 
 import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.product.option.enums.OptionStyleType;
+import com.boot.loiteBackend.user.Entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_product_option")
+@Table(name = "tb_product_review")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductOptionEntity {
+public class AdminProductReviewEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "OPTION_ID")
-    private Long optionId;
+    @Column(name = "REVIEW_ID")
+    private Long reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_ID", nullable = false)
     private AdminProductEntity product;
 
-    @Column(name = "OPTION_TYPE", length = 100)
-    private String optionType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID", nullable = false)
+    private UserEntity user;
 
-    @Column(name = "OPTION_VALUE", length = 100)
-    private String optionValue;
+    @Column(name = "REVIEW_RATING", nullable = false)
+    private Integer reviewRating;
 
-    @Column(name = "OPTION_ADDITIONAL_PRICE")
-    private int optionAdditionalPrice;
-
-    @Column(name = "OPTION_STOCK")
-    private int optionStock;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "OPTION_STYLE_TYPE", length = 30)
-    private OptionStyleType optionStyleType;
+    @Column(name = "REVIEW_CONTENT", columnDefinition = "TEXT")
+    private String reviewContent;
 
     @Column(name = "ACTIVE_YN", length = 100)
     private String activeYn;
 
-    @Column(name = "OPTION_SORT_ORDER")
-    private int optionSortOrder;
+    @Column(name = "HELPFUL_COUNT")
+    private Integer helpfulCount;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
@@ -57,6 +51,9 @@ public class ProductOptionEntity {
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        if (this.helpfulCount == null) {
+            this.helpfulCount = 0;
+        }
     }
 
     @PreUpdate

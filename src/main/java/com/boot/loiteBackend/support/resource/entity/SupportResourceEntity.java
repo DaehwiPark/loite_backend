@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.support.resource.entity;
 
-import com.boot.loiteBackend.product.product.entity.ProductEntity;
+import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +22,7 @@ public class SupportResourceEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_ID", referencedColumnName = "PRODUCT_ID")
-    private ProductEntity product;
+    private AdminProductEntity product;
 
     @Column(name = "RESOURCE_FILE_NAME", nullable = false, length = 255)
     private String resourceFileName;
