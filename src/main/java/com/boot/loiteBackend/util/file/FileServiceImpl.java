@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.util.file;
 
-import com.boot.loiteBackend.config.FileStorageProperties;
+import com.boot.loiteBackend.global.config.FileStorageProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

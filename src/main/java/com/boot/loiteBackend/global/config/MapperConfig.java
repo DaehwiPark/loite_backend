@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.config;
+package com.boot.loiteBackend.global.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
