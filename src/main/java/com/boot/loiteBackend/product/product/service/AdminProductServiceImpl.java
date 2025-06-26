@@ -10,7 +10,7 @@ import com.boot.loiteBackend.product.gift.entity.AdminProductGiftEntity;
 import com.boot.loiteBackend.product.gift.mapper.AdminProductGiftMapper;
 import com.boot.loiteBackend.product.gift.repository.AdminGiftRepository;
 import com.boot.loiteBackend.product.gift.repository.AdminProductGiftRepository;
-import com.boot.loiteBackend.product.option.entity.ProductOptionEntity;
+import com.boot.loiteBackend.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.product.option.mapper.AdminProductOptionMapper;
 import com.boot.loiteBackend.product.option.repository.AdminProductOptionRepository;
 import com.boot.loiteBackend.product.product.dto.*;
@@ -144,9 +144,9 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         //옵션 연결
-        List<ProductOptionEntity> optionEntities = dto.getProductOptions().stream()
+        List<AdminProductOptionEntity> optionEntities = dto.getProductOptions().stream()
                 .map(optionDto -> {
-                    ProductOptionEntity option = adminProductOptionMapper.toEntity(optionDto);
+                    AdminProductOptionEntity option = adminProductOptionMapper.toEntity(optionDto);
                     option.setProduct(savedProduct);
                     return option;
                 })
@@ -226,9 +226,9 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         //기존 옵션 삭제 후 재삽입
         adminProductOptionRepository.deleteByProduct(product);
-        List<ProductOptionEntity> optionEntities = dto.getProductOptions().stream()
+        List<AdminProductOptionEntity> optionEntities = dto.getProductOptions().stream()
                 .map(optionDto -> {
-                    ProductOptionEntity option = adminProductOptionMapper.toEntity(optionDto);
+                    AdminProductOptionEntity option = adminProductOptionMapper.toEntity(optionDto);
                     option.setProduct(product);
                     return option;
                 }).toList();

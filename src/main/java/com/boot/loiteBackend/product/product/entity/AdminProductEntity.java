@@ -2,7 +2,7 @@ package com.boot.loiteBackend.product.product.entity;
 
 import com.boot.loiteBackend.product.brand.entity.AdminProductBrandEntity;
 import com.boot.loiteBackend.product.category.entity.AdminProductCategoryEntity;
-import com.boot.loiteBackend.product.option.entity.ProductOptionEntity;
+import com.boot.loiteBackend.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.product.section.entity.AdminProductSectionEntity;
 import com.boot.loiteBackend.product.tag.entity.AdminProductTagEntity;
 import jakarta.persistence.*;
@@ -43,7 +43,7 @@ public class AdminProductEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductOptionEntity> productOptions = new ArrayList<>();
+    private List<AdminProductOptionEntity> productOptions = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)

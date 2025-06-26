@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/product/product")
 @Tag(name = "Product Management", description = "상품 관리 API")
-public class ProductController {
+public class AdminProductController {
     private final AdminProductService adminProductService;
 
     @Operation(summary = "상품 등록", description = "상품을 등록합니다.")
