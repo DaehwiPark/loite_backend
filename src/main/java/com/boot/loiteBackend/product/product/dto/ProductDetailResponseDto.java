@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.product.product.dto;
 
+import com.boot.loiteBackend.product.section.dto.ProductSectionResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +17,6 @@ public class ProductDetailResponseDto {
     private String productName;
     private String productModelName;
     private String productSummary;
-    private String productDescription;
     private BigDecimal productPrice;
     private BigDecimal productSupplyPrice;
     private Integer discountRate;
@@ -26,6 +26,7 @@ public class ProductDetailResponseDto {
     private BigDecimal productFreeDelivery;
     private String activeYn;
     private String deleteYn;
+    private String mainExposureYn;
     private String recommendedYn;
     private Long productBrandId;
     private String brandName;
@@ -34,6 +35,7 @@ public class ProductDetailResponseDto {
     private List<TagDto> tags;
     private List<ImageDto> productImages;
     private List<ProductOptionDto> productOptions;
+    private List<ProductSectionResponseDto> productSections;
 
     @Getter
     @Setter

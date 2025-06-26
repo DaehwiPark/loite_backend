@@ -3,6 +3,7 @@ package com.boot.loiteBackend.product.product.controller;
 import com.boot.loiteBackend.product.product.dto.ProductDetailResponseDto;
 import com.boot.loiteBackend.product.product.dto.ProductListResponseDto;
 import com.boot.loiteBackend.product.product.dto.ProductRequestDto;
+import com.boot.loiteBackend.product.product.dto.ProductUpdateRequestDto;
 import com.boot.loiteBackend.product.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,26 +31,25 @@ public class ProductController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerProduct(
             @RequestPart("product") ProductRequestDto dto,
-            @RequestPart("thumbnailImages") List<MultipartFile> thumbnailImages,
-            @RequestPart("detailImages") List<MultipartFile> detailImages,
-            @RequestPart("mainThumbnailIndex") Integer mainThumbnailIndex
+            @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages,
+            @RequestPart(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
     ) throws IOException {
-        Long savedId = productService.saveProduct(dto, thumbnailImages, detailImages, mainThumbnailIndex);
-        return ResponseEntity.ok("ID가 " +savedId + "인 상품이 등록되었습니다.");
+        System.out.println(">>>> 컨트롤러 진입 확인");
+        Long savedId = productService.saveProduct(dto, thumbnailImages, mainThumbnailIndex);
+        return ResponseEntity.ok("ID가 " + savedId + "인 상품이 등록되었습니다.");
     }
 
     @Operation(summary = "상품 수정", description = "상품을 수정합니다.")
-    @PutMapping("/{productId}")
+    @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateProduct(
             @PathVariable Long productId,
             @RequestPart("product") ProductRequestDto dto,
             @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages,
-            @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
-            @RequestParam(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
+            @RequestPart(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
     ) throws IOException {
         dto.setProductId(productId);
-        productService.updateProduct(dto, thumbnailImages, detailImages, mainThumbnailIndex);
-        return ResponseEntity.ok("ID가 " +productId + "인 상품이 수정되었습니다.");
+        productService.updateProduct(dto, thumbnailImages, mainThumbnailIndex);
+        return ResponseEntity.ok("ID가 " + productId + "인 상품이 수정되었습니다.");
     }
 
     @DeleteMapping("/{productId}")

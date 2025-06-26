@@ -3,6 +3,7 @@ package com.boot.loiteBackend.product.product.entity;
 import com.boot.loiteBackend.product.brand.entity.ProductBrandEntity;
 import com.boot.loiteBackend.product.category.entity.ProductCategoryEntity;
 import com.boot.loiteBackend.product.option.entity.ProductOptionEntity;
+import com.boot.loiteBackend.product.section.entity.ProductSectionEntity;
 import com.boot.loiteBackend.product.tag.entity.ProductTagEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,6 +49,10 @@ public class ProductEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductTagEntity> productTags = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductSectionEntity> productSections = new ArrayList<>();
+
     @Column(name = "PRODUCT_NAME", nullable = false, length = 100)
     private String productName;
 
@@ -57,15 +62,15 @@ public class ProductEntity {
     @Column(name = "PRODUCT_SUMMARY")
     private String productSummary;
 
-    @Column(name = "PRODUCT_DESCRIPTION")
-    private String productDescription;
-
     @Builder.Default
     @Column(name = "DELETE_YN")
     private String deleteYn = "N";
 
     @Column(name = "ACTIVE_YN")
     private String activeYn;
+
+    @Column(name = "main_exposure_yn", columnDefinition = "CHAR(1) DEFAULT 'N'")
+    private String mainExposureYn;
 
     @Column(name = "PRODUCT_PRICE")
     private BigDecimal productPrice;
@@ -113,4 +118,6 @@ public class ProductEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+
 }

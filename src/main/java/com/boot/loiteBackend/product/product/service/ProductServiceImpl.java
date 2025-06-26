@@ -13,10 +13,7 @@ import com.boot.loiteBackend.product.gift.repository.ProductGiftRepository;
 import com.boot.loiteBackend.product.option.entity.ProductOptionEntity;
 import com.boot.loiteBackend.product.option.mapper.ProductOptionMapper;
 import com.boot.loiteBackend.product.option.repository.ProductOptionRepository;
-import com.boot.loiteBackend.product.product.dto.ProductDetailResponseDto;
-import com.boot.loiteBackend.product.product.dto.ProductImageRequestDto;
-import com.boot.loiteBackend.product.product.dto.ProductListResponseDto;
-import com.boot.loiteBackend.product.product.dto.ProductRequestDto;
+import com.boot.loiteBackend.product.product.dto.*;
 import com.boot.loiteBackend.product.product.entity.ProductEntity;
 import com.boot.loiteBackend.product.product.entity.ProductImageEntity;
 import com.boot.loiteBackend.product.product.enums.ImageType;
@@ -25,6 +22,9 @@ import com.boot.loiteBackend.product.product.mapper.ProductMapper;
 import com.boot.loiteBackend.product.product.repository.ProductImageRepository;
 import com.boot.loiteBackend.product.product.repository.ProductRepository;
 import com.boot.loiteBackend.product.product.spec.ProductSpecification;
+import com.boot.loiteBackend.product.section.dto.ProductSectionResponseDto;
+import com.boot.loiteBackend.product.section.mapper.ProductSectionMapper;
+import com.boot.loiteBackend.product.section.service.ProductSectionService;
 import com.boot.loiteBackend.product.tag.entity.ProductTagEntity;
 import com.boot.loiteBackend.product.tag.entity.TagEntity;
 import com.boot.loiteBackend.product.tag.repository.ProductTagRepository;
@@ -65,10 +65,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageMapper productImageMapper;
     private final ProductOptionMapper productOptionMapper;
     private final ProductGiftMapper productGiftMapper;
+    private final ProductSectionMapper productSectionMapper;
     private final FileService fileService;
+    private final ProductSectionService productSectionService;
 
     @Override
-    public Long saveProduct(ProductRequestDto dto, List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages, Integer mainIndex) throws IOException {
+    public Long saveProduct(ProductRequestDto dto, List<MultipartFile> thumbnailImages, Integer mainIndex) throws IOException {
         //브랜드 조회
         ProductBrandEntity brand = productBrandRepository.findById(dto.getProductBrandId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 브랜드가 존재하지 않습니다."));
@@ -93,6 +95,11 @@ public class ProductServiceImpl implements ProductService {
         }
 
         ProductEntity savedProduct = productRepository.save(product);
+
+        //섹션 등록
+        if (dto.getSections() != null && !dto.getSections().isEmpty()) {
+            productSectionService.saveSections(savedProduct, dto.getSections());
+        }
 
         //사은품 연결
         if (dto.getGiftIdList() != null && !dto.getGiftIdList().isEmpty()) {
@@ -132,27 +139,6 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        // 상세
-        if (detailImages != null && !detailImages.isEmpty()) {
-            for (int i = 0; i < detailImages.size(); i++) {
-                MultipartFile file = detailImages.get(i);
-                if (file == null || file.isEmpty()) continue;
-
-                FileUploadResult result = fileService.save(file, "product");
-                if (result == null) continue;
-
-                ProductImageRequestDto imageDto = new ProductImageRequestDto();
-                imageDto.setImageUrl(result.getUrlPath());
-                imageDto.setImagePath(result.getPhysicalPath());
-                imageDto.setImageType(ImageType.DETAIL.name());
-                imageDto.setImageSortOrder(i + 1);
-                imageDto.setActiveYn("Y");
-
-                ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
-                imageEntity.setProduct(savedProduct);
-                imageEntities.add(imageEntity);
-            }
-        }
         if (!imageEntities.isEmpty()) {
             productImageRepository.saveAll(imageEntities);
         }
@@ -194,7 +180,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateProduct(ProductRequestDto dto, List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages, Integer mainIndex) throws IOException {
+    public void updateProduct(ProductRequestDto dto, List<MultipartFile> thumbnailImages, Integer mainIndex) throws IOException {
         //상품 연결
         ProductEntity product = productRepository.findById(dto.getProductId())
                 .orElseThrow(()-> new IllegalArgumentException("상품이 존재하지 않습니다."));
@@ -217,7 +203,6 @@ public class ProductServiceImpl implements ProductService {
         product.setProductName(dto.getProductName());
         product.setProductModelName(dto.getProductModelName());
         product.setProductSummary(dto.getProductSummary());
-        product.setProductDescription(dto.getProductDescription());
         product.setProductPrice(dto.getProductPrice());
         product.setProductSupplyPrice(dto.getProductSupplyPrice());
         product.setDiscountRate(dto.getDiscountRate());
@@ -226,6 +211,7 @@ public class ProductServiceImpl implements ProductService {
         product.setProductFreeDelivery(dto.getProductFreeDelivery());
         product.setActiveYn(dto.getActiveYn());
         product.setDeleteYn(dto.getDeleteYn());
+        product.setMainExposureYn(dto.getMainExposureYn());
 
         BigDecimal price = dto.getProductPrice();
         Integer rate = dto.getDiscountRate();
@@ -263,6 +249,11 @@ public class ProductServiceImpl implements ProductService {
             productTagRepository.saveAll(tagMaps);
         }
 
+        // 기존 섹션 삭제 후 재삽입
+        if (dto.getSections() != null && !dto.getSections().isEmpty()) {
+            productSectionService.updateSections(product, dto.getSections());
+        }
+
         //기존 이미지 삭제 후 재삽입
         productImageRepository.deleteByProduct(product);
         List<ProductImageEntity> imageEntities = new ArrayList<>();
@@ -291,27 +282,6 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        // 상세
-        if (detailImages != null && !detailImages.isEmpty()) {
-            for (int i = 0; i < detailImages.size(); i++) {
-                MultipartFile file = detailImages.get(i);
-                if (file == null || file.isEmpty()) continue;
-
-                FileUploadResult result = fileService.save(file, "product");
-                if (result == null) continue;
-
-                ProductImageRequestDto imageDto = new ProductImageRequestDto();
-                imageDto.setImageUrl(result.getUrlPath());
-                imageDto.setImagePath(result.getPhysicalPath());
-                imageDto.setImageType(ImageType.DETAIL.name());
-                imageDto.setImageSortOrder(i + 1);
-                imageDto.setActiveYn("Y");
-
-                ProductImageEntity imageEntity = productImageMapper.toEntity(imageDto);
-                imageEntity.setProduct(product);
-                imageEntities.add(imageEntity);
-            }
-        }
         if (!imageEntities.isEmpty()) {
             productImageRepository.saveAll(imageEntities);
         }
@@ -372,7 +342,6 @@ public class ProductServiceImpl implements ProductService {
         dto.setProductName(product.getProductName());
         dto.setProductModelName(product.getProductModelName());
         dto.setProductSummary(product.getProductSummary());
-        dto.setProductDescription(product.getProductDescription());
         dto.setProductPrice(product.getProductPrice());
         dto.setProductSupplyPrice(product.getProductSupplyPrice());
         dto.setDiscountRate(product.getDiscountRate());
@@ -382,7 +351,15 @@ public class ProductServiceImpl implements ProductService {
         dto.setProductFreeDelivery(product.getProductFreeDelivery());
         dto.setDeleteYn(product.getDeleteYn());
         dto.setActiveYn(product.getActiveYn());
+        dto.setMainExposureYn(product.getMainExposureYn());
         dto.setRecommendedYn(product.getRecommendedYn());
+
+        //섹션
+        List<ProductSectionResponseDto> sectionDtos = product.getProductSections().stream()
+                .map(productSectionMapper::toDto)
+                .toList();
+
+        dto.setProductSections(sectionDtos);
 
         // 브랜드
         if (product.getProductBrand() != null) {

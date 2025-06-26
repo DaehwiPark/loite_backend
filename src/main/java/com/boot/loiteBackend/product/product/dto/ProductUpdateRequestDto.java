@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductRequestDto {
+public class ProductUpdateRequestDto {
     private Long productId;
     private Long productBrandId;
     private Long categoryId;
