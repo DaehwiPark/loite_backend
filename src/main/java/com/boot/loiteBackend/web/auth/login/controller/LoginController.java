@@ -1,11 +1,13 @@
+// 📁 com.boot.loiteBackend.web.auth.login.controller.LoginController
+
 package com.boot.loiteBackend.web.auth.login.controller;
 
 import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.web.auth.login.dto.LoginRequestDto;
 import com.boot.loiteBackend.web.auth.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.web.auth.login.service.LoginService;
-import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
-import com.boot.loiteBackend.web.auth.token.repository.RefreshTokenRepository;
+import com.boot.loiteBackend.web.auth.token.service.RefreshTokenService;
 import com.boot.loiteBackend.web.user.dto.UserSummaryDto;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import com.boot.loiteBackend.web.user.repository.UserRepository;
@@ -28,7 +30,7 @@ public class LoginController {
 
     private final LoginService loginService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
 
     @Value("${spring.profiles.active:dev}")
@@ -38,27 +40,34 @@ public class LoginController {
         return "dev".equals(activeProfile);
     }
 
-    @Operation(summary = "로그인", description = "사용자의 이메일과 비밀번호를 검증하고, AccessToken을 쿠키로, RefreshToken은 DB에 저장합니다.")
+    @Operation(summary = "로그인", description = "사용자의 이메일과 비밀번호를 검증하고, AccessToken을 쿠키로, RefreshToken은 Redis에 저장합니다.")
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody LoginRequestDto dto,
             HttpServletResponse response
     ) {
+        // 1. 로그인 처리
         LoginResponseDto result = loginService.login(dto);
+        String accessToken = result.getAccessToken();
+        String refreshToken = result.getRefreshToken();
+        String username = jwtTokenProvider.getUsername(accessToken);
 
-        // AccessToken을 HttpOnly 쿠키로 설정
-        Cookie accessTokenCookie = new Cookie("AccessToken", result.getAccessToken());
-        accessTokenCookie.setHttpOnly(true);  // JavaScript에서 접근 불가 (XSS 방지)
-        accessTokenCookie.setPath("/");  // 모든 경로에 대해 쿠키 전송
-        accessTokenCookie.setMaxAge((int) jwtTokenProvider.getAccessTokenValidity() / 1000); // 쿠키 유효 기간 설정 (초 단위)
-        accessTokenCookie.setSecure(!isDev()); // HTTPS 연결에서만 전송되는 옵션
-        accessTokenCookie.setAttribute("SameSite", "Strict");  // CSRF 방지 (다른 도메인 요청 차단)
-
+        // 2. AccessToken → 쿠키로 전송
+        Cookie accessTokenCookie = new Cookie("AccessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge((int) jwtTokenProvider.getAccessTokenValidity() / 1000);
+        accessTokenCookie.setSecure(!isDev());
+        accessTokenCookie.setAttribute("SameSite", "Strict");
         response.addCookie(accessTokenCookie);
 
-        // 응답은 refreshToken만 반환 (accessToken은 쿠키로 전달)
+        // 3. RefreshToken → Redis 저장
+        long refreshTtlSeconds = jwtTokenProvider.getRefreshTokenValidity() / 1000;
+        refreshTokenService.saveRefreshToken(username, refreshToken, refreshTtlSeconds);
+
+        // 4. 응답 구성
         return ResponseEntity.ok(LoginResponseDto.builder()
-                .refreshToken(result.getRefreshToken())
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .build());
     }
@@ -67,9 +76,8 @@ public class LoginController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal CustomUserDetails userDetails,
                                        HttpServletResponse response) {
-        refreshTokenRepository.deleteById(userDetails.getUserId());
+        refreshTokenService.deleteRefreshToken(userDetails.getUsername()); // Redis 기준은 username
 
-        // AccessToken 쿠키 제거
         Cookie deleteCookie = new Cookie("AccessToken", null);
         deleteCookie.setHttpOnly(true);
         deleteCookie.setPath("/");
@@ -86,9 +94,9 @@ public class LoginController {
     @Operation(summary = "내 정보 조회", description = "로그인된 사용자의 정보를 반환합니다.")
     public ResponseEntity<UserSummaryDto> myInfo(@AuthenticationPrincipal CustomUserDetails user) {
         if (user == null) {
-            // 인증되지 않은 경우 401 반환
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
         UserEntity userEntity = userRepository.findById(user.getUserId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 

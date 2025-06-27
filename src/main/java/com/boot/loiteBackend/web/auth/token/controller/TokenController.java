@@ -4,20 +4,17 @@ import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.web.auth.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.web.auth.token.dto.RefreshRequestDto;
-import com.boot.loiteBackend.web.auth.token.entity.RefreshTokenEntity;
 import com.boot.loiteBackend.web.auth.token.error.RefreshErrorCode;
+import com.boot.loiteBackend.web.auth.token.redis.RefreshToken;
 import com.boot.loiteBackend.web.auth.token.repository.RefreshTokenRepository;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import com.boot.loiteBackend.web.user.repository.UserRepository;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,31 +31,30 @@ public class TokenController {
             @RequestBody RefreshRequestDto dto,
             HttpServletResponse response
     ) {
-        // 1. DB 조회
-        RefreshTokenEntity refreshToken = refreshTokenRepository.findByRefreshToken(dto.getRefreshToken())
+        // 1. RefreshToken 파싱하여 username 추출
+        String username = jwtTokenProvider.getUsername(dto.getRefreshToken());
+
+        // 2. Redis에서 토큰 조회
+        RefreshToken storedToken = refreshTokenRepository.findById(username)
                 .orElseThrow(() -> new CustomException(RefreshErrorCode.NOT_FOUND));
 
-        // 2. 만료 확인
-        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new CustomException(RefreshErrorCode.EXPIRED);
+        // 3. 토큰 값 검증
+        if (!storedToken.getToken().equals(dto.getRefreshToken())) {
+            throw new CustomException(RefreshErrorCode.MISMATCH);
         }
 
-        // 3. 유저 정보 조회
-        UserEntity user = userRepository.findById(refreshToken.getUserId())
+        // 4. 사용자 정보 조회
+        UserEntity user = userRepository.findByUserEmail(username)
                 .orElseThrow(() -> new CustomException(RefreshErrorCode.NOT_FOUND));
 
-        // 4. AccessToken 재발급
+        // 5. 새로운 AccessToken 발급
         String newAccessToken = jwtTokenProvider.createToken(
                 user.getUserId(),
                 user.getUserEmail(),
                 user.getRole()
         );
 
-        // 5. refreshedAt 갱신
-        refreshToken.setRefreshedAt(LocalDateTime.now());
-        refreshTokenRepository.save(refreshToken);
-
-        // 6. AccessToken 쿠키로 전송
+        // 6. AccessToken을 쿠키로 설정
         Cookie accessTokenCookie = new Cookie("AccessToken", newAccessToken);
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setPath("/");
