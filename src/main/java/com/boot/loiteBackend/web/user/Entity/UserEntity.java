@@ -44,6 +44,9 @@ public class UserEntity {
     @Column(name = "AGREE_PRIVACY", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean agreePrivacy;
 
+    @Column(name = "AGREE_MARKETING", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean agreeMarketing;
+
     @Column(name = "EMAIL_VERIFIED", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean emailVerified;
 

@@ -37,6 +37,9 @@ public class UserDto {
     @Schema(description = "개인정보 수집 및 이용 동의 여부", example = "true")
     private Boolean agreePrivacy;
 
+    @Schema(description = "광고/마케팅 수신 동의 여부", example = "true")
+    private Boolean agreeMarketing;
+
     @Schema(description = "이메일 인증 여부", example = "true")
     private Boolean emailVerified;
 
