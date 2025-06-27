@@ -1,6 +1,6 @@
-package com.boot.loiteBackend.product.category.entity;
+package com.boot.loiteBackend.admin.product.category.entity;
 
-import com.boot.loiteBackend.product.brand.entity.AdminProductBrandEntity;
+import com.boot.loiteBackend.admin.product.brand.entity.AdminProductBrandEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

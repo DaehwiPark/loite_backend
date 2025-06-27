@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.section.repository;
+package com.boot.loiteBackend.admin.product.section.repository;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.product.section.entity.AdminProductSectionEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.section.entity.AdminProductSectionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

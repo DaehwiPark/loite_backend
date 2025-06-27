@@ -1,7 +1,8 @@
-package com.boot.loiteBackend.product.order.entity;
+package com.boot.loiteBackend.admin.product.order.entity;
 
-import com.boot.loiteBackend.product.order.enums.OrderStatusType;
-import com.boot.loiteBackend.user.Entity.UserEntity;
+
+import com.boot.loiteBackend.admin.product.order.enums.OrderStatusType;
+import com.boot.loiteBackend.admin.user.Entity.AdminUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,7 @@ public class AdminProductOrderEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
-    private UserEntity user;
+    private AdminUserEntity user;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ORDER_STATUS", length = 20)

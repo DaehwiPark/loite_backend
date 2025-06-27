@@ -1,9 +1,9 @@
-package com.boot.loiteBackend.product.product.controller;
+package com.boot.loiteBackend.admin.product.product.controller;
 
-import com.boot.loiteBackend.product.product.dto.AdminProductDetailResponseDto;
-import com.boot.loiteBackend.product.product.dto.AdminProductListResponseDto;
-import com.boot.loiteBackend.product.product.dto.AdminProductRequestDto;
-import com.boot.loiteBackend.product.product.service.AdminProductService;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductDetailResponseDto;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductListResponseDto;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductRequestDto;
+import com.boot.loiteBackend.admin.product.product.service.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

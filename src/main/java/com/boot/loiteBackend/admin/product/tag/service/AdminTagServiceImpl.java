@@ -1,11 +1,11 @@
-package com.boot.loiteBackend.product.tag.service;
+package com.boot.loiteBackend.admin.product.tag.service;
 
-import com.boot.loiteBackend.product.tag.dto.AdminTagRequestDto;
-import com.boot.loiteBackend.product.tag.dto.AdminTagResponseDto;
-import com.boot.loiteBackend.product.tag.entity.AdminTagEntity;
-import com.boot.loiteBackend.product.tag.mapper.AdminTagMapper;
-import com.boot.loiteBackend.product.tag.repository.AdminProductTagRepository;
-import com.boot.loiteBackend.product.tag.repository.AdminTagRepository;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagRequestDto;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagResponseDto;
+import com.boot.loiteBackend.admin.product.tag.entity.AdminTagEntity;
+import com.boot.loiteBackend.admin.product.tag.mapper.AdminTagMapper;
+import com.boot.loiteBackend.admin.product.tag.repository.AdminProductTagRepository;
+import com.boot.loiteBackend.admin.product.tag.repository.AdminTagRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

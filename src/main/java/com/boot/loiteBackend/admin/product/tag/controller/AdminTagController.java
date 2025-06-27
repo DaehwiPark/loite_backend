@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.tag.controller;
+package com.boot.loiteBackend.admin.product.tag.controller;
 
-import com.boot.loiteBackend.product.tag.dto.AdminTagRequestDto;
-import com.boot.loiteBackend.product.tag.dto.AdminTagResponseDto;
-import com.boot.loiteBackend.product.tag.service.AdminTagService;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagRequestDto;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagResponseDto;
+import com.boot.loiteBackend.admin.product.tag.service.AdminTagService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

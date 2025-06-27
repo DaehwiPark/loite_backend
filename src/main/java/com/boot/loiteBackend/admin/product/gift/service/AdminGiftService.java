@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.gift.service;
+package com.boot.loiteBackend.admin.product.gift.service;
 
-import com.boot.loiteBackend.product.gift.dto.AdminGiftRequestDto;
-import com.boot.loiteBackend.product.gift.dto.AdminGiftResponseDto;
+import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftRequestDto;
+import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftResponseDto;
 
 import java.util.List;
 

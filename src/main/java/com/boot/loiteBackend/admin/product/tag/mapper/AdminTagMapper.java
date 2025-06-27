@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.tag.mapper;
+package com.boot.loiteBackend.admin.product.tag.mapper;
 
-import com.boot.loiteBackend.product.tag.dto.AdminTagRequestDto;
-import com.boot.loiteBackend.product.tag.dto.AdminTagResponseDto;
-import com.boot.loiteBackend.product.tag.entity.AdminTagEntity;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagRequestDto;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagResponseDto;
+import com.boot.loiteBackend.admin.product.tag.entity.AdminTagEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

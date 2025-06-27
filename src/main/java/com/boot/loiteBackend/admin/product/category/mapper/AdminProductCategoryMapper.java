@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.category.mapper;
+package com.boot.loiteBackend.admin.product.category.mapper;
 
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryRequestDto;
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryResponseDto;
-import com.boot.loiteBackend.product.category.entity.AdminProductCategoryEntity;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryRequestDto;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryResponseDto;
+import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.section.service;
+package com.boot.loiteBackend.admin.product.section.service;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.product.section.dto.AdminProductSectionRequestDto;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.section.dto.AdminProductSectionRequestDto;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
-package com.boot.loiteBackend.product.product.entity;
+package com.boot.loiteBackend.admin.product.product.entity;
 
-import com.boot.loiteBackend.product.brand.entity.AdminProductBrandEntity;
-import com.boot.loiteBackend.product.category.entity.AdminProductCategoryEntity;
-import com.boot.loiteBackend.product.option.entity.AdminProductOptionEntity;
-import com.boot.loiteBackend.product.section.entity.AdminProductSectionEntity;
-import com.boot.loiteBackend.product.tag.entity.AdminProductTagEntity;
+import com.boot.loiteBackend.admin.product.brand.entity.AdminProductBrandEntity;
+import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
+import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
+import com.boot.loiteBackend.admin.product.section.entity.AdminProductSectionEntity;
+import com.boot.loiteBackend.admin.product.tag.entity.AdminProductTagEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

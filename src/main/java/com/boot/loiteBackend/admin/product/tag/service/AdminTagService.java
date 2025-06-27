@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.tag.service;
+package com.boot.loiteBackend.admin.product.tag.service;
 
-import com.boot.loiteBackend.product.tag.dto.AdminTagRequestDto;
-import com.boot.loiteBackend.product.tag.dto.AdminTagResponseDto;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagRequestDto;
+import com.boot.loiteBackend.admin.product.tag.dto.AdminTagResponseDto;
 
 import java.util.List;
 

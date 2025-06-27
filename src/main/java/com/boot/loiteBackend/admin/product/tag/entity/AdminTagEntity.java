@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.tag.entity;
+package com.boot.loiteBackend.admin.product.tag.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

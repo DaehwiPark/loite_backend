@@ -1,10 +1,10 @@
-package com.boot.loiteBackend.product.gift.service;
+package com.boot.loiteBackend.admin.product.gift.service;
 
-import com.boot.loiteBackend.product.gift.dto.AdminGiftRequestDto;
-import com.boot.loiteBackend.product.gift.dto.AdminGiftResponseDto;
-import com.boot.loiteBackend.product.gift.entity.AdminGiftEntity;
-import com.boot.loiteBackend.product.gift.mapper.AdminGiftMapper;
-import com.boot.loiteBackend.product.gift.repository.AdminGiftRepository;
+import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftRequestDto;
+import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftResponseDto;
+import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
+import com.boot.loiteBackend.admin.product.gift.mapper.AdminGiftMapper;
+import com.boot.loiteBackend.admin.product.gift.repository.AdminGiftRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.resource.service;
 
-import com.boot.loiteBackend.admin.product.product.dto.ProductSummaryDto;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductSummaryDto;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceDto;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceRequestDto;
 import org.springframework.core.io.Resource;
@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface AdminSupportResourceService {
-    List<ProductSummaryDto> getProductsList();
+    List<AdminProductSummaryDto> getProductsList();
 
     AdminSupportResourceDto createResource(AdminSupportResourceRequestDto requestDto, MultipartFile file);
 

@@ -1,10 +1,10 @@
-package com.boot.loiteBackend.product.brand.service;
+package com.boot.loiteBackend.admin.product.brand.service;
 
-import com.boot.loiteBackend.product.brand.Mapper.AdminProductBrandMapper;
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandRequestDto;
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandResponseDto;
-import com.boot.loiteBackend.product.brand.entity.AdminProductBrandEntity;
-import com.boot.loiteBackend.product.brand.repository.AdminProductBrandRepository;
+import com.boot.loiteBackend.admin.product.brand.Mapper.AdminProductBrandMapper;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandRequestDto;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandResponseDto;
+import com.boot.loiteBackend.admin.product.brand.entity.AdminProductBrandEntity;
+import com.boot.loiteBackend.admin.product.brand.repository.AdminProductBrandRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

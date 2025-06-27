@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.option.enums;
+package com.boot.loiteBackend.admin.product.option.enums;
 
 public enum OptionStyleType {
     DEFAULT,

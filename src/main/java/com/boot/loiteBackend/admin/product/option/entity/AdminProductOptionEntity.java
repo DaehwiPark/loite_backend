@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.option.entity;
+package com.boot.loiteBackend.admin.product.option.entity;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.product.option.enums.OptionStyleType;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.option.enums.OptionStyleType;
 import jakarta.persistence.*;
 import lombok.*;
 

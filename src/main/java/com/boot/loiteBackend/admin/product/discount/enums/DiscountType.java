@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.discount.enums;
+package com.boot.loiteBackend.admin.product.discount.enums;
 
 public enum DiscountType {
     FIXED,

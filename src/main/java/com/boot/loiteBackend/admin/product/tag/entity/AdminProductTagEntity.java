@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.tag.entity;
+package com.boot.loiteBackend.admin.product.tag.entity;
 
-import com.boot.loiteBackend.product.general.AdminProductTagId;
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.general.AdminProductTagId;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

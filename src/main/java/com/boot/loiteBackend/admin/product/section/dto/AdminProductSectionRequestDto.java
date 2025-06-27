@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.section.dto;
+package com.boot.loiteBackend.admin.product.section.dto;
 
 import lombok.Getter;
 import lombok.Setter;

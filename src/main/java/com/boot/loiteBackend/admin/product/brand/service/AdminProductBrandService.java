@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.brand.service;
+package com.boot.loiteBackend.admin.product.brand.service;
 
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandRequestDto;
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandResponseDto;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandRequestDto;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandResponseDto;
 
 import java.util.List;
 

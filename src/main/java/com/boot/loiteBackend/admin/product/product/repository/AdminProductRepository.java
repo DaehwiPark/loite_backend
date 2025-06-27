@@ -1,6 +1,6 @@
-package com.boot.loiteBackend.product.product.repository;
+package com.boot.loiteBackend.admin.product.product.repository;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

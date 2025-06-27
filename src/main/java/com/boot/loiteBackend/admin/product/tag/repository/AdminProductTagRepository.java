@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.tag.repository;
+package com.boot.loiteBackend.admin.product.tag.repository;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.product.tag.entity.AdminProductTagEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.tag.entity.AdminProductTagEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdminProductTagRepository extends JpaRepository<AdminProductTagEntity, Long> {

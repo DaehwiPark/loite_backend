@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.product.enums;
+package com.boot.loiteBackend.admin.product.product.enums;
 
 public enum ImageType {
     MAIN,

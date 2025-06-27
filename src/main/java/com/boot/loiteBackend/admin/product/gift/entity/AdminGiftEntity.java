@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.gift.entity;
+package com.boot.loiteBackend.admin.product.gift.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

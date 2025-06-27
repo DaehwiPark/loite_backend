@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.option.mapper;
+package com.boot.loiteBackend.admin.product.option.mapper;
 
-import com.boot.loiteBackend.product.option.dto.AdminProductOptionRequestDto;
-import com.boot.loiteBackend.product.option.entity.AdminProductOptionEntity;
+import com.boot.loiteBackend.admin.product.option.dto.AdminProductOptionRequestDto;
+import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

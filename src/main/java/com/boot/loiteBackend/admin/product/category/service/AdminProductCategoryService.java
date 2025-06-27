@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.category.service;
+package com.boot.loiteBackend.admin.product.category.service;
 
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryRequestDto;
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryResponseDto;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryRequestDto;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryResponseDto;
 
 import java.util.List;
 

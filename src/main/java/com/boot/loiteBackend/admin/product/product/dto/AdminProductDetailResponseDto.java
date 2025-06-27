@@ -1,6 +1,6 @@
-package com.boot.loiteBackend.product.product.dto;
+package com.boot.loiteBackend.admin.product.product.dto;
 
-import com.boot.loiteBackend.product.section.dto.AdminProductSectionResponseDto;
+import com.boot.loiteBackend.admin.product.section.dto.AdminProductSectionResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

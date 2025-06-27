@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.product.service;
+package com.boot.loiteBackend.admin.product.product.service;
 
-import com.boot.loiteBackend.product.product.dto.AdminProductDetailResponseDto;
-import com.boot.loiteBackend.product.product.dto.AdminProductRequestDto;
-import com.boot.loiteBackend.product.product.dto.AdminProductListResponseDto;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductDetailResponseDto;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductRequestDto;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductListResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;

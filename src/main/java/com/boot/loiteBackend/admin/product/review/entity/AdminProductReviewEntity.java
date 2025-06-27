@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.review.entity;
+package com.boot.loiteBackend.admin.product.review.entity;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.user.Entity.UserEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.user.Entity.AdminUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +27,7 @@ public class AdminProductReviewEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
-    private UserEntity user;
+    private AdminUserEntity user;
 
     @Column(name = "REVIEW_RATING", nullable = false)
     private Integer reviewRating;

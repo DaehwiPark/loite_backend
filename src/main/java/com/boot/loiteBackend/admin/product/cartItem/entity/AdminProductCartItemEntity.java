@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.cartItem.entity;
+package com.boot.loiteBackend.admin.product.cartItem.entity;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.user.Entity.UserEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.user.Entity.AdminUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +23,7 @@ public class AdminProductCartItemEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
-    private UserEntity USER;
+    private AdminUserEntity USER;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_ID")

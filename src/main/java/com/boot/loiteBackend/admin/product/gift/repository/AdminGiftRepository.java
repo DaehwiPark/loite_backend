@@ -1,7 +1,7 @@
-package com.boot.loiteBackend.product.gift.repository;
+package com.boot.loiteBackend.admin.product.gift.repository;
 
 
-import com.boot.loiteBackend.product.gift.entity.AdminGiftEntity;
+import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

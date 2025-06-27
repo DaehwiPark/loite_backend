@@ -1,6 +1,6 @@
-package com.boot.loiteBackend.product.product.spec;
+package com.boot.loiteBackend.admin.product.product.spec;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 

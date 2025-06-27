@@ -1,10 +1,10 @@
-package com.boot.loiteBackend.product.section.service;
+package com.boot.loiteBackend.admin.product.section.service;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.product.section.dto.AdminProductSectionRequestDto;
-import com.boot.loiteBackend.product.section.entity.AdminProductSectionEntity;
-import com.boot.loiteBackend.product.section.mapper.AdminProductSectionMapper;
-import com.boot.loiteBackend.product.section.repository.AdminProductSectionRepository;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.section.dto.AdminProductSectionRequestDto;
+import com.boot.loiteBackend.admin.product.section.entity.AdminProductSectionEntity;
+import com.boot.loiteBackend.admin.product.section.mapper.AdminProductSectionMapper;
+import com.boot.loiteBackend.admin.product.section.repository.AdminProductSectionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

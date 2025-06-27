@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.brand.controller;
+package com.boot.loiteBackend.admin.product.brand.controller;
 
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandRequestDto;
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandResponseDto;
-import com.boot.loiteBackend.product.brand.service.AdminProductBrandService;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandRequestDto;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandResponseDto;
+import com.boot.loiteBackend.admin.product.brand.service.AdminProductBrandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

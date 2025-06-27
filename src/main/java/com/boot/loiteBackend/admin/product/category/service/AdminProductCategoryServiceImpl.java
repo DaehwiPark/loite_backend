@@ -1,10 +1,10 @@
-package com.boot.loiteBackend.product.category.service;
+package com.boot.loiteBackend.admin.product.category.service;
 
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryRequestDto;
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryResponseDto;
-import com.boot.loiteBackend.product.category.entity.AdminProductCategoryEntity;
-import com.boot.loiteBackend.product.category.mapper.AdminProductCategoryMapper;
-import com.boot.loiteBackend.product.category.repository.AdminProductCategoryRepository;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryRequestDto;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryResponseDto;
+import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
+import com.boot.loiteBackend.admin.product.category.mapper.AdminProductCategoryMapper;
+import com.boot.loiteBackend.admin.product.category.repository.AdminProductCategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

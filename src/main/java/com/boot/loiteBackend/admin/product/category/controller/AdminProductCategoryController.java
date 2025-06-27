@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.category.controller;
+package com.boot.loiteBackend.admin.product.category.controller;
 
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryRequestDto;
-import com.boot.loiteBackend.product.category.dto.AdminProductCategoryResponseDto;
-import com.boot.loiteBackend.product.category.service.AdminProductCategoryService;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryRequestDto;
+import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryResponseDto;
+import com.boot.loiteBackend.admin.product.category.service.AdminProductCategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

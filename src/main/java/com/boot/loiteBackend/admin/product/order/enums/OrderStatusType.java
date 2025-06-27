@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.order.enums;
+package com.boot.loiteBackend.admin.product.order.enums;
 
 public enum OrderStatusType {
     PENDING,

@@ -2,9 +2,9 @@ package com.boot.loiteBackend.admin.support.resource.service;
 
 import com.boot.loiteBackend.config.FileStorageProperties;
 import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.admin.product.product.dto.ProductSummaryDto;
-import com.boot.loiteBackend.admin.product.product.entity.ProductEntity;
-import com.boot.loiteBackend.admin.product.product.repository.ProductRepository;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductSummaryDto;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.product.repository.AdminProductRepository;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceDto;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceRequestDto;
 import com.boot.loiteBackend.admin.support.resource.entity.AdminSupportResourceEntity;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class AdminSupportResourceServiceImpl implements AdminSupportResourceService {
 
     private final AdminSupportResourceRepository resourceRepository;
-    private final ProductRepository productRepository;
+    private final AdminProductRepository productRepository;
     private final FileService fileService;
     private final FileStorageProperties fileProps;
     private final AdminSupportResourceMapper adminSupportResourceMapper;
@@ -62,7 +62,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
         }
 
         try {
-            ProductEntity product = productRepository.findById(dto.getProductId())
+            AdminProductEntity product = productRepository.findById(dto.getProductId())
                     .orElseThrow(() -> new CustomException(AdminResourceErrorCode.INVALID_PRODUCT));
 
             AdminSupportResourceEntity entity = AdminSupportResourceEntity.builder()
@@ -108,7 +108,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
         AdminSupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminResourceErrorCode.NOT_FOUND));
 
-        ProductEntity product = productRepository.findById(request.getProductId())
+       AdminProductEntity product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new CustomException(AdminResourceErrorCode.INVALID_PRODUCT));
 
         entity.setProduct(product);
@@ -186,11 +186,11 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductSummaryDto> getProductsList() {
-        List<ProductEntity> products = productRepository.findProductsWithoutResource();
+    public List<AdminProductSummaryDto> getProductsList() {
+        List<AdminProductEntity> products = productRepository.findProductsWithoutResource();
 
         return products.stream()
-                .map(p -> ProductSummaryDto.builder()
+                .map(p -> AdminProductSummaryDto.builder()
                         .productId(p.getProductId())
                         .productName(p.getProductName())
                         .productModelName(p.getProductModelName())

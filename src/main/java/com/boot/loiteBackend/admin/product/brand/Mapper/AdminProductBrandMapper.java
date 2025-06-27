@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.brand.Mapper;
+package com.boot.loiteBackend.admin.product.brand.Mapper;
 
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandRequestDto;
-import com.boot.loiteBackend.product.brand.dto.AdminProductBrandResponseDto;
-import com.boot.loiteBackend.product.brand.entity.AdminProductBrandEntity;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandRequestDto;
+import com.boot.loiteBackend.admin.product.brand.dto.AdminProductBrandResponseDto;
+import com.boot.loiteBackend.admin.product.brand.entity.AdminProductBrandEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

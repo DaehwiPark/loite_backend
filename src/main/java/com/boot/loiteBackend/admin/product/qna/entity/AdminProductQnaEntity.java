@@ -1,7 +1,8 @@
-package com.boot.loiteBackend.product.qna.entity;
+package com.boot.loiteBackend.admin.product.qna.entity;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.user.Entity.UserEntity;
+import com.boot.loiteBackend.admin.user.Entity.AdminUserEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,7 @@ public class AdminProductQnaEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
-    private UserEntity user;
+    private AdminUserEntity user;
 
     @Column(name = "QNA_QUESTION", columnDefinition = "TEXT", nullable = false)
     private String qnaQuestion;

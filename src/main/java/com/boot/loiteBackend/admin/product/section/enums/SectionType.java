@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.section.enums;
+package com.boot.loiteBackend.admin.product.section.enums;
 
 public enum SectionType {
     DESIGN,

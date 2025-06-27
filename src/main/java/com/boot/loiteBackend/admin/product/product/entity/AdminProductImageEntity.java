@@ -1,6 +1,6 @@
-package com.boot.loiteBackend.product.product.entity;
+package com.boot.loiteBackend.admin.product.product.entity;
 
-import com.boot.loiteBackend.product.product.enums.ImageType;
+import com.boot.loiteBackend.admin.product.product.enums.ImageType;
 import jakarta.persistence.*;
 import lombok.*;
 

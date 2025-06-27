@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.product.dto;
+package com.boot.loiteBackend.admin.product.product.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

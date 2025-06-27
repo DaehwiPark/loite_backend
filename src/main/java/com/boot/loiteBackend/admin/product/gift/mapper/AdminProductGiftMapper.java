@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.product.gift.mapper;
+package com.boot.loiteBackend.admin.product.gift.mapper;
 
-import com.boot.loiteBackend.product.gift.entity.AdminGiftEntity;
-import com.boot.loiteBackend.product.gift.entity.AdminProductGiftEntity;
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
+import com.boot.loiteBackend.admin.product.gift.entity.AdminProductGiftEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

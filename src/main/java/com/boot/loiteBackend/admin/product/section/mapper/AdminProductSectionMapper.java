@@ -1,9 +1,9 @@
-package com.boot.loiteBackend.product.section.mapper;
+package com.boot.loiteBackend.admin.product.section.mapper;
 
-import com.boot.loiteBackend.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.product.section.dto.AdminProductSectionRequestDto;
-import com.boot.loiteBackend.product.section.dto.AdminProductSectionResponseDto;
-import com.boot.loiteBackend.product.section.entity.AdminProductSectionEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.section.dto.AdminProductSectionRequestDto;
+import com.boot.loiteBackend.admin.product.section.dto.AdminProductSectionResponseDto;
+import com.boot.loiteBackend.admin.product.section.entity.AdminProductSectionEntity;
 import org.springframework.stereotype.Component;
 
 @Component

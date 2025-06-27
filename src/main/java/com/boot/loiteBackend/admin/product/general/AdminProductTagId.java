@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.product.general;
+package com.boot.loiteBackend.admin.product.general;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
