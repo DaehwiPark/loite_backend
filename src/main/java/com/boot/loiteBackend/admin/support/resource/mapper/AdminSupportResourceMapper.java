@@ -2,7 +2,7 @@ package com.boot.loiteBackend.admin.support.resource.mapper;
 
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceDto;
 import com.boot.loiteBackend.admin.support.resource.entity.AdminSupportResourceEntity;
-import com.boot.loiteBackend.admin.product.product.entity.ProductEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ public class AdminSupportResourceMapper {
 
         AdminSupportResourceDto dto = modelMapper.map(entity, AdminSupportResourceDto.class);
 
-        ProductEntity product = entity.getProduct();
+        AdminProductEntity product = entity.getProduct();
         if (product != null) {
             dto.setProductId(product.getProductId());
             dto.setProductName(product.getProductName());

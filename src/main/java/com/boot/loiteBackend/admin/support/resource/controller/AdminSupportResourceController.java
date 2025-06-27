@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.resource.controller;
 
-import com.boot.loiteBackend.admin.product.product.dto.ProductSummaryDto;
+import com.boot.loiteBackend.admin.product.product.dto.AdminProductSummaryDto;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceDto;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceRequestDto;
 import com.boot.loiteBackend.admin.support.resource.service.AdminSupportResourceService;
@@ -31,8 +31,8 @@ public class AdminSupportResourceController {
 
     @Operation(summary = "설명서 미등록 제품 목록 조회", description = "아직 제품 설명서가 등록되지 않은 상품 목록을 조회합니다.")
     @GetMapping("/product")
-    public ResponseEntity<List<ProductSummaryDto>> getProductListWithoutResource() {
-        List<ProductSummaryDto> productList = adminSupportResourceService.getProductsList();
+    public ResponseEntity<List<AdminProductSummaryDto>> getProductListWithoutResource() {
+        List<AdminProductSummaryDto> productList = adminSupportResourceService.getProductsList();
         return ResponseEntity.ok(productList);
     }
 
