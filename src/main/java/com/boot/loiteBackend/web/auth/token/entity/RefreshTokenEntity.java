@@ -27,8 +27,18 @@ public class RefreshTokenEntity {
     @Column(name = "CREATED_AT", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @Column(name = "REFRESHED_AT", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime refreshedAt;
+
     @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.refreshedAt = now;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.refreshedAt = LocalDateTime.now();
     }
 }

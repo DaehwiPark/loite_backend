@@ -37,15 +37,20 @@ public class LoginServiceImpl implements LoginService {
             throw new CustomException(LoginErrorCode.INVALID_PASSWORD);
         }
 
-        // 3. 토큰 생성
-        String accessToken = jwtTokenProvider.createToken(user.getUserId(), user.getRole());
+        // 3. AccessToken + RefreshToken 생성 (이메일 추가)
+        String accessToken = jwtTokenProvider.createToken(
+                user.getUserId(),
+                user.getUserEmail(),   // username 필드로 사용
+                user.getRole()
+        );
+
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
-        // 4. 만료 시각 계산
+        // 4. Refresh Token 만료 시각 계산
         LocalDateTime expiry = LocalDateTime.now()
                 .plus(Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidity()));
 
-        // 5. Refresh Token DB 저장 (Upsert 방식)
+        // 5. Refresh Token 저장 (Upsert)
         RefreshTokenEntity tokenEntity = RefreshTokenEntity.builder()
                 .userId(user.getUserId())
                 .refreshToken(refreshToken)
@@ -53,7 +58,7 @@ public class LoginServiceImpl implements LoginService {
                 .build();
         refreshTokenRepository.save(tokenEntity);
 
-        // 6. 응답 객체 생성
+        // 6. 응답 반환
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

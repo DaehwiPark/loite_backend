@@ -5,16 +5,17 @@ import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -27,31 +28,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        // 1. AccessToken 쿠키에서 추출
+        if (request.getCookies() != null) {
+            token = Arrays.stream(request.getCookies())
+                    .filter(cookie -> "AccessToken".equals(cookie.getName()))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse(null);
+        }
 
+        // 2. 토큰 유효성 검사 및 사용자 정보 추출
+        if (token != null && jwtTokenProvider.validateToken(token)) {
             try {
-                if (jwtTokenProvider.validateToken(token)) {
-                    Long userId = jwtTokenProvider.getUserId(token);
-                    String role = jwtTokenProvider.getUserRole(token);
+                String tokenType = jwtTokenProvider.getTokenType(token);
 
-                    // CustomUserDetails 생성
-                    CustomUserDetails userDetails = new CustomUserDetails(userId, role);
-
-                    // Authentication 객체 생성 (UserDetails 기반)
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                // tokenType이 "access"인 경우만 인증 처리
+                if (!"access".equals(tokenType)) {
+                    logger.debug("JWT token is not access type. Skipping authentication.");
+                    filterChain.doFilter(request, response);
+                    return;
                 }
+
+                Long userId = jwtTokenProvider.getUserId(token);
+                String role = jwtTokenProvider.getUserRole(token);
+                String username = jwtTokenProvider.getUsername(token); // 변경된 key 사용
+
+                // 3. UserDetails 생성
+                CustomUserDetails userDetails = new CustomUserDetails(userId, role, username);
+
+                // 4. 인증 객체 생성 및 SecurityContext 설정
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
             } catch (JwtException | IllegalArgumentException e) {
                 logger.warn("Invalid JWT token", e);
             }
         }
 
+        // 5. 다음 필터로 전달
         filterChain.doFilter(request, response);
     }
 }
