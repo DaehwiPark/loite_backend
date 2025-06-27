@@ -12,7 +12,7 @@ import java.util.List;
 public interface AdminProductRepository extends JpaRepository<AdminProductEntity, Long> {
     @Query("""
         SELECT p FROM AdminProductEntity p
-        LEFT JOIN SupportResourceEntity r ON p.productId = r.product.productId
+        LEFT JOIN AdminSupportResourceEntity r ON p.productId = r.product.productId
         WHERE r.product IS NULL
           AND p.deleteYn = 'N'
     """)
