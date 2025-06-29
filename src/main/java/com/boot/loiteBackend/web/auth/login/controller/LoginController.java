@@ -50,7 +50,7 @@ public class LoginController {
         LoginResponseDto result = loginService.login(dto);
         String accessToken = result.getAccessToken();
         String refreshToken = result.getRefreshToken();
-        String username = jwtTokenProvider.getUsername(accessToken);
+        String userId = String.valueOf(jwtTokenProvider.getUserId(accessToken));
 
         // 2. AccessToken → 쿠키로 전송
         Cookie accessTokenCookie = new Cookie("AccessToken", accessToken);
@@ -63,7 +63,7 @@ public class LoginController {
 
         // 3. RefreshToken → Redis 저장
         long refreshTtlSeconds = jwtTokenProvider.getRefreshTokenValidity() / 1000;
-        refreshTokenService.saveRefreshToken(username, refreshToken, refreshTtlSeconds);
+        refreshTokenService.saveRefreshToken(userId, refreshToken, refreshTtlSeconds);
 
         // 4. 응답 구성
         return ResponseEntity.ok(LoginResponseDto.builder()
@@ -76,18 +76,20 @@ public class LoginController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal CustomUserDetails userDetails,
                                        HttpServletResponse response) {
-        refreshTokenService.deleteRefreshToken(userDetails.getUsername()); // Redis 기준은 username
+      // Redis에서 userId 기반으로 토큰 삭제
+      refreshTokenService.deleteRefreshToken(String.valueOf(userDetails.getUserId()));
 
-        Cookie deleteCookie = new Cookie("AccessToken", null);
-        deleteCookie.setHttpOnly(true);
-        deleteCookie.setPath("/");
-        deleteCookie.setMaxAge(0);
-        deleteCookie.setSecure(!isDev());
-        deleteCookie.setAttribute("SameSite", "Strict");
+      // AccessToken 쿠키 만료
+      Cookie deleteCookie = new Cookie("AccessToken", null);
+      deleteCookie.setHttpOnly(true);
+      deleteCookie.setPath("/");
+      deleteCookie.setMaxAge(0); // 즉시 만료
+      deleteCookie.setSecure(!isDev()); // dev 환경 여부에 따라 처리
+      deleteCookie.setAttribute("SameSite", "Strict");
 
-        response.addCookie(deleteCookie);
+      response.addCookie(deleteCookie);
 
-        return ResponseEntity.ok().build();
+      return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me")
