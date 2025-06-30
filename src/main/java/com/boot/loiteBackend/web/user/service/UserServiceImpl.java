@@ -23,16 +23,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long signup(UserCreateRequestDto dto) {
 
-        // 이메일 중복 검사
         if (userRepository.existsByUserEmail(dto.getUserEmail())) {
             throw new CustomException(UserErrorCode.EMAIL_DUPLICATED);
         }
 
-        // DTO → Entity 매핑
         UserEntity user = userMapper.toEntity(dto);
 
-        // 필드 후처리
-        user.setUserPassword(passwordEncoder.encode(dto.getUserPassword()));
+        user.setUserPassword(dto.getUserPassword());
         user.setUserBirthdate(LocalDate.parse(dto.getUserBirthdate()));
         user.setEmailVerified(false);
         user.setRole("USER");

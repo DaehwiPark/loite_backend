@@ -20,6 +20,10 @@ public class UserCreateRequestDto {
     @NotBlank
     private String userPassword;
 
+    @Schema(description = "비밀번호 확인", example = "password1234")
+    @NotBlank
+    private String userPasswordCheck;
+
     @Schema(description = "이름", example = "홍길동")
     @NotBlank
     private String userName;
