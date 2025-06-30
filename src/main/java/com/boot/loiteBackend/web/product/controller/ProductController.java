@@ -1,4 +1,40 @@
 package com.boot.loiteBackend.web.product.controller;
 
+import com.boot.loiteBackend.web.product.dto.ProductListResponseDto;
+import com.boot.loiteBackend.web.product.dto.ProductMainResponseDto;
+import com.boot.loiteBackend.web.product.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/public/product")
+@Tag(name = "Public Product List", description = "쇼핑몰 상품 조회 API")
 public class ProductController {
+
+    private final ProductService productService;
+
+    @Operation(summary = "메인페이지 상품 조회", description = "메인페이지 상품을 조회합니다.")
+    @GetMapping("/main")
+    public ResponseEntity<List<ProductMainResponseDto>> getMainProducts() {
+        List<ProductMainResponseDto> products = productService.getMainProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @Operation(summary = "상품리스트 페이지 목록 조회", description = "상품리스트 페이지 목록을 조회합니다.")
+    @GetMapping("/list")
+    public ResponseEntity<Page<ProductListResponseDto>> getListProducts(
+            @RequestParam Long categoryId,
+            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(productService.getListProducts(categoryId, pageable));
+    }
 }

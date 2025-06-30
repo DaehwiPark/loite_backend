@@ -33,7 +33,6 @@ public class AdminProductController {
             @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages,
             @RequestPart(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
     ) throws IOException {
-        System.out.println(">>>> 컨트롤러 진입 확인");
         Long savedId = adminProductService.saveProduct(dto, thumbnailImages, mainThumbnailIndex);
         return ResponseEntity.ok("ID가 " + savedId + "인 상품이 등록되었습니다.");
     }
@@ -58,6 +57,7 @@ public class AdminProductController {
     }
 
     //상품 리스트 조회
+    @Operation(summary = "상품 목록 조회", description = "상품 목록을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<Page<AdminProductListResponseDto>> getPagedProducts(
             @RequestParam(required = false) String keyword,
