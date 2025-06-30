@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.util.file;
+package com.boot.loiteBackend.global.util.file;
 
 import com.boot.loiteBackend.global.config.FileStorageProperties;
 import org.springframework.stereotype.Service;

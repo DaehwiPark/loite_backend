@@ -11,8 +11,8 @@ import com.boot.loiteBackend.admin.support.resource.entity.AdminSupportResourceE
 import com.boot.loiteBackend.admin.support.resource.error.AdminResourceErrorCode;
 import com.boot.loiteBackend.admin.support.resource.mapper.AdminSupportResourceMapper;
 import com.boot.loiteBackend.admin.support.resource.repository.AdminSupportResourceRepository;
-import com.boot.loiteBackend.util.file.FileService;
-import com.boot.loiteBackend.util.file.FileUploadResult;
+import com.boot.loiteBackend.global.util.file.FileService;
+import com.boot.loiteBackend.global.util.file.FileUploadResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

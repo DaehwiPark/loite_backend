@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum RefreshErrorCode implements ErrorCode {
+public enum TokenErrorCode implements ErrorCode {
 
     NOT_FOUND("REFRESH_001", "리프레시 토큰을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     EXPIRED("REFRESH_002", "리프레시 토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED),
