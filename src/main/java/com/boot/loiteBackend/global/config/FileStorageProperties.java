@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.config;
+package com.boot.loiteBackend.global.config;
 
 import lombok.Getter;
 import lombok.Setter;

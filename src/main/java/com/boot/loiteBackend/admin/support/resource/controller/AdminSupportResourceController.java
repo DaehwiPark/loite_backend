@@ -22,7 +22,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/support/resource")
+@RequestMapping("/api/admin/support/resource")
 @Tag(name = "고객센터 자료실 API", description = "고객센터 자료실 관련 API")
 public class AdminSupportResourceController {
 

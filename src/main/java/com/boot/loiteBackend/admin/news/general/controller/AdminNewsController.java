@@ -17,7 +17,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/news")
+@RequestMapping("/api/admin/news")
 @Tag(name = "새소식 API", description = "새소식(News) 등록, 조회, 수정, 삭제 기능을 제공합니다.")
 public class AdminNewsController {
 

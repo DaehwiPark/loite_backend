@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.resource.service;
 
-import com.boot.loiteBackend.config.FileStorageProperties;
+import com.boot.loiteBackend.global.config.FileStorageProperties;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.admin.product.product.dto.AdminProductSummaryDto;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
@@ -11,8 +11,8 @@ import com.boot.loiteBackend.admin.support.resource.entity.AdminSupportResourceE
 import com.boot.loiteBackend.admin.support.resource.error.AdminResourceErrorCode;
 import com.boot.loiteBackend.admin.support.resource.mapper.AdminSupportResourceMapper;
 import com.boot.loiteBackend.admin.support.resource.repository.AdminSupportResourceRepository;
-import com.boot.loiteBackend.util.file.FileService;
-import com.boot.loiteBackend.util.file.FileUploadResult;
+import com.boot.loiteBackend.global.util.file.FileService;
+import com.boot.loiteBackend.global.util.file.FileUploadResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

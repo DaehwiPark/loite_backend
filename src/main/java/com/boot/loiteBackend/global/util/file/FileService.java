@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.util.file;
+package com.boot.loiteBackend.global.util.file;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/policy")
+@RequestMapping("/api/admin/policy")
 @Tag(name = "개인정보처리방침 API", description = "개인정보 처리방침 등록, 수정, 삭제, 조회 기능을 제공합니다.")
 public class AdminPolicyController {
 
