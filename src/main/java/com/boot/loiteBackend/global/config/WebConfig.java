@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.global.config;
 
+import com.boot.loiteBackend.global.util.file.FileStorageProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.resource.service;
 
-import com.boot.loiteBackend.global.config.FileStorageProperties;
+import com.boot.loiteBackend.global.util.file.FileStorageProperties;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.admin.product.product.dto.AdminProductSummaryDto;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;

@@ -3,7 +3,7 @@ package com.boot.loiteBackend.web.auth.token.service;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.security.jwt.JwtCookieUtil;
 import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
-import com.boot.loiteBackend.web.auth.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.web.auth.token.dto.TokenRequestDto;
 import com.boot.loiteBackend.web.auth.token.error.TokenErrorCode;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
@@ -85,4 +85,32 @@ public class TokenServiceImpl implements TokenService {
             .tokenType("Bearer")
             .build();
   }
+
+  @Override
+  public LoginResponseDto getLoginToken(UserEntity user, HttpServletResponse response) {
+    // 1. AccessToken 발급
+    String accessToken = jwtTokenProvider.createToken(
+            user.getUserId(),
+            user.getUserEmail(),
+            user.getRole()
+    );
+
+    // 2. RefreshToken 발급
+    String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId());
+
+    // 3. RefreshToken Redis 저장
+    String key = String.valueOf(user.getUserId());
+    long expirationSeconds = jwtTokenProvider.getRefreshTokenValidity() / 1000;
+    saveRefreshToken(key, refreshToken, expirationSeconds);
+
+    // 4. AccessToken 쿠키 저장
+    jwtCookieUtil.addAccessTokenCookie(response, accessToken, jwtTokenProvider.getAccessTokenValidity() / 1000);
+
+    // 5. 응답 DTO 생성
+    return LoginResponseDto.builder()
+            .refreshToken(refreshToken)
+            .tokenType("Bearer")
+            .build();
+  }
+
 }

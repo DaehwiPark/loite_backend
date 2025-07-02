@@ -1,10 +1,14 @@
 package com.boot.loiteBackend.web.user.entity;
 
+import com.boot.loiteBackend.web.social.entity.UserSocialEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_user")
@@ -81,4 +85,8 @@ public class UserEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserSocialEntity> userSocials = new ArrayList<>();
+
 }
