@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface AdminProductService {
-    Long saveProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages, Integer mainIndex) throws IOException;
+    Long saveProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages);
 
-    void updateProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages, Integer mainIndex) throws IOException;
+    void updateProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages);
 
     Page<AdminProductListResponseDto> getPagedProducts(String keyword, Pageable pageable);
 

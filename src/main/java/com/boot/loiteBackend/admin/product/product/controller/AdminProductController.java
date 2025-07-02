@@ -24,16 +24,16 @@ import java.util.List;
 @RequestMapping("/api/admin/product/product")
 @Tag(name = "Product Management", description = "상품 관리 API")
 public class AdminProductController {
+
     private final AdminProductService adminProductService;
 
     @Operation(summary = "상품 등록", description = "상품을 등록합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerProduct(
             @RequestPart("product") AdminProductRequestDto dto,
-            @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages,
-            @RequestPart(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
+            @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages
     ) throws IOException {
-        Long savedId = adminProductService.saveProduct(dto, thumbnailImages, mainThumbnailIndex);
+        Long savedId = adminProductService.saveProduct(dto, thumbnailImages);
         return ResponseEntity.ok("ID가 " + savedId + "인 상품이 등록되었습니다.");
     }
 
@@ -42,11 +42,10 @@ public class AdminProductController {
     public ResponseEntity<String> updateProduct(
             @PathVariable Long productId,
             @RequestPart("product") AdminProductRequestDto dto,
-            @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages,
-            @RequestPart(value = "mainThumbnailIndex", required = false) Integer mainThumbnailIndex
+            @RequestPart(value = "thumbnailImages", required = false) List<MultipartFile> thumbnailImages
     ) throws IOException {
         dto.setProductId(productId);
-        adminProductService.updateProduct(dto, thumbnailImages, mainThumbnailIndex);
+        adminProductService.updateProduct(dto, thumbnailImages);
         return ResponseEntity.ok("ID가 " + productId + "인 상품이 수정되었습니다.");
     }
 
@@ -56,7 +55,6 @@ public class AdminProductController {
         return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
 
-    //상품 리스트 조회
     @Operation(summary = "상품 목록 조회", description = "상품 목록을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<Page<AdminProductListResponseDto>> getPagedProducts(
@@ -67,7 +65,6 @@ public class AdminProductController {
         return ResponseEntity.ok(result);
     }
 
-    // 상품 상세 조회
     @Operation(summary = "상품 상세 조회", description = "상품 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{productId}")
     public ResponseEntity<AdminProductDetailResponseDto> getProductDetail(@PathVariable Long productId) {
@@ -75,3 +72,4 @@ public class AdminProductController {
         return ResponseEntity.ok(productDetail);
     }
 }
+

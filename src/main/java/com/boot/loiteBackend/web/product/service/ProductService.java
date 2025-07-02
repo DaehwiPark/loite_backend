@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.web.product.service;
 
+import com.boot.loiteBackend.web.product.dto.ProductDetailResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductListResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductMainResponseDto;
 import org.springframework.data.domain.Page;
@@ -12,4 +13,5 @@ public interface ProductService {
 
     Page<ProductListResponseDto> getListProducts(Long categoryId, Pageable pageable);
 
+    ProductDetailResponseDto getDetailProducts(Long productId);
 }

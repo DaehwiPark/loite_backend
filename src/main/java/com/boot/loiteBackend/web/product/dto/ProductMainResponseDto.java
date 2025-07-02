@@ -18,21 +18,4 @@ public class ProductMainResponseDto {
     private BigDecimal discountedPrice;
     private Integer discountRate;
     private String imageUrl;
-
-    public static ProductMainResponseDto from(AdminProductEntity entity) {
-        String imageUrl = entity.getProductImages().stream()
-                .filter(img -> img.getImageType() == ImageType.MAIN)
-                .findFirst()
-                .map(AdminProductImageEntity::getImageUrl)
-                .orElse(null);
-
-        return ProductMainResponseDto.builder()
-                .productId(entity.getProductId())
-                .productName(entity.getProductName())
-                .productPrice(entity.getProductPrice())
-                .discountedPrice(entity.getDiscountedPrice())
-                .discountRate(entity.getDiscountRate())
-                .imageUrl(imageUrl)
-                .build();
-    }
 }

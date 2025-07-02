@@ -70,7 +70,7 @@ public class AdminProductServiceImpl implements AdminProductService {
     private final AdminProductSectionService adminProductSectionService;
 
     @Override
-    public Long saveProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages, Integer mainIndex) throws IOException {
+    public Long saveProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages) {
         //브랜드 조회
         AdminProductBrandEntity brand = adminProductBrandRepository.findById(dto.getProductBrandId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 브랜드가 존재하지 않습니다."));
@@ -115,7 +115,6 @@ public class AdminProductServiceImpl implements AdminProductService {
         // 이미지 등록
         List<AdminProductImageEntity> imageEntities = new ArrayList<>();
 
-        // 썸네일
         if (thumbnailImages != null && !thumbnailImages.isEmpty()) {
             for (int i = 0; i < thumbnailImages.size(); i++) {
                 MultipartFile file = thumbnailImages.get(i);
@@ -124,13 +123,11 @@ public class AdminProductServiceImpl implements AdminProductService {
                 FileUploadResult result = fileService.save(file, "product");
                 if (result == null) continue;
 
-                ImageType type = (i == mainIndex) ? ImageType.MAIN : ImageType.THUMBNAIL;
-
                 AdminProductImageRequestDto imageDto = new AdminProductImageRequestDto();
                 imageDto.setImageUrl(result.getUrlPath());
                 imageDto.setImagePath(result.getPhysicalPath());
-                imageDto.setImageType(type.name());
-                imageDto.setImageSortOrder(i + 1);
+                imageDto.setImageType("THUMBNAIL");
+                imageDto.setImageSortOrder(i);
                 imageDto.setActiveYn("Y");
 
                 AdminProductImageEntity imageEntity = adminProductImageMapper.toEntity(imageDto);
@@ -180,7 +177,7 @@ public class AdminProductServiceImpl implements AdminProductService {
     }
 
     @Override
-    public void updateProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages, Integer mainIndex) throws IOException {
+    public void updateProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages) {
         //상품 연결
         AdminProductEntity product = adminProductRepository.findById(dto.getProductId())
                 .orElseThrow(()-> new IllegalArgumentException("상품이 존재하지 않습니다."));
@@ -254,11 +251,11 @@ public class AdminProductServiceImpl implements AdminProductService {
             adminProductSectionService.updateSections(product, dto.getSections());
         }
 
-        //기존 이미지 삭제 후 재삽입
+        // 기존 이미지 삭제 후 재삽입
         adminProductImageRepository.deleteByProduct(product);
+
         List<AdminProductImageEntity> imageEntities = new ArrayList<>();
 
-        // 썸네일
         if (thumbnailImages != null && !thumbnailImages.isEmpty()) {
             for (int i = 0; i < thumbnailImages.size(); i++) {
                 MultipartFile file = thumbnailImages.get(i);
@@ -267,13 +264,11 @@ public class AdminProductServiceImpl implements AdminProductService {
                 FileUploadResult result = fileService.save(file, "product");
                 if (result == null) continue;
 
-                ImageType type = (i == mainIndex) ? ImageType.MAIN : ImageType.THUMBNAIL;
-
                 AdminProductImageRequestDto imageDto = new AdminProductImageRequestDto();
                 imageDto.setImageUrl(result.getUrlPath());
                 imageDto.setImagePath(result.getPhysicalPath());
-                imageDto.setImageType(type.name());
-                imageDto.setImageSortOrder(i + 1);
+                imageDto.setImageType("THUMBNAIL");
+                imageDto.setImageSortOrder(i);
                 imageDto.setActiveYn("Y");
 
                 AdminProductImageEntity imageEntity = adminProductImageMapper.toEntity(imageDto);
@@ -285,6 +280,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         if (!imageEntities.isEmpty()) {
             adminProductImageRepository.saveAll(imageEntities);
         }
+
     }
 
     @Override

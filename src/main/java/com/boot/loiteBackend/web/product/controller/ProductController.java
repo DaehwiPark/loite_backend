@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.web.product.controller;
 
+import com.boot.loiteBackend.web.product.dto.ProductDetailResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductListResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductMainResponseDto;
 import com.boot.loiteBackend.web.product.service.ProductService;
@@ -36,5 +37,12 @@ public class ProductController {
             @RequestParam Long categoryId,
             @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(productService.getListProducts(categoryId, pageable));
+    }
+
+    @Operation(summary = "상품상세 페이지 상품정보 조회", description = "상품상세 페이지 상품정보를 조회합니다.")
+    @GetMapping("/detail/{productId}")
+    public ResponseEntity<ProductDetailResponseDto> getDetailProducts(@PathVariable Long productId) {
+        ProductDetailResponseDto dto = productService.getDetailProducts(productId);
+        return ResponseEntity.ok(dto);
     }
 }
