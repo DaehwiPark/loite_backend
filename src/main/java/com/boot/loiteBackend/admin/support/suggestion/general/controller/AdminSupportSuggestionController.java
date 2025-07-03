@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/support/suggestion")
+@RequestMapping("/api/admin/support/suggestion")
 @Tag(name = "고객센터 경영진에게 제안 API", description = "고객센터 경영진에게 제안 내역을 조회, 수정, 삭제, 다운로드할 수 있는 API입니다.")
 public class AdminSupportSuggestionController {
 

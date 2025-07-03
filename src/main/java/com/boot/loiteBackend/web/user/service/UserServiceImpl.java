@@ -23,21 +23,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long signup(UserCreateRequestDto dto) {
 
-        // 이메일 중복 검사
         if (userRepository.existsByUserEmail(dto.getUserEmail())) {
             throw new CustomException(UserErrorCode.EMAIL_DUPLICATED);
         }
 
-        // DTO → Entity 매핑
-        UserEntity user = userMapper.toEntity(dto);
+        if (!dto.getUserPassword().equals(dto.getUserPasswordCheck())) {
+            throw new CustomException(UserErrorCode.PASSWORD_MISMATCH);
+        }
 
-        // 필드 후처리
-        user.setUserPassword(passwordEncoder.encode(dto.getUserPassword()));
-        user.setUserBirthdate(LocalDate.parse(dto.getUserBirthdate()));
+        LocalDate birthdate;
+        try {
+            birthdate = LocalDate.parse(dto.getUserBirthdate());  // "yyyy-MM-dd" 형식이어야 함
+        } catch (Exception e) {
+            throw new CustomException(UserErrorCode.INVALID_BIRTHDATE_FORMAT);
+        }
+
+        UserEntity user = userMapper.toEntity(dto);
+        user.setUserPassword(dto.getUserPassword());
+        user.setUserBirthdate(birthdate);
         user.setEmailVerified(false);
         user.setRole("USER");
         user.setUserStatus("ACTIVE");
 
+        // 7. 저장 및 ID 반환
         return userRepository.save(user).getUserId();
     }
+
 }

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/support/counsel")
+@RequestMapping("/api/admin/support/counsel")
 @Tag(name = "고객센터 1:1 문의 API", description = "고객센터 1:1 게시판 문의 관련 API")
 public class AdminSupportCounselController {
 
