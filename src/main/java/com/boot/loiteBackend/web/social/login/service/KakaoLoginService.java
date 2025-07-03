@@ -5,7 +5,6 @@ import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.web.social.login.dto.SocialUserRegistrationDto;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.ResponseEntity;
 
 public interface KakaoLoginService {
     String getKakaoLoginUrl();

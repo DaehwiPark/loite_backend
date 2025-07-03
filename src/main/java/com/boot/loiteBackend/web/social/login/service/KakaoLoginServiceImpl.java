@@ -33,7 +33,7 @@ import java.util.Optional;
 @Slf4j
 public class KakaoLoginServiceImpl implements KakaoLoginService {
 
-    private final KakaoOAuthProperties kakaoProps;
+    private final KakaoOAuthProperties kakaoOAuthProperties;
     private final RestTemplate restTemplate = new RestTemplate();
     private final UserRepository userRepository;
     private final UserSocialRepository userSocialRepository;
@@ -42,28 +42,23 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
     @Override
     public String getKakaoLoginUrl() {
         try {
-            return kakaoProps.getAuthEndpoint()
-                    + "?client_id=" + kakaoProps.getClientId()
-                    + "&redirect_uri=" + kakaoProps.getRedirectUri()
-                    + "&response_type=" + kakaoProps.getResponseType();
+            return kakaoOAuthProperties.getAuthEndpoint()
+                    + "?client_id=" + kakaoOAuthProperties.getClientId()
+                    + "&redirect_uri=" + kakaoOAuthProperties.getRedirectUri()
+                    + "&response_type=" + kakaoOAuthProperties.getResponseType();
         } catch (Exception e) {
             log.error("카카오 로그인 URL 생성 실패", e);
             throw new CustomException(KakaoLoginErrorCode.FAILED_TO_GET_AUTH_URL);
         }
     }
 
+    @Override
     public ApiResponse<LoginResponseDto> kakaoLoginCallback(String code, HttpServletResponse response) {
         String accessToken = getKakaoAccessToken(code);
         KakaoUserResponse kakaoUser = getKakaoUserProfile(accessToken);
 
         if (kakaoUser == null || kakaoUser.getId() == null || kakaoUser.getKakao_account() == null) {
-            return ResponseEntity
-                    .status(KakaoLoginErrorCode.FAILED_TO_GET_USER.getStatus())
-                    .body(ApiResponse.<LoginResponseDto>builder()
-                            .success(false)
-                            .message(KakaoLoginErrorCode.FAILED_TO_GET_USER.getMessage())
-                            .data(null)
-                            .build()).getBody();
+            return ApiResponse.error(KakaoLoginErrorCode.FAILED_TO_GET_USER);
         }
 
         String kakaoId = kakaoUser.getId().toString();
@@ -80,39 +75,26 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
 
             if (isLinkedToKakao) {
                 LoginResponseDto loginDto = tokenService.getLoginToken(user, response);
-                return ResponseEntity.ok(ApiResponse.<LoginResponseDto>builder()
-                        .success(true)
-                        .message("카카오 로그인 성공")
-                        .data(loginDto)
-                        .build()).getBody();
+                return ApiResponse.ok(loginDto, "카카오 로그인 성공");
             } else {
-                return ResponseEntity
-                        .status(KakaoLoginErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER.getStatus())
-                        .body(ApiResponse.<LoginResponseDto>builder()
-                                .success(false)
-                                .message(KakaoLoginErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER.getMessage())
-                                .data(null)
-                                .build()).getBody();
+                return ApiResponse.error(KakaoLoginErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER);
             }
         }
-
-        // 회원가입 유도 응답
+        // 신규 가입 유도
         log.info("카카오 회원가입 유도 - 이메일: {}, 소셜ID: {}", email, kakaoId);
-        return ResponseEntity
-                .status(KakaoLoginErrorCode.USER_NOT_REGISTERED.getStatus())
-                .body(ApiResponse.<LoginResponseDto>builder()
-                        .success(false)
-                        .message(KakaoLoginErrorCode.USER_NOT_REGISTERED.getMessage())
-                        .data(null)
-                        .extra(Map.of( // 필요 시 추가 데이터 전송
-                                "email", email,
-                                "socialId", kakaoId,
-                                "name", name,
-                                "code", code
-                        ))
-                        .build()).getBody();
+        return ApiResponse.<LoginResponseDto>builder()
+                .success(false)
+                .message(KakaoLoginErrorCode.USER_NOT_REGISTERED.getMessage())
+                .code(KakaoLoginErrorCode.USER_NOT_REGISTERED.getCode())
+                .data(null)
+                .extra(Map.of(
+                        "email", email,
+                        "socialId", kakaoId,
+                        "name", name,
+                        "code", code
+                ))
+                .build();
     }
-
 
     private String getKakaoAccessToken(String code) {
         log.debug("받은 authorization_code: {}", code);
@@ -122,15 +104,15 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", kakaoProps.getClientId());
-        params.add("redirect_uri", kakaoProps.getRedirectUri());
+        params.add("client_id", kakaoOAuthProperties.getClientId());
+        params.add("redirect_uri", kakaoOAuthProperties.getRedirectUri());
         params.add("code", code);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
         try {
             ResponseEntity<KakaoTokenResponseDto> response = restTemplate.postForEntity(
-                    kakaoProps.getTokenEndpoint(),
+                    kakaoOAuthProperties.getTokenEndpoint(),
                     request,
                     KakaoTokenResponseDto.class
             );
@@ -187,7 +169,8 @@ public class KakaoLoginServiceImpl implements KakaoLoginService {
                     .isOver14(dto.isOver14())
                     .agreeTerms(dto.isAgreeTerms())
                     .agreePrivacy(dto.isAgreePrivacy())
-                    .agreeMarketing(dto.isAgreeMarketing())
+                    .agreeMarketingSns(dto.isAgreeMarketingSns())
+                    .agreeMarketingEmail(dto.isAgreeMarketingEmail())
                     .emailVerified(true)
                     .emailVerifiedAt(LocalDateTime.now())
                     .role("USER")

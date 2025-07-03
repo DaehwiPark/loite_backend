@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.global.config;
+package com.boot.loiteBackend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

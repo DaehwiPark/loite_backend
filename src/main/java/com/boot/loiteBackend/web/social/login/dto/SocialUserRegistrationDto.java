@@ -20,7 +20,8 @@ public class SocialUserRegistrationDto {
     private boolean isOver14;
     private boolean agreeTerms;
     private boolean agreePrivacy;
-    private boolean agreeMarketing;
+    private boolean agreeMarketingSns;
+    private boolean agreeMarketingEmail;
 
     @NotBlank(message = "소셜 ID는 필수입니다.")
     private String socialId;

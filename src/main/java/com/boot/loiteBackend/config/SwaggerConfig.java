@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.global.config;
+package com.boot.loiteBackend.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

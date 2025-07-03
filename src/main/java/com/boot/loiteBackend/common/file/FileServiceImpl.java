@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.global.util.file;
+package com.boot.loiteBackend.common.file;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

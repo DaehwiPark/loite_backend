@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.global.util.file;
+package com.boot.loiteBackend.common.file;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
