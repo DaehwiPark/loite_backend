@@ -48,6 +48,9 @@ public class UserCreateRequestDto {
     @AssertTrue(message = "개인정보 수집 및 이용 동의는 필수입니다.")
     private Boolean agreePrivacy;
 
-    @Schema(description = "광고/마케팅 수신 동의 여부", example = "false")
-    private Boolean agreeMarketing;
+    @Schema(description = "광고/마케팅 수신 동의 여부(sns)", example = "false")
+    private Boolean agreeMarketingSns;
+
+    @Schema(description = "광고/마케팅 수신 동의 여부(email)", example = "false")
+    private Boolean agreeMarketingEmail;
 }
