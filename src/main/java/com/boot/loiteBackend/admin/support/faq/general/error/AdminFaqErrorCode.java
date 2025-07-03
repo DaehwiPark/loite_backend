@@ -5,15 +5,17 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum AdminFaqErrorCode implements ErrorCode {
 
-    NOT_FOUND(HttpStatus.NOT_FOUND, "해당 FAQ 항목을 찾을 수 없습니다."),
-    DELETE_FAILED(HttpStatus.BAD_REQUEST, "FAQ 항목 삭제에 실패했습니다."),
-    UPDATE_FAILED(HttpStatus.BAD_REQUEST, "FAQ 항목 수정에 실패했습니다."),
-    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "FAQ 카테고리를 찾을 수 없습니다.");
+    NOT_FOUND("ADMIN_FAQ_404", "해당 FAQ 항목을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    DELETE_FAILED("ADMIN_FAQ_400", "FAQ 항목 삭제에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    UPDATE_FAILED("ADMIN_FAQ_400", "FAQ 항목 수정에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_FOUND("ADMIN_FAQ_404", "FAQ 카테고리를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
-    private final HttpStatus status;
+    private final String code;
     private final String message;
+    private final HttpStatus status;
+
 }

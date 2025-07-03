@@ -9,8 +9,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum AdminSupportNoticeErrorCode implements ErrorCode {
 
-    NOT_FOUND(HttpStatus.NOT_FOUND, "해당 공지사항을 찾을 수 없습니다.");
+    NOT_FOUND("ADMIN_NOTICE_404", "해당 공지사항을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
-    private final HttpStatus status;
+    private final String code;
     private final String message;
+    private final HttpStatus status;
 }
