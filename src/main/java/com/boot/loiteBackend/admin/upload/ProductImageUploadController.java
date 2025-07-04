@@ -1,7 +1,7 @@
 package com.boot.loiteBackend.admin.upload;
 
-import com.boot.loiteBackend.global.util.file.FileService;
-import com.boot.loiteBackend.global.util.file.FileUploadResult;
+import com.boot.loiteBackend.common.file.FileService;
+import com.boot.loiteBackend.common.file.FileUploadResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
