@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.social.login.error;
+package com.boot.loiteBackend.domain.social.error;
 
 import com.boot.loiteBackend.global.error.ErrorCode;
 import lombok.Getter;

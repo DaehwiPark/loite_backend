@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.user.entity;
 
-import com.boot.loiteBackend.web.social.entity.UserSocialEntity;
+import com.boot.loiteBackend.domain.social.entity.SocialUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -90,6 +90,6 @@ public class UserEntity {
     }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<UserSocialEntity> userSocials = new ArrayList<>();
+    private List<SocialUserEntity> userSocials = new ArrayList<>();
 
 }

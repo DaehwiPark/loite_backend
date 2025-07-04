@@ -1,4 +1,5 @@
-package com.boot.loiteBackend.web.social.entity;
+package com.boot.loiteBackend.domain.social.entity;
+
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,16 +7,16 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_user_social",uniqueConstraints = {
-                @UniqueConstraint(name = "UK_SOCIAL_TYPE_NUMBER", columnNames = {"SOCIAL_TYPE", "SOCIAL_NUMBER"}),
-                @UniqueConstraint(name = "UK_SOCIAL_USER_TYPE", columnNames = {"USER_ID", "SOCIAL_TYPE"})
-        })
+@Table(name = "tb_user_social", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_SOCIAL_TYPE_NUMBER", columnNames = {"SOCIAL_TYPE", "SOCIAL_NUMBER"}),
+        @UniqueConstraint(name = "UK_SOCIAL_USER_TYPE", columnNames = {"USER_ID", "SOCIAL_TYPE"})
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserSocialEntity {
+public class SocialUserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

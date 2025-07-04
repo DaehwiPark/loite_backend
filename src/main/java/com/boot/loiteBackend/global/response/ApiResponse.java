@@ -19,7 +19,7 @@ public class ApiResponse<T> {
     @Schema(description = "메시지 또는 설명", example = "요청이 정상 처리되었습니다.")
     private String message;
 
-    @Schema(description = "에러 코드 (실패 시에만 존재)", example = "KAKAO_404")
+    @Schema(description = "에러 코드 (실패 시에만 존재)", example = "KAKAO_200")
     private String code;
 
     @Schema(description = "응답 데이터 (성공 시)", nullable = true)

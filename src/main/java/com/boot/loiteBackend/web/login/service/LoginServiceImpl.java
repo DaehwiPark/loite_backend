@@ -28,16 +28,13 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response) {
-        // 1. 사용자 조회
         UserEntity user = userRepository.findByUserEmail(dto.getEmail())
                 .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
 
-        // 2. 비밀번호 검증
         if (!passwordEncoder.matches(dto.getPassword(), user.getUserPassword())) {
             throw new CustomException(LoginErrorCode.INVALID_PASSWORD);
         }
 
-        // 3. 토큰 생성
         String accessToken = jwtTokenProvider.createToken(
                 user.getUserId(),
                 user.getUserEmail(),
