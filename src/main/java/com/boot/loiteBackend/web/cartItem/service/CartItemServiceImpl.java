@@ -61,7 +61,7 @@ public class CartItemServiceImpl implements CartItemService {
                         .quantity(p.getQuantity())
                         .unitPrice(p.getUnitPrice())
                         .totalPrice(p.getUnitPrice() * p.getQuantity())
-                        .checked(p.getChecked())
+                        .checked(p.getChecked() == 1)
                         .build())
                 .toList();
     }
