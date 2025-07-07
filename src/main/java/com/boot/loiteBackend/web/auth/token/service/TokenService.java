@@ -1,7 +1,8 @@
 package com.boot.loiteBackend.web.auth.token.service;
 
-import com.boot.loiteBackend.web.auth.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.web.auth.token.dto.TokenRequestDto;
+import com.boot.loiteBackend.web.user.entity.UserEntity;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Optional;
@@ -19,4 +20,6 @@ public interface TokenService {
     Long getRemainingTTL(String userId);
 
     LoginResponseDto refresh(TokenRequestDto dto, HttpServletResponse response);
+
+    LoginResponseDto getLoginToken(UserEntity user, HttpServletResponse response);
 }

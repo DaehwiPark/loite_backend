@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.global.security.jwt;
 
-import com.boot.loiteBackend.global.config.AppEnvironmentConfig;
+import com.boot.loiteBackend.config.AppEnvironmentConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;

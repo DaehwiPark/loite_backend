@@ -1,10 +1,14 @@
 package com.boot.loiteBackend.web.user.entity;
 
+import com.boot.loiteBackend.domain.social.entity.SocialUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_user")
@@ -44,11 +48,11 @@ public class UserEntity {
     @Column(name = "AGREE_PRIVACY", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean agreePrivacy;
 
-    @Column(name = "AGREE_MARKETING_EMAIL", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private Boolean agreeMarketingEmail;
-
     @Column(name = "AGREE_MARKETING_SNS", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean agreeMarketingSns;
+
+    @Column(name = "AGREE_MARKETING_EMAIL", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean agreeMarketingEmail;
 
     @Column(name = "EMAIL_VERIFIED", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean emailVerified;
@@ -84,4 +88,8 @@ public class UserEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<SocialUserEntity> userSocials = new ArrayList<>();
+
 }
