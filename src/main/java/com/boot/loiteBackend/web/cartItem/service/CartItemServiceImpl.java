@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,22 +49,33 @@ public class CartItemServiceImpl implements CartItemService {
     @Transactional(readOnly = true)
     public List<CartItemResponseDto> getCartItemsByUser(Long userId) {
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
-        List<CartItemProjection> items = cartItemRepository.findCartItemDetailsByUserId(userId, oneMonthAgo);
+        List<CartItemProjection> items = cartItemRepository.findCartItemsByUserId(userId, oneMonthAgo);
 
         return items.stream()
-                .map(p -> CartItemResponseDto.builder()
-                        .cartItemId(p.getCartItemId())
-                        .productId(p.getProductId())
-                        .productName(p.getProductName())
-                        .brandName(p.getBrandName())
-                        .thumbnailUrl(p.getThumbnailUrl())
-                        .optionText(p.getOptionText())
-                        .quantity(p.getQuantity())
-                        .unitPrice(p.getUnitPrice())
-                        .totalPrice(p.getUnitPrice() * p.getQuantity())
-                        .checked(p.getChecked() == 1)
-                        .build())
+                .map(p -> {
+                    BigDecimal basePrice = p.getDiscountedPrice() != null
+                            ? p.getDiscountedPrice()
+                            : p.getUnitPrice();
+                    BigDecimal totalPrice = basePrice
+                            .add(BigDecimal.valueOf(p.getOptionAdditionalPrice()))
+                            .multiply(BigDecimal.valueOf(p.getQuantity()));
+
+                    return CartItemResponseDto.builder()
+                            .cartItemId(p.getCartItemId())
+                            .productId(p.getProductId())
+                            .productName(p.getProductName())
+                            .brandName(p.getBrandName())
+                            .thumbnailUrl(p.getThumbnailUrl())
+                            .optionType(p.getOptionType())
+                            .optionValue(p.getOptionValue())
+                            .optionAdditionalPrice(p.getOptionAdditionalPrice())
+                            .quantity(p.getQuantity())
+                            .unitPrice(p.getUnitPrice())
+                            .discountedPrice(p.getDiscountedPrice())
+                            .discountRate(p.getDiscountRate())
+                            .checked(p.getChecked() == 1)
+                            .build();
+                })
                 .toList();
     }
-
 }

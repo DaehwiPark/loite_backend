@@ -27,12 +27,10 @@ public class CartItemResponseDto {
     private int discountRate;
     private boolean checked;
 
-    // 옵션 텍스트 조립
     public String getOptionText() {
         return optionType + " / " + optionValue;
     }
 
-    // 최종 가격 = 상품가격 + 옵션 추가금 × 수량
     public BigDecimal getTotalPrice() {
         BigDecimal basePrice = discountedPrice != null ? discountedPrice : unitPrice;
         BigDecimal totalUnit = basePrice.add(BigDecimal.valueOf(optionAdditionalPrice));
