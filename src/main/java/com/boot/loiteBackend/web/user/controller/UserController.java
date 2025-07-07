@@ -41,7 +41,7 @@ public class UserController {
         );
     }
 
-    @Operation(summary = "특정 회원 탈퇴", description = "userId를 입력받아 해당 사용자의 계정을 삭제합니다. (관리자 전용)")
+    @Operation(summary = "특정 회원 탈퇴", description = "userId를 입력 받아 해당 사용자의 계정을 삭제합니다. (관리자 전용)")
     @DeleteMapping("/withdraw/{userId}")
     public ResponseEntity<ApiResponse<Void>> withdrawById(@PathVariable Long userId) {
         userService.withdrawById(userId);

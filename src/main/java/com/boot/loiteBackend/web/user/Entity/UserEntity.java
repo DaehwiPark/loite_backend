@@ -89,7 +89,7 @@ public class UserEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SocialUserEntity> userSocials = new ArrayList<>();
-
 }

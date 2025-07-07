@@ -13,7 +13,12 @@ public class AppEnvironmentConfig {
         return "dev".equalsIgnoreCase(activeProfile);
     }
 
+    public boolean isProd() {
+        return "prod".equalsIgnoreCase(activeProfile);
+    }
+    // dev 제외한 환경은 secure 쿠키,  HTTPS 요청에서만 브라우저가 전송되도록
     public boolean isSecureCookieEnabled() {
-        return !isDev(); // dev 제외한 환경은 secure 쿠키,  HTTPS 요청에서만 브라우저가 전송되도록
+        // 개발서버에 ssl 인증 후에는 prod를 제거 필요
+        return !isDev() && !isProd();
     }
 }
