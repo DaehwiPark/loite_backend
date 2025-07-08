@@ -25,6 +25,9 @@ public class UserDto {
     @Schema(description = "휴대폰 번호", example = "010-1234-5678")
     private String userPhone;
 
+    @Schema(description = "가입 유형", example = "EMAIL/KAKAO/NAVER/GOOGLE")
+    private String userRegisterType;
+
     @Schema(description = "생년월일", example = "1990-01-01")
     private LocalDate userBirthdate;
 

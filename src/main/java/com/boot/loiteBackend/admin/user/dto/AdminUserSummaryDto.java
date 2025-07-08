@@ -15,7 +15,7 @@ public class AdminUserSummaryDto {
     @Schema(description = "사용자 ID", example = "1")
     private Long userId;
 
-    @Schema(description = "사용자 이메일", example = "user@example.com")
+    @Schema(description = "사용자 이메일", example = "u7ser@example.com")
     private String userEmail;
 
     @Schema(description = "사용자 이름", example = "홍길동")

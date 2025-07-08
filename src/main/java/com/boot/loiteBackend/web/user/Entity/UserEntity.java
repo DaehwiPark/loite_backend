@@ -1,13 +1,12 @@
 package com.boot.loiteBackend.web.user.entity;
 
-import com.boot.loiteBackend.domain.social.entity.SocialUserEntity;
+import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -36,6 +35,9 @@ public class UserEntity {
     @Column(name = "USER_PHONE", nullable = false, length = 20, columnDefinition = "VARCHAR(20)")
     private String userPhone;
 
+    @Column(name="USER_REGISTER_TYPE", nullable = false, length = 20, columnDefinition = "VARCHAR(20)")
+    private String userRegisterType;
+
     @Column(name = "USER_BIRTHDATE", nullable = false, columnDefinition = "DATE")
     private LocalDate userBirthdate;
 
@@ -60,8 +62,8 @@ public class UserEntity {
     @Column(name = "EMAIL_VERIFIED_AT", columnDefinition = "TIMESTAMP NULL DEFAULT NULL")
     private LocalDateTime emailVerifiedAt;
 
-    @Column(name = "ROLE", nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'USER'")
-    private String role;
+    @Column(name = "USER_ROLE", nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'USER'")
+    private String userRole;
 
     @Column(name = "USER_STATUS", nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
     private String userStatus;

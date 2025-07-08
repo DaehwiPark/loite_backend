@@ -26,7 +26,7 @@ public class SocialLinkController {
     @GetMapping("/{provider}")
     @Operation(summary = "소셜 연동 URL 발급", description = "카카오/구글/네이버 등의 연동용 인증 URL을 생성합니다.")
     public ResponseEntity<ApiResponse<String>> getLoginUrl(@PathVariable String provider) {
-        String url = handlerResolver.resolveLink(provider).getUrl();
+        String url = handlerResolver.resolveLink(provider).getLinkUrl();
         return ResponseEntity.ok(ApiResponse.ok(url));
     }
 

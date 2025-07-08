@@ -43,8 +43,9 @@ public class UserServiceImpl implements UserService {
         user.setUserPassword(dto.getUserPassword());
         user.setUserBirthdate(birthdate);
         user.setEmailVerified(false);
-        user.setRole("USER");
+        user.setUserRole("USER");
         user.setUserStatus("ACTIVE");
+        user.setUserRegisterType("EMAIL");
 
         // 7. 저장 및 ID 반환
         return userRepository.save(user).getUserId();

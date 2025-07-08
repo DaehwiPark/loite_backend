@@ -32,6 +32,10 @@ public class UserCreateRequestDto {
     @NotBlank
     private String userPhone;
 
+    @Schema(description = "가입 유형", example = "EMAIL/KAKAO/NAVER/GOOGLE")
+    @NotBlank
+    private String userRegisterType;
+
     @Schema(description = "생년월일", example = "1990-01-01")
     @NotBlank
     private String userBirthdate;

@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.social.link.service;
 
-import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface OAuthLoginService {
