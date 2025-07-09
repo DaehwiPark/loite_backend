@@ -37,6 +37,10 @@ public class AdminProductOptionEntity {
     @Column(name = "OPTION_STOCK")
     private int optionStock;
 
+    @Builder.Default
+    @Column(name = "SOLD_OUT_YN")
+    private String soldOutYn = "N";
+
     @Enumerated(EnumType.STRING)
     @Column(name = "OPTION_STYLE_TYPE", length = 30)
     private OptionStyleType optionStyleType;

@@ -74,6 +74,10 @@ public class ProductServiceImpl implements ProductService {
                             .discountRate(entity.getDiscountRate())
                             .stock(entity.getProductStock())
                             .imageUrl(imageUrl)
+                            .soldOutYn(entity.getProductOptions() != null &&
+                                    !entity.getProductOptions().isEmpty() &&
+                                    entity.getProductOptions().stream().allMatch(opt -> opt.getOptionStock() <= 0) ? "Y" : "N")
+
                             .build();
                 })
                 .toList();
@@ -101,6 +105,7 @@ public class ProductServiceImpl implements ProductService {
                         .optionValue(option.getOptionValue())
                         .optionAdditionalPrice(option.getOptionAdditionalPrice())
                         .optionStock(option.getOptionStock())
+                        .soldOutYn(option.getSoldOutYn())
                         .build())
                 .toList();
 

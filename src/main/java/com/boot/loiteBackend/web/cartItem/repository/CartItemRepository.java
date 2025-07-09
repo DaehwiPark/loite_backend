@@ -38,4 +38,6 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
             AND ci.CREATED_AT >= ?
     """, nativeQuery = true)
     List<CartItemProjection> findCartItemsByUserId(@Param("userId") Long userId, @Param("after") LocalDateTime after);
+
+    List<CartItemEntity> findByUserIdAndCheckedYn(Long userId, String checkedYn);
 }

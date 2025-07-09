@@ -26,7 +26,7 @@ public class AdminProductRequestDto {
     private BigDecimal productSupplyPrice;
     private Integer discountRate;
     private BigDecimal discountedPrice;
-    private int productStock;
+    //private int productStock;
     private String recommendedYn;
     private BigDecimal productDeliveryCharge;
     private BigDecimal productFreeDelivery;

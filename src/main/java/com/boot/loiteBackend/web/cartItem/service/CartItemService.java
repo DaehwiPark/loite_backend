@@ -10,4 +10,11 @@ public interface CartItemService {
     void addToCart(Long userId, CartItemRequestDto requestDto);
 
     List<CartItemResponseDto> getCartItemsByUser(Long userId);
+
+    void updateCheckedYn(Long userId, Long cartItemId, boolean checked);
+
+    void deleteCartItems(Long userId, List<Long> cartItemIds);
+
+    void deleteCheckedCartItems(Long userId);
+
 }

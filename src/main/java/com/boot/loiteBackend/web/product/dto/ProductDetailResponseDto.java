@@ -39,6 +39,7 @@ public class ProductDetailResponseDto {
         private String optionValue;
         private int optionAdditionalPrice;
         private int optionStock;
+        private String soldOutYn;
     }
 
     // 사은품

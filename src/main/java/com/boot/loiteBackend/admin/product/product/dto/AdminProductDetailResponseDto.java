@@ -21,7 +21,7 @@ public class AdminProductDetailResponseDto {
     private BigDecimal productSupplyPrice;
     private Integer discountRate;
     private BigDecimal discountedPrice;
-    private int productStock;
+    //private int productStock;
     private BigDecimal productDeliveryCharge;
     private BigDecimal productFreeDelivery;
     private String activeYn;
