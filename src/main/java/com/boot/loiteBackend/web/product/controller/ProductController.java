@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/public/product")
-@Tag(name = "Public Product List", description = "쇼핑몰 상품 조회 API")
+@Tag(name = "쇼핑몰 상품 조회", description = "쇼핑몰 상품 조회 API")
 public class ProductController {
 
     private final ProductService productService;
