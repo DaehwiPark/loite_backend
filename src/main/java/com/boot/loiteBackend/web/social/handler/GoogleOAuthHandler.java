@@ -1,7 +1,6 @@
 package com.boot.loiteBackend.web.social.handler;
 
 import com.boot.loiteBackend.web.social.client.GoogleOAuthClient;
-import com.boot.loiteBackend.web.social.dto.google.GoogleUserResponseDto;
 import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class GoogleOAuthHandler implements OAuthHandler {
+public class GoogleOAuthHandler implements OAuthHandler, OAuthLinkHandler {
 
     private final GoogleOAuthClient googleOAuthClient;
 
@@ -22,7 +21,12 @@ public class GoogleOAuthHandler implements OAuthHandler {
 
     @Override
     public String getUrl() {
-        return googleOAuthClient.buildLoginUrl();
+        return googleOAuthClient.getLoginUrl();
+    }
+
+    @Override
+    public String getLinkUrl() {
+        return googleOAuthClient.getLinkingUrl();
     }
 
     @Override
@@ -31,14 +35,12 @@ public class GoogleOAuthHandler implements OAuthHandler {
     }
 
     @Override
-    public OAuthUserInfoDto getUserInfo(String accessToken) {
-        GoogleUserResponseDto user = googleOAuthClient.requestUserInfo(accessToken);
+    public String requestLinkingAccessToken(String code) {
+        return googleOAuthClient.requestLinkingAccessToken(code);
+    }
 
-        return OAuthUserInfoDto.builder()
-                .email(user.getEmail())
-                .name(user.getName())
-                .socialId(user.getSub())
-                .provider(ProviderType.GOOGLE)
-                .build();
+    @Override
+    public OAuthUserInfoDto getUserInfo(String accessToken) {
+        return googleOAuthClient.requestUserInfo(accessToken);
     }
 }

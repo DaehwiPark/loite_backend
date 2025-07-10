@@ -2,9 +2,12 @@ package com.boot.loiteBackend.web.social.client;
 
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.social.config.OAuthProperties;
+import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
 import com.boot.loiteBackend.web.social.dto.kakao.KakaoTokenResponseDto;
 import com.boot.loiteBackend.web.social.dto.kakao.KakaoUserResponseDto;
 import com.boot.loiteBackend.web.social.error.KakaoLoginErrorCode;
+import com.boot.loiteBackend.web.social.error.NaverLoginErrorCode;
+import com.boot.loiteBackend.web.social.link.model.KakaoOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -22,10 +25,6 @@ public class KakaoOAuthClient {
     private final OAuthProperties oAuthProperties;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // ========================
-    // 인증 URL 생성
-    // ========================
-
     // 로그인용 URL 생성
     public String getLoginUrl() {
         return buildAuthorizeUrl(oAuthProperties.getKakao().getRedirectUri());
@@ -36,6 +35,7 @@ public class KakaoOAuthClient {
         return buildAuthorizeUrl(oAuthProperties.getKakao().getLinkRedirectUri());
     }
 
+
     private String buildAuthorizeUrl(String redirectUri) {
         OAuthProperties.Provider kakao = oAuthProperties.getKakao();
         return kakao.getAuthEndpoint()
@@ -43,10 +43,6 @@ public class KakaoOAuthClient {
                 + "&redirect_uri=" + redirectUri
                 + "&response_type=" + kakao.getResponseType();
     }
-
-    // ========================
-    // 🔹 토큰 요청
-    // ========================
 
     // 로그인용 액세스 토큰 요청
     public String requestAccessToken(String code) {
@@ -58,6 +54,7 @@ public class KakaoOAuthClient {
         return requestAccessTokenInternal(code, oAuthProperties.getKakao().getLinkRedirectUri());
     }
 
+    // 내부 공통 토큰 요청 로직
     private String requestAccessTokenInternal(String code, String redirectUri) {
         OAuthProperties.Provider kakao = oAuthProperties.getKakao();
 
@@ -74,7 +71,9 @@ public class KakaoOAuthClient {
 
         try {
             ResponseEntity<KakaoTokenResponseDto> response = restTemplate.postForEntity(
-                    kakao.getTokenEndpoint(), request, KakaoTokenResponseDto.class
+                    kakao.getTokenEndpoint(),
+                    request,
+                    KakaoTokenResponseDto.class
             );
 
             KakaoTokenResponseDto body = response.getBody();
@@ -92,11 +91,8 @@ public class KakaoOAuthClient {
         throw new CustomException(KakaoLoginErrorCode.FAILED_TO_GET_TOKEN);
     }
 
-    // ========================
-    // 🔹 사용자 정보 요청
-    // ========================
-
-    public KakaoUserResponseDto requestUserInfo(String accessToken) {
+    // 사용자 정보 요청
+    public OAuthUserInfoDto requestUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
 
@@ -107,7 +103,14 @@ public class KakaoOAuthClient {
                     new HttpEntity<>(headers),
                     KakaoUserResponseDto.class
             );
-            return response.getBody();
+            KakaoUserResponseDto kakaoUser = response.getBody();
+            log.debug("카카오 사용자 정보 응답: {}", kakaoUser);
+
+            return new KakaoOAuthUserInfo(kakaoUser); // 어댑터 객체로 감싸서 반환
+
+        } catch (HttpClientErrorException e) {
+            log.error("카카오 사용자 정보 요청 실패 (Client Error): {}", e.getResponseBodyAsString());
+            throw new CustomException(KakaoLoginErrorCode.FAILED_TO_GET_USER);
         } catch (Exception e) {
             log.error("카카오 사용자 정보 요청 실패", e);
             throw new CustomException(KakaoLoginErrorCode.FAILED_TO_GET_USER);

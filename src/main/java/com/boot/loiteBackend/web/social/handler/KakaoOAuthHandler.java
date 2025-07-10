@@ -6,6 +6,7 @@ import com.boot.loiteBackend.web.social.dto.kakao.KakaoUserResponseDto;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
 import com.boot.loiteBackend.global.error.exception.CustomException;
+import com.boot.loiteBackend.web.social.link.model.KakaoOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,6 @@ public class KakaoOAuthHandler implements OAuthHandler, OAuthLinkHandler {
     public ProviderType getProvider() {
         return ProviderType.KAKAO;
     }
-
     // 로그인 URL
     @Override
     public String getUrl() {
@@ -40,18 +40,12 @@ public class KakaoOAuthHandler implements OAuthHandler, OAuthLinkHandler {
     }
 
     @Override
+    public String requestLinkingAccessToken(String code) {
+        return kakaoOAuthClient.requestLinkingAccessToken(code);
+    }
+
+    @Override
     public OAuthUserInfoDto getUserInfo(String accessToken) {
-        KakaoUserResponseDto user = kakaoOAuthClient.requestUserInfo(accessToken);
-
-        if (user != null && user.getKakao_account() != null) {
-            return OAuthUserInfoDto.builder()
-                    .email(user.getKakao_account().getEmail())
-                    .name(user.getKakao_account().getProfile().getNickname())
-                    .socialId(user.getId().toString())
-                    .provider(ProviderType.KAKAO)
-                    .build();
-        }
-
-        throw new CustomException(SocialErrorCode.FAILED_TO_GET_USER);
+        return kakaoOAuthClient.requestUserInfo(accessToken);
     }
 }

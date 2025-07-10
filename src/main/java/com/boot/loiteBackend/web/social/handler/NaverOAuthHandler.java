@@ -2,14 +2,13 @@ package com.boot.loiteBackend.web.social.handler;
 
 import com.boot.loiteBackend.web.social.client.NaverOAuthClient;
 import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
-import com.boot.loiteBackend.web.social.dto.naver.NaverUserResponseDto;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class NaverOAuthHandler implements OAuthHandler {
+public class NaverOAuthHandler implements OAuthHandler, OAuthLinkHandler {
 
     private final NaverOAuthClient naverOAuthClient;
 
@@ -24,19 +23,22 @@ public class NaverOAuthHandler implements OAuthHandler {
     }
 
     @Override
+    public String getLinkUrl() {
+        return naverOAuthClient.getLinkingUrl();
+    }
+
+    @Override
     public String requestAccessToken(String code) {
         return naverOAuthClient.requestAccessToken(code);
     }
 
     @Override
-    public OAuthUserInfoDto getUserInfo(String accessToken) {
-        NaverUserResponseDto response = naverOAuthClient.requestUserInfo(accessToken);
+    public String requestLinkingAccessToken(String code) {
+        return naverOAuthClient.requestAccessToken(code);
+    }
 
-        return OAuthUserInfoDto.builder()
-                .socialId(response.getResponse().getId())
-                .email(response.getResponse().getEmail())
-                .name(response.getResponse().getName())
-                .provider(ProviderType.NAVER)
-                .build();
+    @Override
+    public OAuthUserInfoDto getUserInfo(String accessToken) {
+        return naverOAuthClient.requestUserInfo(accessToken);
     }
 }

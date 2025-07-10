@@ -3,6 +3,7 @@ package com.boot.loiteBackend.web.social.service;
 import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
 import com.boot.loiteBackend.web.social.handler.OAuthHandler;
+import com.boot.loiteBackend.web.social.link.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.global.response.ApiResponse;

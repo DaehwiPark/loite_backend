@@ -73,7 +73,8 @@ public class TokenServiceImpl implements TokenService {
     String newAccessToken = jwtTokenProvider.createToken(
             user.getUserId(),
             user.getUserEmail(),
-            user.getUserRole()
+            user.getUserRole(),
+            user.getUserRegisterType()
     );
 
     extendRefreshTokenTTL(key, dto.getRefreshToken());
@@ -92,7 +93,8 @@ public class TokenServiceImpl implements TokenService {
     String accessToken = jwtTokenProvider.createToken(
             user.getUserId(),
             user.getUserEmail(),
-            user.getUserRole()
+            user.getUserRole(),
+            user.getUserRegisterType()
     );
 
     // 2. RefreshToken 발급

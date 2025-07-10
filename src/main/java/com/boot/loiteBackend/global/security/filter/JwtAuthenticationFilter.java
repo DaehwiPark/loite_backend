@@ -53,10 +53,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 Long userId = jwtTokenProvider.getUserId(token);
                 String role = jwtTokenProvider.getUserRole(token);
-                String username = jwtTokenProvider.getUsername(token); // 변경된 key 사용
+                String username = jwtTokenProvider.getUsername(token);
+                String userRegisterType = jwtTokenProvider.getUserRegisterType(token); // ⭐️ 추가된 부분
 
                 // 3. UserDetails 생성
-                CustomUserDetails userDetails = new CustomUserDetails(userId, role, username);
+                CustomUserDetails userDetails = new CustomUserDetails(
+                        userId, role, username, userRegisterType
+                );
 
                 // 4. 인증 객체 생성 및 SecurityContext 설정
                 UsernamePasswordAuthenticationToken authentication =

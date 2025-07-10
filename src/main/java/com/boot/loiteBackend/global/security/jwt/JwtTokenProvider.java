@@ -14,11 +14,12 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
 
-    public String createToken(Long userId, String email, String role) {
+    public String createToken(Long userId, String email, String role, String userRegisterType) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId)); // "sub": userId
         claims.put("username", email);                                    // "username": email
         claims.put("role", role);                                         // "role": role
         claims.put("tokenType", "access");                                // "tokenType": access
+        claims.put("userRegisterType", userRegisterType);                // "userRegisterType": email
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtProperties.getAccessTokenValidity());
@@ -26,24 +27,24 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)          // "iat"
-                 .setExpiration(expiry)     // "exp"
+                .setExpiration(expiry)     // "exp"
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
                 .compact();
     }
 
     public String createRefreshToken(Long userId) {
-      Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-      claims.put("tokenType", "refresh");
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
+        claims.put("tokenType", "refresh");
 
-      Date now = new Date();
-      Date expiry = new Date(now.getTime() + jwtProperties.getRefreshTokenValidity());
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + jwtProperties.getRefreshTokenValidity());
 
-      return Jwts.builder()
-        .setClaims(claims)
-        .setIssuedAt(now)
-        .setExpiration(expiry)
-        .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
-        .compact();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
+                .compact();
     }
 
     public boolean validateToken(String token) {
@@ -87,6 +88,14 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("tokenType", String.class);
+    }
+
+    public String getUserRegisterType(String token) {
+        return Jwts.parser()
+                .setSigningKey(jwtProperties.getSecret())
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userRegisterType", String.class);
     }
 
     public long getAccessTokenValidity() {

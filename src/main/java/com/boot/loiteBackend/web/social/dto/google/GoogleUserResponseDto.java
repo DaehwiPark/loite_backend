@@ -1,10 +1,14 @@
 package com.boot.loiteBackend.web.social.dto.google;
 
+import com.boot.loiteBackend.web.social.link.model.OAuthUserInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class GoogleUserResponseDto {
+@Getter
+@Setter
+@Schema(description = "Google 사용자 정보 응답 DTO")
+public class GoogleUserResponseDto implements OAuthUserInfo {
 
     @Schema(description = "Google 고유 사용자 ID", example = "113475829103984798132")
     private String sub;
@@ -29,4 +33,24 @@ public class GoogleUserResponseDto {
 
     @Schema(description = "사용자 지역 설정", example = "ko")
     private String locale;
+
+    @Override
+    public String getSocialId() {
+        return sub;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getProvider() {
+        return "GOOGLE";
+    }
 }

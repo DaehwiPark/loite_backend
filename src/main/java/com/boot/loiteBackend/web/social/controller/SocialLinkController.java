@@ -2,6 +2,8 @@ package com.boot.loiteBackend.web.social.controller;
 
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.global.response.ApiResponse;
+import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.web.social.dto.SocialLinkingStatusResponseDto;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
@@ -21,7 +23,17 @@ import org.springframework.web.bind.annotation.*;
 public class SocialLinkController {
 
     private final OAuthHandlerResolver handlerResolver;
-    private final SocialLinkService socialLinkService;
+    private final SocialLinkService  socialLinkService;
+
+    @GetMapping("/status")
+    @Operation(summary = "소셜 연동 현황 조회", description = "현재 로그인된 사용자의 소셜 연동 상태를 확인합니다.")
+    public ResponseEntity<ApiResponse<SocialLinkingStatusResponseDto>> getSocialLinkingStatus(
+            @AuthenticationPrincipal CustomUserDetails loginUser
+    ) {
+        SocialLinkingStatusResponseDto status = socialLinkService.getSocialLinkingStatus(loginUser);
+        return ResponseEntity.ok(ApiResponse.ok(status));
+    }
+
 
     @GetMapping("/{provider}")
     @Operation(summary = "소셜 연동 URL 발급", description = "카카오/구글/네이버 등의 연동용 인증 URL을 생성합니다.")
@@ -35,7 +47,7 @@ public class SocialLinkController {
     public ResponseEntity<ApiResponse<LoginResponseDto>> linkCallback(
             @PathVariable String provider,
             @RequestParam String code,
-            @AuthenticationPrincipal UserEntity loginUser,
+            @AuthenticationPrincipal CustomUserDetails loginUser,
             HttpServletResponse response
     ) {
         ApiResponse<LoginResponseDto> result = socialLinkService.link(provider, code, loginUser, response);
@@ -43,12 +55,18 @@ public class SocialLinkController {
     }
 
 
-//    @PostMapping("/{provider}/unlink")
-//    public ResponseEntity<String> unlinkAccount(@PathVariable String provider, @RequestBody LoginVO loginVO) {
-//        boolean success = socialLinkService.unlinkAccount(provider, loginVO);
-//        return success ? ResponseEntity.ok("true") : ResponseEntity.badRequest().body("연결 해제 실패");
-//    }
-//
+    @DeleteMapping("/{provider}/unlink")
+    @Operation(summary = "소셜 연동 해제", description = "선택한 소셜 계정의 연동을 해제합니다.")
+    public ResponseEntity<ApiResponse<String>> unlinkAccount(
+            @PathVariable String provider,
+            @AuthenticationPrincipal CustomUserDetails loginUser
+    ) {
+        ApiResponse<String>  result = socialLinkService.unlinkAccount(provider, loginUser);
+        return ResponseEntity.ok(result);
+
+    }
+
+
 //    @GetMapping("/{provider}/check")
 //    public ResponseEntity<String> redirectToCheckPage(@PathVariable String provider) {
 //        return ResponseEntity.ok(socialLinkService.buildSocialCheckUrl(provider));

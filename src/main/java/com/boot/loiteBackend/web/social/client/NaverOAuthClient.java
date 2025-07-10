@@ -1,10 +1,12 @@
 package com.boot.loiteBackend.web.social.client;
 
 import com.boot.loiteBackend.web.social.config.OAuthProperties;
+import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
 import com.boot.loiteBackend.web.social.dto.naver.NaverTokenResponseDto;
 import com.boot.loiteBackend.web.social.dto.naver.NaverUserResponseDto;
 import com.boot.loiteBackend.web.social.error.NaverLoginErrorCode;
 import com.boot.loiteBackend.global.error.exception.CustomException;
+import com.boot.loiteBackend.web.social.link.model.NaverOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -22,7 +24,37 @@ public class NaverOAuthClient {
     private final OAuthProperties oAuthProperties;
     private final RestTemplate restTemplate = new RestTemplate();
 
+    // 로그인용 URL
+    public String getLoginUrl() {
+        return buildAuthorizeUrl(oAuthProperties.getNaver().getRedirectUri());
+    }
+
+    // 연동용 URL
+    public String getLinkingUrl() {
+        return buildAuthorizeUrl(oAuthProperties.getNaver().getLinkRedirectUri());
+    }
+
+    private String buildAuthorizeUrl(String redirectUri) {
+        OAuthProperties.Provider naver = oAuthProperties.getNaver();
+        return naver.getAuthEndpoint()
+                + "?client_id=" + naver.getClientId()
+                + "&redirect_uri=" + redirectUri
+                + "&response_type=" + naver.getResponseType()
+                + "&state=loite"; // CSRF 대응
+    }
+
+    // 로그인용 액세스 토큰 요청
     public String requestAccessToken(String code) {
+        return requestAccessToken(code, oAuthProperties.getNaver().getRedirectUri());
+    }
+
+    // 연동용 액세스 토큰 요청
+    public String requestLinkingAccessToken(String code) {
+        return requestAccessToken(code, oAuthProperties.getNaver().getLinkRedirectUri());
+    }
+
+    // 내부 공통 토큰 요청 로직
+    private String requestAccessToken(String code, String redirectUri) {
         OAuthProperties.Provider naver = oAuthProperties.getNaver();
 
         HttpHeaders headers = new HttpHeaders();
@@ -32,9 +64,9 @@ public class NaverOAuthClient {
         params.add("grant_type", "authorization_code");
         params.add("client_id", naver.getClientId());
         params.add("client_secret", naver.getClientSecret());
-        params.add("redirect_uri", naver.getRedirectUri());
+        params.add("redirect_uri", redirectUri);
         params.add("code", code);
-        params.add("state", "loite"); // CSRF 대응용 임의의 값
+        params.add("state", "loite");
 
         HttpEntity<?> request = new HttpEntity<>(params, headers);
 
@@ -44,26 +76,23 @@ public class NaverOAuthClient {
                     request,
                     NaverTokenResponseDto.class
             );
-
             NaverTokenResponseDto body = response.getBody();
             log.debug("네이버 토큰 응답: {}", body);
 
             if (body != null && body.getAccessToken() != null) {
                 return body.getAccessToken();
-            } else {
-                throw new CustomException(NaverLoginErrorCode.FAILED_TO_GET_TOKEN);
             }
-
         } catch (HttpClientErrorException e) {
-            log.error("네이버 토큰 요청 실패 (Client Error): {}", e.getResponseBodyAsString());
-            throw new CustomException(NaverLoginErrorCode.FAILED_TO_GET_TOKEN);
+            log.error("네이버 토큰 요청 오류: {}", e.getResponseBodyAsString());
         } catch (Exception e) {
             log.error("네이버 토큰 요청 실패", e);
-            throw new CustomException(NaverLoginErrorCode.FAILED_TO_GET_TOKEN);
         }
+
+        throw new CustomException(NaverLoginErrorCode.FAILED_TO_GET_TOKEN);
     }
 
-    public NaverUserResponseDto requestUserInfo(String accessToken) {
+    // 사용자 정보 요청
+    public OAuthUserInfoDto requestUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
 
@@ -75,8 +104,10 @@ public class NaverOAuthClient {
                     NaverUserResponseDto.class
             );
 
-            log.debug("네이버 사용자 정보 응답: {}", response.getBody());
-            return response.getBody();
+            NaverUserResponseDto NaverUser = response.getBody();
+            log.debug("네이버 사용자 정보 응답: {}", NaverUser);
+
+            return new NaverOAuthUserInfo(NaverUser);
 
         } catch (HttpClientErrorException e) {
             log.error("네이버 사용자 정보 요청 실패 (Client Error): {}", e.getResponseBodyAsString());
@@ -85,15 +116,5 @@ public class NaverOAuthClient {
             log.error("네이버 사용자 정보 요청 실패", e);
             throw new CustomException(NaverLoginErrorCode.FAILED_TO_GET_USER);
         }
-    }
-
-    public String getLoginUrl() {
-        OAuthProperties.Provider naver = oAuthProperties.getNaver();
-
-        return naver.getAuthEndpoint()
-                + "?client_id=" + naver.getClientId()
-                + "&redirect_uri=" + naver.getRedirectUri()
-                + "&response_type=" + naver.getResponseType()
-                + "&state=loite";
     }
 }

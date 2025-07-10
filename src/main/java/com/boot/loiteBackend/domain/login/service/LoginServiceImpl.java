@@ -39,7 +39,8 @@ public class LoginServiceImpl implements LoginService {
         String accessToken = jwtTokenProvider.createToken(
                 user.getUserId(),
                 user.getUserEmail(),
-                user.getUserRole()
+                user.getUserRole(),
+                user.getUserRegisterType()
         );
         return tokenService.getLoginToken(user, response);
     }

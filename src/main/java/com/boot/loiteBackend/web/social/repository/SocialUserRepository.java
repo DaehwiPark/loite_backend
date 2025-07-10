@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.web.social.repository;
 
+import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,7 @@ public interface SocialUserRepository extends JpaRepository<SocialUserEntity, Lo
 
     Optional<SocialUserEntity> findBySocialTypeAndSocialNumber(String socialType, String socialNumber);
 
+    List<SocialUserEntity> findAllByUser(UserEntity user);
+
+    Optional<SocialUserEntity> findByUserAndSocialType(UserEntity user, String upperCase);
 }

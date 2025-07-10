@@ -1,19 +1,43 @@
 package com.boot.loiteBackend.web.social.dto.kakao;
 
+import com.boot.loiteBackend.web.social.link.model.OAuthUserInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Schema(description = "카카오 사용자 정보 응답 DTO")
-public class KakaoUserResponseDto {
+public class KakaoUserResponseDto implements OAuthUserInfo {
 
     @Schema(description = "카카오 사용자 고유 ID", example = "123456789")
     private Long id;
 
     @Schema(description = "카카오 계정 정보")
     private KakaoAccount kakao_account;
+
+    @Override
+    public String getSocialId() {
+        return id != null ? String.valueOf(id) : null;
+    }
+
+    @Override
+    public String getEmail() {
+        return kakao_account != null ? kakao_account.getEmail() : null;
+    }
+
+    @Override
+    public String getName() {
+        if (kakao_account != null && kakao_account.getProfile() != null) {
+            return kakao_account.getProfile().getNickname();
+        }
+        return null;
+    }
+
+    @Override
+    public String getProvider() {
+        return "KAKAO";
+    }
 
     @Getter
     @Setter
