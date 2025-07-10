@@ -11,28 +11,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/public/user")
-@Tag(name = "회원가입", description = "회원 계정 생성 관련 API (비회원 접근 가능)")
-public class UserController {
+@RequestMapping("/api/private/user")
+@Tag(name = "회원탈퇴", description = "회원 계정 탈퇴 관련 API (비회원 접근 불가)")
+public class PrivateUserController {
 
     private final UserService userService;
 
-    @Operation( summary = "회원가입", description = "사용자의 이메일, 비밀번호, 이름, 연락처 등의 정보를 입력받아 신규 회원 계정을 생성합니다.")
-    @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<Long>> signup(@RequestBody UserCreateRequestDto dto) {
-        Long userId = userService.signup(dto);
-        return ResponseEntity.ok(
-                ApiResponse.<Long>builder()
-                        .success(true)
-                        .message("회원가입이 완료되었습니다.")
-                        .data(userId)
-                        .build()
-        );
-    }
     @Operation(summary = "회원 탈퇴", description = "현재 로그인된 사용자의 회원 정보를 삭제(탈퇴)합니다.")
     @DeleteMapping("/withdraw")
     public ResponseEntity<ApiResponse<Void>> withdraw() {
-        userService.withdraw(); // 현재 로그인한 사용자 기준 탈퇴 처리
+        userService.withdraw();
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()
                         .success(true)
@@ -52,5 +40,4 @@ public class UserController {
                         .build()
         );
     }
-
 }

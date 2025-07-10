@@ -15,7 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user/link")
+@RequestMapping("/api/private/link")
 @RequiredArgsConstructor
 @Tag(name = "소셜 계정 연동", description = "일반 계정과 소셜 계정을 연동하는 API")
 public class SocialLinkController {
