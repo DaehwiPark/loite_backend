@@ -17,6 +17,7 @@ public class CustomUserDetails implements UserDetails {
     private final String username;
     private final String userRegisterType;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();

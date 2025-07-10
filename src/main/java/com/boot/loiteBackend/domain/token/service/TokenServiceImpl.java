@@ -70,11 +70,15 @@ public class TokenServiceImpl implements TokenService {
     UserEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(TokenErrorCode.NOT_FOUND));
 
+    // 기존 refreshToken에 들어있던 로그인 타입 추출
+    String userLoginType = jwtTokenProvider.getUserLoginType(dto.getRefreshToken());
+
     String newAccessToken = jwtTokenProvider.createToken(
             user.getUserId(),
             user.getUserEmail(),
             user.getUserRole(),
-            user.getUserRegisterType()
+            user.getUserRegisterType(),
+            userLoginType
     );
 
     extendRefreshTokenTTL(key, dto.getRefreshToken());
@@ -88,31 +92,31 @@ public class TokenServiceImpl implements TokenService {
   }
 
   @Override
-  public LoginResponseDto getLoginToken(UserEntity user, HttpServletResponse response) {
-    // 1. AccessToken 발급
+  public LoginResponseDto getLoginToken(UserEntity user, HttpServletResponse response, String userLoginType) {
+    // 1. AccessToken 발급 (로그인 방식 포함)
     String accessToken = jwtTokenProvider.createToken(
             user.getUserId(),
             user.getUserEmail(),
             user.getUserRole(),
-            user.getUserRegisterType()
+            user.getUserRegisterType(),
+            userLoginType
     );
 
-    // 2. RefreshToken 발급
+    // RefreshToken 발급
     String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId());
 
-    // 3. RefreshToken Redis 저장
+    // Redis 저장
     String key = String.valueOf(user.getUserId());
     long expirationSeconds = jwtTokenProvider.getRefreshTokenValidity() / 1000;
     saveRefreshToken(key, refreshToken, expirationSeconds);
 
-    // 4. AccessToken 쿠키 저장
+    // AccessToken 쿠키 저장
     jwtCookieUtil.addAccessTokenCookie(response, accessToken, jwtTokenProvider.getAccessTokenValidity() / 1000);
 
-    // 5. 응답 DTO 생성
+    // 응답 DTO
     return LoginResponseDto.builder()
             .refreshToken(refreshToken)
             .tokenType("Bearer")
             .build();
   }
-
 }

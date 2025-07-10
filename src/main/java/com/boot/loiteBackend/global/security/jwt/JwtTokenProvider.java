@@ -14,20 +14,21 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
 
-    public String createToken(Long userId, String email, String role, String userRegisterType) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(userId)); // "sub": userId
-        claims.put("username", email);                                    // "username": email
-        claims.put("role", role);                                         // "role": role
-        claims.put("tokenType", "access");                                // "tokenType": access
-        claims.put("userRegisterType", userRegisterType);                // "userRegisterType": email
+    public String createToken(Long userId, String email, String role, String userRegisterType, String userLoginType) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
+        claims.put("username", email);
+        claims.put("role", role);
+        claims.put("tokenType", "access");
+        claims.put("userRegisterType", userRegisterType);
+        claims.put("userLoginType", userLoginType);
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtProperties.getAccessTokenValidity());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(now)          // "iat"
-                .setExpiration(expiry)     // "exp"
+                .setIssuedAt(now)
+                .setExpiration(expiry)
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
                 .compact();
     }
@@ -96,6 +97,18 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("userRegisterType", String.class);
+    }
+
+    public String getUserLoginType(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(jwtProperties.getSecret())
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("userLoginType", String.class);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public long getAccessTokenValidity() {

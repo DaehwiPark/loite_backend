@@ -8,9 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface LoginService {
 
-    LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response);
+    LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response, String userLoginType);
 
     void logout(CustomUserDetails userDetails, HttpServletResponse response);
 
-    UserSummaryDto myInfo(CustomUserDetails user);
+    UserSummaryDto myInfo(CustomUserDetails user, String token);
 }

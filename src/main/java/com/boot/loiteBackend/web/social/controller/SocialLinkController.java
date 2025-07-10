@@ -50,9 +50,15 @@ public class SocialLinkController {
             @AuthenticationPrincipal CustomUserDetails loginUser,
             HttpServletResponse response
     ) {
-        ApiResponse<LoginResponseDto> result = socialLinkService.link(provider, code, loginUser, response);
+        // JWT에 담을 로그인 방식 (이번 연동 요청에 사용된 소셜 제공자 타입)
+        String userLoginType = provider.toUpperCase();
+
+        ApiResponse<LoginResponseDto> result = socialLinkService.link(provider, code, loginUser, response, userLoginType
+        );
+
         return ResponseEntity.ok(result);
     }
+
 
 
     @DeleteMapping("/{provider}/unlink")

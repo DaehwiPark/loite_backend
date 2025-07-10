@@ -9,7 +9,6 @@ import com.boot.loiteBackend.web.social.dto.SocialLinkingDto;
 import com.boot.loiteBackend.web.social.dto.SocialLinkingStatusResponseDto;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
-import com.boot.loiteBackend.web.social.handler.OAuthHandler;
 import com.boot.loiteBackend.web.social.handler.OAuthLinkHandler;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
@@ -58,7 +57,7 @@ public class SocialLinkService {
     }
 
 
-    public ApiResponse<LoginResponseDto> link(String provider, String code, CustomUserDetails loginUser, HttpServletResponse response) {
+    public ApiResponse<LoginResponseDto> link(String provider, String code, CustomUserDetails loginUser, HttpServletResponse response, String userLoginType) {
         OAuthLinkHandler handler = resolver.resolveLink(provider);
         String accessToken = handler.requestLinkingAccessToken(code);
         OAuthUserInfoDto userInfo = handler.getUserInfo(accessToken);
@@ -97,7 +96,7 @@ public class SocialLinkService {
 
         socialUserRepository.save(socialUser);
 
-        return ApiResponse.ok(tokenService.getLoginToken(user, response),
+        return ApiResponse.ok(tokenService.getLoginToken(user, response, userLoginType),
                 provider.toUpperCase() + " 계정 연동 완료");
     }
 

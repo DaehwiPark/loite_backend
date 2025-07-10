@@ -26,42 +26,51 @@ public class SocialRegisterService {
     private final SocialUserRepository socialUserRepository;
     private final TokenService tokenService;
 
-    public LoginResponseDto register(String providerName, SocialUserRegistrationDto dto, HttpServletResponse response) {
+    public LoginResponseDto register(
+            String providerName,
+            SocialUserRegistrationDto dto,
+            HttpServletResponse response,
+            String userLoginType
+    ) {
         ProviderType provider = parseProvider(providerName);
 
+        // 이메일 중복 확인
         if (userRepository.existsByUserEmail(dto.getUserEmail())) {
             throw new CustomException(SocialErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER);
         }
 
+        // 사용자 계정 등록
         UserEntity user = UserEntity.builder()
                 .userEmail(dto.getUserEmail())
                 .userName(dto.getUserName())
+                .userRegisterType(provider.name())   // 가입 방식
+                .userStatus("ACTIVE")
+                .userRole("USER")
+                .emailVerified(true)
+                .emailVerifiedAt(LocalDateTime.now())
                 .isOver14(dto.isOver14())
                 .agreeTerms(dto.isAgreeTerms())
                 .agreePrivacy(dto.isAgreePrivacy())
                 .agreeMarketingSns(dto.isAgreeMarketingSns())
                 .agreeMarketingEmail(dto.isAgreeMarketingEmail())
-                .emailVerified(true)
-                .emailVerifiedAt(LocalDateTime.now())
-                .userRole("USER")
-                .userStatus("ACTIVE")
-                .userRegisterType(provider.name())
                 .build();
 
         userRepository.save(user);
 
+        // 소셜 계정 연동 정보 저장
         SocialUserEntity social = SocialUserEntity.builder()
                 .user(user)
                 .socialType(provider.name())
                 .socialNumber(dto.getSocialId())
-                .connectedAt(LocalDateTime.now())
                 .socialEmail(dto.getUserEmail())
                 .socialUserName(dto.getUserName())
+                .connectedAt(LocalDateTime.now())
                 .build();
 
         socialUserRepository.save(social);
 
-        return tokenService.getLoginToken(user, response);
+        // 로그인 토큰 발급
+        return tokenService.getLoginToken(user, response, userLoginType);
     }
 
     private ProviderType parseProvider(String providerName) {

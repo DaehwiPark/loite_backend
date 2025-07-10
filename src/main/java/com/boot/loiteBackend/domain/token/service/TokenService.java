@@ -21,5 +21,5 @@ public interface TokenService {
 
     LoginResponseDto refresh(TokenRequestDto dto, HttpServletResponse response);
 
-    LoginResponseDto getLoginToken(UserEntity user, HttpServletResponse response);
+    LoginResponseDto getLoginToken(UserEntity user, HttpServletResponse response, String userLoginType);
 }

@@ -21,15 +21,20 @@ public class LoginController {
 
     private final LoginService loginService;
 
+
+     // 로그인 - 일반/소셜 모두 지원
     @Operation(summary = "로그인", description = "사용자의 이메일과 비밀번호를 검증하고, AccessToken을 쿠키로 설정하며 RefreshToken은 Redis에 저장합니다.")
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody LoginRequestDto dto,
+            @RequestParam(name = "loginType", defaultValue = "EMAIL") String userLoginType,
             HttpServletResponse response
     ) {
-        return ResponseEntity.ok(loginService.login(dto, response));
+        return ResponseEntity.ok(loginService.login(dto, response, userLoginType));
     }
 
+
+     // 로그아웃
     @Operation(summary = "로그아웃", description = "사용자의 리프레시 토큰을 제거하고, AccessToken 쿠키를 만료시킵니다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
@@ -40,10 +45,14 @@ public class LoginController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "내 정보 조회", description = "현재 로그인된 사용자의 정보를 반환합니다.")
-    @GetMapping("/me")
-    public ResponseEntity<UserSummaryDto> myInfo(@AuthenticationPrincipal CustomUserDetails user) {
-        UserSummaryDto result = loginService.myInfo(user);
-        return ResponseEntity.ok(result);
-    }
+
+     // 내 정보 조회
+     @GetMapping("/me")
+     public ResponseEntity<UserSummaryDto> myInfo(
+             @AuthenticationPrincipal CustomUserDetails user,
+             @CookieValue(name = "AccessToken", required = false) String token
+     ) {
+         UserSummaryDto result = loginService.myInfo(user, token);
+         return ResponseEntity.ok(result);
+     }
 }

@@ -3,11 +3,11 @@ package com.boot.loiteBackend.domain.login.service;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.global.security.jwt.JwtCookieUtil;
-import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.domain.login.dto.LoginRequestDto;
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.login.error.LoginErrorCode;
 import com.boot.loiteBackend.domain.token.service.TokenService;
+import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.web.user.dto.UserSummaryDto;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import com.boot.loiteBackend.web.user.repository.UserRepository;
@@ -17,18 +17,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.PrivateKey;
+
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
     private final TokenService tokenService;
     private final JwtCookieUtil jwtCookieUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
+
+     // 일반 로그인 처리
     @Override
-    public LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response) {
+    public LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response, String userLoginType) {
         UserEntity user = userRepository.findByUserEmail(dto.getEmail())
                 .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
 
@@ -36,15 +40,13 @@ public class LoginServiceImpl implements LoginService {
             throw new CustomException(LoginErrorCode.INVALID_PASSWORD);
         }
 
-        String accessToken = jwtTokenProvider.createToken(
-                user.getUserId(),
-                user.getUserEmail(),
-                user.getUserRole(),
-                user.getUserRegisterType()
-        );
-        return tokenService.getLoginToken(user, response);
+        // 로그인 방식 정보를 포함하여 토큰 생성 및 응답 처리
+        return tokenService.getLoginToken(user, response, userLoginType);
     }
 
+
+
+     // 로그아웃 처리 - RefreshToken 제거 + 쿠키 삭제
     @Override
     public void logout(CustomUserDetails userDetails, HttpServletResponse response) {
         String userId = String.valueOf(userDetails.getUserId());
@@ -52,29 +54,28 @@ public class LoginServiceImpl implements LoginService {
         jwtCookieUtil.deleteAccessTokenCookie(response);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public UserSummaryDto myInfo(CustomUserDetails user) {
-        if (user == null) {
-            throw new CustomException(LoginErrorCode.UNAUTHORIZED);
-        }
 
-        UserEntity userEntity = userRepository.findById(user.getUserId())
-                .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
+     // 로그인한 사용자 정보 조회
+     @Override
+     @Transactional(readOnly = true)
+     public UserSummaryDto myInfo(CustomUserDetails user, String token) {
+         if (user == null) {
+             throw new CustomException(LoginErrorCode.UNAUTHORIZED);
+         }
 
-        // 소셜 타입 결정 (소셜 회원인 경우만)
-        String socialType = null;
-        if (userEntity.getUserPassword() == null && !userEntity.getUserSocials().isEmpty()) {
-            socialType = userEntity.getUserSocials().get(0).getSocialType(); // 첫 번째 소셜 타입 사용
-        }
+         UserEntity userEntity = userRepository.findById(user.getUserId())
+                 .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
 
-        return UserSummaryDto.builder()
-                .userId(userEntity.getUserId())
-                .userEmail(userEntity.getUserEmail())
-                .userName(userEntity.getUserName())
-                .userRole(userEntity.getUserRole())
-                .userRegisterType(userEntity.getUserRegisterType())
-                .build();
-    }
+         String userLoginType = jwtTokenProvider.getUserLoginType(token);
+
+         return UserSummaryDto.builder()
+                 .userId(userEntity.getUserId())
+                 .userEmail(userEntity.getUserEmail())
+                 .userName(userEntity.getUserName())
+                 .userRole(userEntity.getUserRole())
+                 .userRegisterType(userEntity.getUserRegisterType())
+                 .userLoginType(userLoginType)
+                 .build();
+     }
 
 }

@@ -66,7 +66,19 @@ public class SocialLoginController {
             @Valid @RequestBody SocialUserRegistrationDto registrationDto,
             HttpServletResponse response
     ) {
-        LoginResponseDto loginResult = socialRegisterService.register(provider, registrationDto, response);
-        return ResponseEntity.ok(ApiResponse.ok(loginResult, provider.toUpperCase() + " 사용자 등록 및 로그인 성공"));
+        // 로그인 타입은 provider 값 그대로 사용
+        String userLoginType = provider.toUpperCase();
+
+        // 서비스 호출 시 로그인 방식 전달
+        LoginResponseDto loginResult = socialRegisterService.register(
+                provider,
+                registrationDto,
+                response,
+                userLoginType
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(loginResult, userLoginType + " 사용자 등록 및 로그인 성공")
+        );
     }
 }

@@ -1,14 +1,14 @@
 package com.boot.loiteBackend.web.social.service;
 
+import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.domain.token.service.TokenService;
+import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
 import com.boot.loiteBackend.web.social.handler.OAuthHandler;
-import com.boot.loiteBackend.web.social.link.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
-import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.domain.token.service.TokenService;
-import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import com.boot.loiteBackend.web.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,9 +26,12 @@ public class SocialLoginService {
 
     private final OAuthHandlerResolver resolver;
     private final UserRepository userRepository;
+    private final SocialUserRepository socialUserRepository;
     private final TokenService tokenService;
 
+     // 소셜 로그인 처리 로직
     public ApiResponse<LoginResponseDto> login(String provider, String code, HttpServletResponse response) {
+        // 소셜 인증 처리
         OAuthHandler handler = resolver.resolveLogin(provider);
         String accessToken = handler.requestAccessToken(code);
         OAuthUserInfoDto userInfo = handler.getUserInfo(accessToken);
@@ -36,30 +39,38 @@ public class SocialLoginService {
         String email = userInfo.getEmail();
         String socialId = userInfo.getSocialId();
         String name = userInfo.getName();
+        String userLoginType = provider.toUpperCase();
 
-        Optional<UserEntity> userOpt = userRepository.findByUserEmail(email);
+        // 소셜 계정으로 이미 연동된 계정이 있는 경우
+        Optional<SocialUserEntity> socialOpt = socialUserRepository
+                .findBySocialTypeAndSocialNumber(userLoginType, socialId);
 
-        if (userOpt.isPresent()) {
-            UserEntity user = userOpt.get();
-            boolean linked = user.getUserSocials().stream()
-                    .anyMatch(s -> s.getSocialType().equalsIgnoreCase(provider) &&
-                            s.getSocialNumber().equals(socialId));
-
-            if (!linked) {
-                return ApiResponse.error(
-                        SocialErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER,
-                        Map.of(
-                                "email", email,
-                                "socialId", socialId,
-                                "provider", provider
-                        )
-                );
-            }
-
-            LoginResponseDto loginDto = tokenService.getLoginToken(user, response);
-            return ApiResponse.ok(loginDto, provider.toUpperCase() + " 로그인 성공");
+        if (socialOpt.isPresent()) {
+            UserEntity user = socialOpt.get().getUser();
+            LoginResponseDto loginDto = tokenService.getLoginToken(user, response, userLoginType);
+            return ApiResponse.ok(loginDto, userLoginType + " 로그인 성공 (연동 계정)");
         }
 
+        // 기존 이메일 회원이 존재하는 경우 -> 연동 정보 저장 후 로그인 처리
+        Optional<UserEntity> userOpt = userRepository.findByUserEmail(email);
+        if (userOpt.isPresent()) {
+            UserEntity user = userOpt.get();
+
+            SocialUserEntity userSocial = SocialUserEntity.builder()
+                    .user(user)
+                    .socialEmail(email)
+                    .socialNumber(socialId)
+                    .socialType(userLoginType)
+                    .socialUserName(name)
+                    .build();
+
+            socialUserRepository.save(userSocial);
+
+            LoginResponseDto loginDto = tokenService.getLoginToken(user, response, userLoginType);
+            return ApiResponse.ok(loginDto, userLoginType + " 로그인 성공 (연동 처리)");
+        }
+
+        // 신규 유저 → 회원가입 유도
         log.info("신규 회원 가입 유도: email={}, provider={}, socialId={}, name={}", email, provider, socialId, name);
 
         return ApiResponse.error(
@@ -68,7 +79,7 @@ public class SocialLoginService {
                         "email", email,
                         "socialId", socialId,
                         "name", name,
-                        "provider", provider
+                        "provider", userLoginType
                 )
         );
     }
