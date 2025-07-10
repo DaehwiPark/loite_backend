@@ -1,12 +1,12 @@
-package com.boot.loiteBackend.web.social.link.model;
+package com.boot.loiteBackend.web.social.dto;
 
 public interface OAuthUserInfo {
-
-    String getSocialId();
 
     String getEmail();
 
     String getName();
+
+    String getSocialId();
 
     String getProvider();
 }
