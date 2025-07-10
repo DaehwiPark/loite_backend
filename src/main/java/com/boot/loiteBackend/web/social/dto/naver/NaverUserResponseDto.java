@@ -5,9 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 네이버 사용자 정보 응답 DTO (OAuthUserInfo 인터페이스 구현)
- */
 @Getter
 @Setter
 @Schema(description = "네이버 사용자 정보 응답 DTO")
