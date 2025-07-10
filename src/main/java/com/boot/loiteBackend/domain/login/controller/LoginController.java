@@ -21,9 +21,11 @@ public class LoginController {
 
     private final LoginService loginService;
 
-
-     // 로그인 - 일반/소셜 모두 지원
-    @Operation(summary = "로그인", description = "사용자의 이메일과 비밀번호를 검증하고, AccessToken을 쿠키로 설정하며 RefreshToken은 Redis에 저장합니다.")
+    @Operation(
+            summary = "로그인",
+            description = "사용자의 이메일과 비밀번호(또는 소셜 로그인 정보)를 검증한 후, AccessToken은 응답 쿠키에 설정되고 RefreshToken은 Redis에 저장됩니다. " +
+                    "loginType 파라미터로 EMAIL, GOOGLE, KAKAO, NAVER 등의 로그인 유형을 구분할 수 있습니다."
+    )
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody LoginRequestDto dto,
@@ -34,8 +36,10 @@ public class LoginController {
     }
 
 
-     // 로그아웃
-    @Operation(summary = "로그아웃", description = "사용자의 리프레시 토큰을 제거하고, AccessToken 쿠키를 만료시킵니다.")
+    @Operation(
+            summary = "로그아웃",
+            description = "현재 로그인된 사용자의 RefreshToken을 Redis에서 제거하고, 브라우저에 저장된 AccessToken 쿠키를 만료시켜 로그아웃 처리합니다."
+    )
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -46,13 +50,17 @@ public class LoginController {
     }
 
 
-     // 내 정보 조회
-     @GetMapping("/me")
-     public ResponseEntity<UserSummaryDto> myInfo(
-             @AuthenticationPrincipal CustomUserDetails user,
-             @CookieValue(name = "AccessToken", required = false) String token
-     ) {
-         UserSummaryDto result = loginService.myInfo(user, token);
-         return ResponseEntity.ok(result);
-     }
+    @Operation(
+            summary = "현재 로그인된 사용자 정보 조회",
+            description = "AccessToken을 통해 인증된 사용자의 정보를 반환합니다. 반환되는 정보에는 이름, 이메일, 소셜 연동 여부, 권한 등이 포함됩니다. " +
+                    "AccessToken은 쿠키로 전달되며, 유효하지 않을 경우 401 응답을 받을 수 있습니다."
+    )
+    @GetMapping("/me")
+    public ResponseEntity<UserSummaryDto> myInfo(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @CookieValue(name = "AccessToken", required = false) String token
+    ) {
+        UserSummaryDto result = loginService.myInfo(user, token);
+        return ResponseEntity.ok(result);
+    }
 }
