@@ -30,8 +30,8 @@ public class ErrorResponseUtil {
     /**
      * 알 수 없는 서버 오류(500) 발생 시 응답 생성
      *
-     * @param ex       예외 객체
-     * @param request  요청 정보
+     * @param ex      예외 객체
+     * @param request 요청 정보
      * @return 에러 응답 ResponseEntity
      */
     public static ResponseEntity<ErrorResponse> toInternalServerError(Exception ex, HttpServletRequest request) {

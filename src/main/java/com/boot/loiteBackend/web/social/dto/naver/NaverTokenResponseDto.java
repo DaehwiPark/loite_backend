@@ -5,29 +5,29 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "네이버 토큰 응답 DTO")
+@Schema(description = "Naver OAuth 토큰 응답 DTO (네이버 인증 서버에서 받은 토큰 정보)")
 public class NaverTokenResponseDto {
 
     @JsonProperty("access_token")
-    @Schema(description = "액세스 토큰", example = "AAAABBBBCCCCDDDD")
+    @Schema(description = "Access Token (API 요청 시 사용되는 인증 토큰)", example = "AAAABBBBCCCCDDDD")
     private String accessToken;
 
     @JsonProperty("token_type")
-    @Schema(description = "토큰 타입", example = "bearer")
+    @Schema(description = "토큰 타입 (일반적으로 'bearer')", example = "bearer")
     private String tokenType;
 
     @JsonProperty("refresh_token")
-    @Schema(description = "리프레시 토큰", example = "ZZZZYYYYXXXXWWWW")
+    @Schema(description = "Refresh Token (Access Token 재발급용)", example = "ZZZZYYYYXXXXWWWW")
     private String refreshToken;
 
     @JsonProperty("expires_in")
-    @Schema(description = "액세스 토큰 만료 시간(초)", example = "3600")
+    @Schema(description = "Access Token 만료 시간 (초 단위)", example = "3600")
     private Integer expiresIn;
 
-    @Schema(description = "토큰 권한 범위", example = "name email")
+    @Schema(description = "Access Token 권한 범위", example = "name email")
     private String scope;
 
     @JsonProperty("refresh_token_expires_in")
-    @Schema(description = "리프레시 토큰 만료 시간(초)", example = "5184000")
+    @Schema(description = "Refresh Token 만료 시간 (초 단위)", example = "5184000")
     private Integer refreshTokenExpiresIn;
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
+@Schema(description = "Kakao OAuth 토큰 응답 DTO (카카오 인증 서버에서 받은 토큰 정보)")
 public class KakaoTokenResponseDto {
 
     @Schema(description = "Access Token", example = "v7LuUq4Vb9s...")

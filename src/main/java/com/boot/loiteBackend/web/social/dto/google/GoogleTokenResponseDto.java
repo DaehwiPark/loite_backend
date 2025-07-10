@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
+@Schema(description = "Google OAuth 토큰 응답 DTO (구글 인증 서버에서 반환된 토큰 정보)")
 public class GoogleTokenResponseDto {
 
     @Schema(description = "Access Token", example = "ya29.a0AfH6SMD...")

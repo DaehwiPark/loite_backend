@@ -1,12 +1,11 @@
-package com.boot.loiteBackend.web.social.link.model;
+package com.boot.loiteBackend.web.social.model;
 
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
 import com.boot.loiteBackend.web.social.dto.naver.NaverUserResponseDto;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class NaverOAuthUserInfo implements OAuthUserInfoDto {
+public class NaverOAuthUserInfo implements OAuthUserInfo {
 
     private final NaverUserResponseDto naverUser;
 

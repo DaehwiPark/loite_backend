@@ -4,7 +4,7 @@ import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.dto.SocialLinkingDto;
 import com.boot.loiteBackend.web.social.dto.SocialLinkingStatusResponseDto;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
@@ -61,7 +61,7 @@ public class SocialLinkService {
     public ApiResponse<LoginResponseDto> link(String provider, String code, CustomUserDetails loginUser, HttpServletResponse response, String userLoginType) {
         OAuthLinkHandler handler = resolver.resolveLink(provider);
         String accessToken = handler.requestLinkingAccessToken(code);
-        OAuthUserInfoDto userInfo = handler.getUserInfo(accessToken);
+        OAuthUserInfo userInfo = handler.getUserInfo(accessToken);
 
         String email = userInfo.getEmail();
         String socialId = userInfo.getSocialId();
@@ -101,6 +101,7 @@ public class SocialLinkService {
                 provider.toUpperCase() + " 계정 연동 완료");
     }
 
+
     public ApiResponse<String> unlinkAccount(String provider, CustomUserDetails loginUser) {
         UserEntity user = userRepository.findById(loginUser.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
@@ -116,6 +117,7 @@ public class SocialLinkService {
         }
     }
 
+    
     public boolean verifySocialAuthentication(String provider, String code, CustomUserDetails loginUser) {
         // 인증용 핸들러 resolve
         OAuthVerifyHandlers handler = resolver.resolveVerify(provider);
@@ -124,7 +126,7 @@ public class SocialLinkService {
         String accessToken = handler.requestVerifyAccessToken(code);
 
         //  access token 으로 사용자 정보 요청
-        OAuthUserInfoDto userInfo = handler.getUserInfo(accessToken);
+        OAuthUserInfo userInfo = handler.getUserInfo(accessToken);
         String authenticatedEmail = userInfo.getEmail();
         String authenticatedSocialNumber = userInfo.getSocialId();
 

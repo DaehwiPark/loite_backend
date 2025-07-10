@@ -1,7 +1,7 @@
 package com.boot.loiteBackend.web.social.handler;
 
 import com.boot.loiteBackend.web.social.client.NaverOAuthClient;
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ public class NaverOAuthHandler implements OAuthHandler, OAuthLinkHandler, OAuthV
 
     // 사용자 정보 요청 공통
     @Override
-    public OAuthUserInfoDto getUserInfo(String accessToken) {
+    public OAuthUserInfo getUserInfo(String accessToken) {
         return naverOAuthClient.requestUserInfo(accessToken);
     }
 

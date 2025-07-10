@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.social.dto;
+package com.boot.loiteBackend.web.social.model;
 
 public interface OAuthUserInfo {
 

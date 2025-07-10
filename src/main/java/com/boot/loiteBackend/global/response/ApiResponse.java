@@ -28,8 +28,7 @@ public class ApiResponse<T> {
     @Schema(description = "추가 정보 (선택적)", example = "{\"email\": \"user@loite.com\"}")
     private Map<String, Object> extra;
 
-    // === 성공 응답 헬퍼 ===
-
+    // 성공 응답 헬퍼
     public static <T> ApiResponse<T> ok(T data) {
         return ApiResponse.<T>builder()
                 .success(true)
@@ -45,8 +44,7 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    // === 실패 응답 헬퍼 ===
-
+    // 실패 응답 헬퍼
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
         return ApiResponse.<T>builder()
                 .success(false)

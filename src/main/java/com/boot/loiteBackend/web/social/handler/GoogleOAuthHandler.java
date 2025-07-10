@@ -1,7 +1,7 @@
 package com.boot.loiteBackend.web.social.handler;
 
 import com.boot.loiteBackend.web.social.client.GoogleOAuthClient;
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class GoogleOAuthHandler implements OAuthHandler, OAuthLinkHandler, OAuthVerifyHandlers {
 
     private final GoogleOAuthClient googleOAuthClient;
 
     // 사용자 정보 요청 공통
     @Override
-    public OAuthUserInfoDto getUserInfo(String accessToken) {
+    public OAuthUserInfo getUserInfo(String accessToken) {
         return googleOAuthClient.requestUserInfo(accessToken);
     }
 

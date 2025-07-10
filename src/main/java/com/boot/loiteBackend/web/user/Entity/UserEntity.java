@@ -35,7 +35,7 @@ public class UserEntity {
     @Column(name = "USER_PHONE", nullable = false, length = 20, columnDefinition = "VARCHAR(20)")
     private String userPhone;
 
-    @Column(name="USER_REGISTER_TYPE", nullable = false, length = 20, columnDefinition = "VARCHAR(20)")
+    @Column(name = "USER_REGISTER_TYPE", nullable = false, length = 20, columnDefinition = "VARCHAR(20)")
     private String userRegisterType;
 
     @Column(name = "USER_BIRTHDATE", nullable = false, columnDefinition = "DATE")
@@ -79,6 +79,9 @@ public class UserEntity {
 
     @Column(name = "UPDATED_AT", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<SocialUserEntity> userSocials = new ArrayList<>();
 
     @PrePersist
     public void onCreate() {
@@ -90,8 +93,4 @@ public class UserEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<SocialUserEntity> userSocials = new ArrayList<>();
 }

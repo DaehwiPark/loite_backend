@@ -26,7 +26,7 @@ public class OAuthHandlerResolver {
                 .orElseThrow(() -> new CustomException(SocialErrorCode.UNSUPPORTED_PROVIDER));
     }
 
-    // 연동용 핸들러 (리다이렉트 URL이 다를 수 있음)
+    // 연동용 핸들러
     public OAuthLinkHandler resolveLink(String providerName) {
         return linkHandlers.stream()
                 .filter(handler -> handler.getProvider().name().equalsIgnoreCase(providerName))
@@ -34,7 +34,7 @@ public class OAuthHandlerResolver {
                 .orElseThrow(() -> new CustomException(SocialErrorCode.UNSUPPORTED_PROVIDER));
     }
 
-    // 인증용 핸들러 (리다이렉트 URL이 다를 수 있음)
+    // 인증용 핸들러
     public OAuthVerifyHandlers resolveVerify(String providerName) {
         return verifyHandlers.stream()
                 .filter(handler -> handler.getProvider().name().equalsIgnoreCase(providerName))

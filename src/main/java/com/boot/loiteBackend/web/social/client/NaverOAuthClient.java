@@ -1,12 +1,12 @@
 package com.boot.loiteBackend.web.social.client;
 
 import com.boot.loiteBackend.web.social.config.OAuthProperties;
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.dto.naver.NaverTokenResponseDto;
 import com.boot.loiteBackend.web.social.dto.naver.NaverUserResponseDto;
 import com.boot.loiteBackend.web.social.error.NaverLoginErrorCode;
 import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.web.social.link.model.NaverOAuthUserInfo;
+import com.boot.loiteBackend.web.social.model.NaverOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -104,7 +104,7 @@ public class NaverOAuthClient {
     }
 
     // 사용자 정보 요청
-    public OAuthUserInfoDto requestUserInfo(String accessToken) {
+    public OAuthUserInfo requestUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
 

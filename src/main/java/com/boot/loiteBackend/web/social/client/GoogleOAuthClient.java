@@ -1,12 +1,12 @@
 package com.boot.loiteBackend.web.social.client;
 
 import com.boot.loiteBackend.web.social.config.OAuthProperties;
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.dto.google.GoogleTokenResponseDto;
 import com.boot.loiteBackend.web.social.dto.google.GoogleUserResponseDto;
 import com.boot.loiteBackend.web.social.error.GoogleLoginErrorCode;
 import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.web.social.link.model.GoogleOAuthUserInfo;
+import com.boot.loiteBackend.web.social.model.GoogleOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -107,7 +108,7 @@ public class GoogleOAuthClient {
     }
 
     // 사용자 정보 요청
-    public OAuthUserInfoDto requestUserInfo(String accessToken) {
+    public OAuthUserInfo requestUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
 

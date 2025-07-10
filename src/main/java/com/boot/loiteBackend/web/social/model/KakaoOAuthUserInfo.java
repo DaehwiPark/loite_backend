@@ -1,12 +1,11 @@
-package com.boot.loiteBackend.web.social.link.model;
+package com.boot.loiteBackend.web.social.model;
 
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
 import com.boot.loiteBackend.web.social.dto.kakao.KakaoUserResponseDto;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class KakaoOAuthUserInfo implements OAuthUserInfoDto {
+public class KakaoOAuthUserInfo implements OAuthUserInfo {
 
     private final KakaoUserResponseDto kakaoUser;
 

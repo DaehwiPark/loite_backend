@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.social.dto.naver;
 
-import com.boot.loiteBackend.web.social.link.model.OAuthUserInfo;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

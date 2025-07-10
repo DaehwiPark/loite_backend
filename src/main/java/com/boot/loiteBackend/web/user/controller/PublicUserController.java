@@ -17,7 +17,7 @@ public class PublicUserController {
 
     private final UserService userService;
 
-    @Operation( summary = "회원가입", description = "사용자의 이메일, 비밀번호, 이름, 연락처 등의 정보를 입력받아 신규 회원 계정을 생성합니다.")
+    @Operation(summary = "회원가입", description = "사용자의 이메일, 비밀번호, 이름, 연락처 등의 정보를 입력받아 신규 회원 계정을 생성합니다.")
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Long>> signup(@RequestBody UserCreateRequestDto dto) {
         Long userId = userService.signup(dto);

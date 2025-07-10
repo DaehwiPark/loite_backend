@@ -3,7 +3,7 @@ package com.boot.loiteBackend.web.social.service;
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
 import com.boot.loiteBackend.web.social.handler.OAuthHandler;
@@ -29,12 +29,10 @@ public class SocialLoginService {
     private final SocialUserRepository socialUserRepository;
     private final TokenService tokenService;
 
-     // 소셜 로그인 처리 로직
     public ApiResponse<LoginResponseDto> login(String provider, String code, HttpServletResponse response) {
-        // 소셜 인증 처리
         OAuthHandler handler = resolver.resolveLogin(provider);
         String accessToken = handler.requestAccessToken(code);
-        OAuthUserInfoDto userInfo = handler.getUserInfo(accessToken);
+        OAuthUserInfo userInfo = handler.getUserInfo(accessToken);
 
         String email = userInfo.getEmail();
         String socialId = userInfo.getSocialId();

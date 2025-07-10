@@ -30,7 +30,7 @@ public class LoginServiceImpl implements LoginService {
     private final JwtTokenProvider jwtTokenProvider;
 
 
-     // 일반 로그인 처리
+    // 일반 로그인 처리
     @Override
     public LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response, String userLoginType) {
         UserEntity user = userRepository.findByUserEmail(dto.getEmail())
@@ -45,8 +45,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
 
-
-     // 로그아웃 처리 - RefreshToken 제거 + 쿠키 삭제
+    // 로그아웃 처리 - RefreshToken 제거 + 쿠키 삭제
     @Override
     public void logout(CustomUserDetails userDetails, HttpServletResponse response) {
         String userId = String.valueOf(userDetails.getUserId());
@@ -55,28 +54,28 @@ public class LoginServiceImpl implements LoginService {
     }
 
 
-     // 로그인한 사용자 정보 조회
-     @Override
-     @Transactional(readOnly = true)
-     public UserSummaryDto myInfo(CustomUserDetails user, String token) {
-         if (user == null) {
-             throw new CustomException(LoginErrorCode.UNAUTHORIZED);
-         }
+    // 로그인한 사용자 정보 조회
+    @Override
+    @Transactional(readOnly = true)
+    public UserSummaryDto myInfo(CustomUserDetails user, String token) {
+        if (user == null) {
+            throw new CustomException(LoginErrorCode.UNAUTHORIZED);
+        }
 
-         UserEntity userEntity = userRepository.findById(user.getUserId())
-                 .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
+        UserEntity userEntity = userRepository.findById(user.getUserId())
+                .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
 
-         String userLoginType = jwtTokenProvider.getUserLoginType(token);
+        String userLoginType = jwtTokenProvider.getUserLoginType(token);
 
-         return UserSummaryDto.builder()
-                 .userId(userEntity.getUserId())
-                 .userEmail(userEntity.getUserEmail())
-                 .userName(userEntity.getUserName())
-                 .userRole(userEntity.getUserRole())
-                 .userRegisterType(userEntity.getUserRegisterType())
-                 .userLoginType(userLoginType)
-                 .build();
-     }
+        return UserSummaryDto.builder()
+                .userId(userEntity.getUserId())
+                .userEmail(userEntity.getUserEmail())
+                .userName(userEntity.getUserName())
+                .userRole(userEntity.getUserRole())
+                .userRegisterType(userEntity.getUserRegisterType())
+                .userLoginType(userLoginType)
+                .build();
+    }
 
     @Override
     public boolean check(CustomUserDetails user, String password) {

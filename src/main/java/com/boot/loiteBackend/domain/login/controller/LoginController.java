@@ -66,6 +66,7 @@ public class LoginController {
         return ResponseEntity.ok(result);
     }
 
+
     @Operation(
             summary = "비밀번호 인증 (본인 확인)",
             description = "마이페이지 접근 등 민감한 작업 전에 사용자 비밀번호를 다시 입력받아 검증합니다."
@@ -78,5 +79,4 @@ public class LoginController {
         boolean result = loginService.check(user, dto.getPassword());
         return ResponseEntity.ok(ApiResponse.ok(result, "비밀번호 인증 성공"));
     }
-
 }

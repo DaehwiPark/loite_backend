@@ -17,8 +17,6 @@ public interface TokenService {
 
     void extendRefreshTokenTTL(String userId, String refreshToken);
 
-    Long getRemainingTTL(String userId);
-
     LoginResponseDto refresh(TokenRequestDto dto, HttpServletResponse response);
 
     LoginResponseDto getLoginToken(UserEntity user, HttpServletResponse response, String userLoginType);

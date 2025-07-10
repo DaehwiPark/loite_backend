@@ -2,12 +2,11 @@ package com.boot.loiteBackend.web.social.client;
 
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.social.config.OAuthProperties;
-import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
+import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.dto.kakao.KakaoTokenResponseDto;
 import com.boot.loiteBackend.web.social.dto.kakao.KakaoUserResponseDto;
 import com.boot.loiteBackend.web.social.error.KakaoLoginErrorCode;
-import com.boot.loiteBackend.web.social.error.NaverLoginErrorCode;
-import com.boot.loiteBackend.web.social.link.model.KakaoOAuthUserInfo;
+import com.boot.loiteBackend.web.social.model.KakaoOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -102,7 +101,7 @@ public class KakaoOAuthClient {
     }
 
     // 사용자 정보 요청
-    public OAuthUserInfoDto requestUserInfo(String accessToken) {
+    public OAuthUserInfo requestUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
 
