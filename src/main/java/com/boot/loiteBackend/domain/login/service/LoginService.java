@@ -13,4 +13,6 @@ public interface LoginService {
     void logout(CustomUserDetails userDetails, HttpServletResponse response);
 
     UserSummaryDto myInfo(CustomUserDetails user, String token);
+
+    boolean check(CustomUserDetails user, String password);
 }

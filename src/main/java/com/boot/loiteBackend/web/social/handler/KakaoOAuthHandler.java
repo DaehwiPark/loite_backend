@@ -2,11 +2,7 @@ package com.boot.loiteBackend.web.social.handler;
 
 import com.boot.loiteBackend.web.social.client.KakaoOAuthClient;
 import com.boot.loiteBackend.web.social.dto.OAuthUserInfoDto;
-import com.boot.loiteBackend.web.social.dto.kakao.KakaoUserResponseDto;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
-import com.boot.loiteBackend.web.social.error.SocialErrorCode;
-import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.web.social.link.model.KakaoOAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,24 +10,25 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class KakaoOAuthHandler implements OAuthHandler, OAuthLinkHandler {
+public class KakaoOAuthHandler implements OAuthHandler, OAuthLinkHandler, OAuthVerifyHandlers {
 
     private final KakaoOAuthClient kakaoOAuthClient;
 
+    // 사용자 정보 요청 공통
     @Override
     public ProviderType getProvider() {
         return ProviderType.KAKAO;
     }
-    // 로그인 URL
+
+    @Override
+    public OAuthUserInfoDto getUserInfo(String accessToken) {
+        return kakaoOAuthClient.requestUserInfo(accessToken);
+    }
+
+    // 로그인용
     @Override
     public String getUrl() {
         return kakaoOAuthClient.getLoginUrl();
-    }
-
-    // 연동용 URL 추가
-    @Override
-    public String getLinkUrl() {
-        return kakaoOAuthClient.getLinkingUrl();
     }
 
     @Override
@@ -39,13 +36,25 @@ public class KakaoOAuthHandler implements OAuthHandler, OAuthLinkHandler {
         return kakaoOAuthClient.requestAccessToken(code);
     }
 
+    // 연동용
+    @Override
+    public String getLinkUrl() {
+        return kakaoOAuthClient.getLinkingUrl();
+    }
+
     @Override
     public String requestLinkingAccessToken(String code) {
         return kakaoOAuthClient.requestLinkingAccessToken(code);
     }
 
+    // 인증(verify)용
     @Override
-    public OAuthUserInfoDto getUserInfo(String accessToken) {
-        return kakaoOAuthClient.requestUserInfo(accessToken);
+    public String getVerifyUrl() {
+        return kakaoOAuthClient.getVerifyUrl();
+    }
+
+    @Override
+    public String requestVerifyAccessToken(String code) {
+        return kakaoOAuthClient.requestVerifyAccessToken(code);
     }
 }

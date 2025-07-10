@@ -25,17 +25,22 @@ public class KakaoOAuthClient {
     private final OAuthProperties oAuthProperties;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // 로그인용 URL 생성
+    // 로그인용 URL
     public String getLoginUrl() {
         return buildAuthorizeUrl(oAuthProperties.getKakao().getRedirectUri());
     }
 
-    // 연동용 URL 생성
+    // 연동용 URL
     public String getLinkingUrl() {
         return buildAuthorizeUrl(oAuthProperties.getKakao().getLinkRedirectUri());
     }
 
+    // 인증용 URL (마이페이지 인증)
+    public String getVerifyUrl() {
+        return buildAuthorizeUrl(oAuthProperties.getKakao().getVerifyRedirectUri());
+    }
 
+    // 공통 URL 생성
     private String buildAuthorizeUrl(String redirectUri) {
         OAuthProperties.Provider kakao = oAuthProperties.getKakao();
         return kakao.getAuthEndpoint()
@@ -44,17 +49,22 @@ public class KakaoOAuthClient {
                 + "&response_type=" + kakao.getResponseType();
     }
 
-    // 로그인용 액세스 토큰 요청
+    // 로그인용 토큰
     public String requestAccessToken(String code) {
         return requestAccessTokenInternal(code, oAuthProperties.getKakao().getRedirectUri());
     }
 
-    // 연동용 액세스 토큰 요청
+    // 연동용 토큰
     public String requestLinkingAccessToken(String code) {
         return requestAccessTokenInternal(code, oAuthProperties.getKakao().getLinkRedirectUri());
     }
 
-    // 내부 공통 토큰 요청 로직
+    // 인증용 토큰 (마이페이지 인증)
+    public String requestVerifyAccessToken(String code) {
+        return requestAccessTokenInternal(code, oAuthProperties.getKakao().getVerifyRedirectUri());
+    }
+
+    // 공통 액세스 토큰 요청 로직
     private String requestAccessTokenInternal(String code, String redirectUri) {
         OAuthProperties.Provider kakao = oAuthProperties.getKakao();
 
@@ -103,10 +113,11 @@ public class KakaoOAuthClient {
                     new HttpEntity<>(headers),
                     KakaoUserResponseDto.class
             );
+
             KakaoUserResponseDto kakaoUser = response.getBody();
             log.debug("카카오 사용자 정보 응답: {}", kakaoUser);
 
-            return new KakaoOAuthUserInfo(kakaoUser); // 어댑터 객체로 감싸서 반환
+            return new KakaoOAuthUserInfo(kakaoUser);
 
         } catch (HttpClientErrorException e) {
             log.error("카카오 사용자 정보 요청 실패 (Client Error): {}", e.getResponseBodyAsString());

@@ -78,4 +78,23 @@ public class LoginServiceImpl implements LoginService {
                  .build();
      }
 
+    @Override
+    public boolean check(CustomUserDetails user, String password) {
+        if (user == null) {
+            throw new CustomException(LoginErrorCode.UNAUTHORIZED);
+        }
+
+        UserEntity userEntity = userRepository.findById(user.getUserId())
+                .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
+
+        if (userEntity.getUserPassword() == null) {
+            throw new CustomException(LoginErrorCode.SOCIAL_USER_CANNOT_VERIFY_PASSWORD);
+        }
+
+        if (!passwordEncoder.matches(password, userEntity.getUserPassword())) {
+            throw new CustomException(LoginErrorCode.INVALID_PASSWORD);
+        }
+
+        return true;
+    }
 }

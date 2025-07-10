@@ -20,13 +20,14 @@ public class OAuthProperties {
     @Getter
     @Setter
     public static class Provider {
-        private String authEndpoint;         // 인증 요청 URL
-        private String tokenEndpoint;        // 토큰 요청 URL
+        private String authEndpoint;
+        private String tokenEndpoint;
         private String clientId;
         private String clientSecret;
-        private String redirectUri;          // 로그인용 redirect_uri
-        private String linkRedirectUri;      // 소셜 연동용 redirect_uri (신규 추가)
+        private String redirectUri;
+        private String linkRedirectUri;
+        private String verifyRedirectUri;
         private String responseType;
-        private String scope;                // 구글 전용
+        private String scope;
     }
 }

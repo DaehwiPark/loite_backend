@@ -10,6 +10,7 @@ import com.boot.loiteBackend.web.social.dto.SocialLinkingStatusResponseDto;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
 import com.boot.loiteBackend.web.social.handler.OAuthLinkHandler;
+import com.boot.loiteBackend.web.social.handler.OAuthVerifyHandlers;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
@@ -114,4 +115,35 @@ public class SocialLinkService {
             return ApiResponse.error(SocialErrorCode.SOCIAL_NOT_LINKED);
         }
     }
+
+    public boolean verifySocialAuthentication(String provider, String code, CustomUserDetails loginUser) {
+        // 인증용 핸들러 resolve
+        OAuthVerifyHandlers handler = resolver.resolveVerify(provider);
+
+        //  인증 코드로 access token 요청
+        String accessToken = handler.requestVerifyAccessToken(code);
+
+        //  access token 으로 사용자 정보 요청
+        OAuthUserInfoDto userInfo = handler.getUserInfo(accessToken);
+        String authenticatedEmail = userInfo.getEmail();
+        String authenticatedSocialNumber = userInfo.getSocialId();
+
+        //  현재 로그인된 사용자 기준 연동된 소셜 계정 조회
+        Optional<SocialUserEntity> linkedOpt = socialUserRepository
+                .findByUserAndSocialType(
+                        userRepository.findById(loginUser.getUserId())
+                                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다.")),
+                        provider.toUpperCase()
+                );
+
+        if (linkedOpt.isEmpty()) return false;
+
+        SocialUserEntity linked = linkedOpt.get();
+
+        //  이메일, SOCIAL_NUMBER 비교
+        boolean emailMatches = linked.getSocialEmail().equalsIgnoreCase(authenticatedEmail);
+        boolean socialNumberMatches = linked.getSocialNumber().equals(authenticatedSocialNumber);
+        return emailMatches && socialNumberMatches;
+    }
+
 }

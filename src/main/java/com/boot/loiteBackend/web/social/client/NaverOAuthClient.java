@@ -34,6 +34,13 @@ public class NaverOAuthClient {
         return buildAuthorizeUrl(oAuthProperties.getNaver().getLinkRedirectUri());
     }
 
+    // 인증용 URL (마이페이지 인증)
+
+    public String getVerifyUrl() {
+        return buildAuthorizeUrl(oAuthProperties.getNaver().getVerifyRedirectUri());
+    }
+
+    // 공통 URL 생성
     private String buildAuthorizeUrl(String redirectUri) {
         OAuthProperties.Provider naver = oAuthProperties.getNaver();
         return naver.getAuthEndpoint()
@@ -43,17 +50,22 @@ public class NaverOAuthClient {
                 + "&state=loite"; // CSRF 대응
     }
 
-    // 로그인용 액세스 토큰 요청
+    // 로그인용 토큰
     public String requestAccessToken(String code) {
         return requestAccessToken(code, oAuthProperties.getNaver().getRedirectUri());
     }
 
-    // 연동용 액세스 토큰 요청
+    // 연동용 토큰
     public String requestLinkingAccessToken(String code) {
         return requestAccessToken(code, oAuthProperties.getNaver().getLinkRedirectUri());
     }
 
-    // 내부 공통 토큰 요청 로직
+    // 인증용 토큰 (마이페이지 인증)
+    public String requestVerifyAccessToken(String code) {
+        return requestAccessToken(code, oAuthProperties.getNaver().getVerifyRedirectUri());
+    }
+
+    // 공통 액세스 토큰 요청 로직
     private String requestAccessToken(String code, String redirectUri) {
         OAuthProperties.Provider naver = oAuthProperties.getNaver();
 
@@ -104,10 +116,10 @@ public class NaverOAuthClient {
                     NaverUserResponseDto.class
             );
 
-            NaverUserResponseDto NaverUser = response.getBody();
-            log.debug("네이버 사용자 정보 응답: {}", NaverUser);
+            NaverUserResponseDto user = response.getBody();
+            log.debug("네이버 사용자 정보 응답: {}", user);
 
-            return new NaverOAuthUserInfo(NaverUser);
+            return new NaverOAuthUserInfo(user);
 
         } catch (HttpClientErrorException e) {
             log.error("네이버 사용자 정보 요청 실패 (Client Error): {}", e.getResponseBodyAsString());

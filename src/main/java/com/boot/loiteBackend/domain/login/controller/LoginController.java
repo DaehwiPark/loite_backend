@@ -1,5 +1,7 @@
 package com.boot.loiteBackend.domain.login.controller;
 
+import com.boot.loiteBackend.domain.login.dto.VerifyRequestDto;
+import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.domain.login.dto.LoginRequestDto;
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
@@ -63,4 +65,18 @@ public class LoginController {
         UserSummaryDto result = loginService.myInfo(user, token);
         return ResponseEntity.ok(result);
     }
+
+    @Operation(
+            summary = "비밀번호 인증 (본인 확인)",
+            description = "마이페이지 접근 등 민감한 작업 전에 사용자 비밀번호를 다시 입력받아 검증합니다."
+    )
+    @PostMapping("/verify-password")
+    public ResponseEntity<ApiResponse<Boolean>> verifyPassword(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody VerifyRequestDto dto
+    ) {
+        boolean result = loginService.check(user, dto.getPassword());
+        return ResponseEntity.ok(ApiResponse.ok(result, "비밀번호 인증 성공"));
+    }
+
 }

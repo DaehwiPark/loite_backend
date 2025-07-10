@@ -15,4 +15,6 @@ public interface SocialUserRepository extends JpaRepository<SocialUserEntity, Lo
     List<SocialUserEntity> findAllByUser(UserEntity user);
 
     Optional<SocialUserEntity> findByUserAndSocialType(UserEntity user, String upperCase);
+
+    Optional<SocialUserEntity> findByUser_UserIdAndSocialNumber(Long userId, String socialNumber);
 }
