@@ -103,6 +103,7 @@ public class ProductServiceImpl implements ProductService {
                         .optionId(option.getOptionId())
                         .optionType(option.getOptionType())
                         .optionValue(option.getOptionValue())
+                        .optionColorCode(option.getOptionColorCode())
                         .optionAdditionalPrice(option.getOptionAdditionalPrice())
                         .optionStock(option.getOptionStock())
                         .soldOutYn(option.getSoldOutYn())
