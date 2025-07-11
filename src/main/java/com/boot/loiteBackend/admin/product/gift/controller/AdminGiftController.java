@@ -6,8 +6,10 @@ import com.boot.loiteBackend.admin.product.gift.service.AdminGiftService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,9 +22,12 @@ public class AdminGiftController {
     private final AdminGiftService adminGiftService;
 
     @Operation(summary = "사은품 등록", description = "사은품을 등록합니다.")
-    @PostMapping
-    public ResponseEntity<Long> saveGift(@RequestBody AdminGiftRequestDto dto) {
-        Long giftId = adminGiftService.saveGift(dto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Long> saveGift(
+            @ModelAttribute AdminGiftRequestDto dto,
+            @RequestParam("imageFile") MultipartFile imageFile) {
+
+        Long giftId = adminGiftService.saveGift(dto, imageFile);
         return ResponseEntity.ok(giftId);
     }
 

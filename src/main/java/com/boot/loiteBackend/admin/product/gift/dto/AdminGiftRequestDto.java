@@ -10,6 +10,7 @@ import lombok.Setter;
 public class AdminGiftRequestDto {
     private Long giftId;
     private String giftName;
+    private String giftImageUrl;
     private Integer giftStock;
     private String activeYn;
 }

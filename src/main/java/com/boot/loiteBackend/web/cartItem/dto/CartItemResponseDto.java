@@ -3,6 +3,7 @@ package com.boot.loiteBackend.web.cartItem.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,6 +27,13 @@ public class CartItemResponseDto {
     private BigDecimal discountedPrice;
     private int discountRate;
     private boolean checked;
+
+    private List<GiftDto> gifts;
+
+    public static class GiftDto {
+        private String giftName;
+        private String giftImageUrl;
+    }
 
     public String getOptionText() {
         return optionType + " / " + optionValue;

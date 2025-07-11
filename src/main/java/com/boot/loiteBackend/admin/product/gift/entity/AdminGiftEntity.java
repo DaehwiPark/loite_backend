@@ -22,6 +22,9 @@ public class AdminGiftEntity {
     @Column(name = "GIFT_NAME", nullable = false, length = 255)
     private String giftName;
 
+    @Column(name = "GIFT_IMAGE_URL")
+    private String giftImageUrl;
+
     @Column(name = "GIFT_STOCK")
     private Integer giftStock;
 

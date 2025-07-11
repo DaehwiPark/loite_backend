@@ -28,6 +28,7 @@ public class ProductDetailResponseDto {
     private String productCode;
     private Integer productStock;
 
+
     private List<ProductSectionDto> sections;
 
     // 옵션
