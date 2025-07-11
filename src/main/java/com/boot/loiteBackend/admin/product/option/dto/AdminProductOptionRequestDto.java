@@ -12,6 +12,7 @@ public class AdminProductOptionRequestDto {
     private Long productId;
     private String optionType;
     private String optionValue;
+    private String optionColorCode;
     private int optionAdditionalPrice;
     private int optionStock;
     private String optionStyleType;

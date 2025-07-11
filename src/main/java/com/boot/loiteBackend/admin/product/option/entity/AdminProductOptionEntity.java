@@ -31,6 +31,9 @@ public class AdminProductOptionEntity {
     @Column(name = "OPTION_VALUE", length = 100)
     private String optionValue;
 
+    @Column(name = "OPTION_COLOR_CODE")
+    private String optionColorCode;
+
     @Column(name = "OPTION_ADDITIONAL_PRICE")
     private int optionAdditionalPrice;
 

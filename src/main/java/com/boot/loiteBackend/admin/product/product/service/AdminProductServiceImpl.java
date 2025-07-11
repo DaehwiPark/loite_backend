@@ -389,6 +389,7 @@ public class AdminProductServiceImpl implements AdminProductService {
                     AdminProductDetailResponseDto.ProductOptionDto optDto = new AdminProductDetailResponseDto.ProductOptionDto();
                     optDto.setOptionType(opt.getOptionType());
                     optDto.setOptionValue(opt.getOptionValue());
+                    optDto.setOptionColorCode(opt.getOptionColorCode());
                     optDto.setOptionAdditionalPrice(opt.getOptionAdditionalPrice());
                     optDto.setOptionStock(opt.getOptionStock());
                     optDto.setOptionStyleType(opt.getOptionStyleType().name());
