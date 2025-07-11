@@ -29,4 +29,17 @@ public class PublicUserController {
                         .build()
         );
     }
+
+    @Operation(summary = "이메일 중복 확인", description = "입력한 이메일이 이미 가입된 이메일인지 확인합니다.")
+    @GetMapping("/check-email")
+    public ResponseEntity<ApiResponse<Boolean>> checkEmail(@RequestParam String email) {
+        boolean duplicated = userService.isEmailDuplicated(email);
+        return ResponseEntity.ok(
+                ApiResponse.<Boolean>builder()
+                        .success(true)
+                        .message(duplicated ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다.")
+                        .data(duplicated)
+                        .build()
+        );
+    }
 }

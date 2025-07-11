@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -81,5 +82,11 @@ public class UserServiceImpl implements UserService {
 
         // 물리 삭제를 원한다면 아래 한 줄로 대체 가능
         userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isEmailDuplicated(String userEmail) {
+        return userRepository.existsByUserEmail(userEmail);
     }
 }

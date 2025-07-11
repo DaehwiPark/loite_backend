@@ -11,4 +11,6 @@ public interface UserService {
     void withdraw();
 
     void withdrawById(Long userId);
+
+    boolean isEmailDuplicated(String userEmail);
 }
