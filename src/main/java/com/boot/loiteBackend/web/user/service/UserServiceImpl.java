@@ -43,25 +43,26 @@ public class UserServiceImpl implements UserService {
         user.setUserPassword(dto.getUserPassword());
         user.setUserBirthdate(birthdate);
         user.setEmailVerified(false);
-        user.setRole("USER");
+        user.setUserRole("USER");
         user.setUserStatus("ACTIVE");
+        user.setUserRegisterType("EMAIL");
 
-        // 7. 저장 및 ID 반환
         return userRepository.save(user).getUserId();
     }
 
     @Override
     public void withdraw() {
         // 인증된 사용자 조회 (SecurityContext 기반)
-        UserEntity currentUser =  getCurrentUser();
+        UserEntity currentUser = getCurrentUser();
 
         // 소프트 삭제 방식 권장
         currentUser.setUserStatus("DELETED");
         userRepository.save(currentUser);
 
         // 만약 물리 삭제를 원한다면 아래 코드 사용
-         userRepository.delete(currentUser);
+        userRepository.delete(currentUser);
     }
+
     private UserEntity getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -79,7 +80,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         // 물리 삭제를 원한다면 아래 한 줄로 대체 가능
-         userRepository.delete(user);
+        userRepository.delete(user);
     }
-
 }

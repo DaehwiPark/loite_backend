@@ -24,7 +24,12 @@ public class UserSummaryDto {
     @Schema(description = "사용자 이름", example = "홍길동")
     private String userName;
 
-    @Schema(description = "사용자 역할", example = "ADMIN / USER")
-    private String role;
+    @Schema(description = "가입 시 소셜 타입 또는 이메일", example = "KAKAO / NAVER / GOOGLE / EMAIL")
+    private String userRegisterType;
 
+    @Schema(description = "현재 로그인 방식", example = "KAKAO / NAVER / GOOGLE / EMAIL")
+    private String userLoginType;
+
+    @Schema(description = "사용자 역할", example = "ADMIN / USER")
+    private String userRole;
 }
