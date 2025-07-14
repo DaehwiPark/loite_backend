@@ -22,22 +22,14 @@ public class CartItemResponseDto {
     private String optionValue;
     private Integer optionAdditionalPrice;
 
+    private String giftName;
+    private String giftImageUrl;
+
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal discountedPrice;
     private int discountRate;
     private boolean checked;
-
-    private List<GiftDto> gifts;
-
-    public static class GiftDto {
-        private String giftName;
-        private String giftImageUrl;
-    }
-
-    public String getOptionText() {
-        return optionType + " / " + optionValue;
-    }
 
     public BigDecimal getTotalPrice() {
         BigDecimal basePrice = discountedPrice != null ? discountedPrice : unitPrice;

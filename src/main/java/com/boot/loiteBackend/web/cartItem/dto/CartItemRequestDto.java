@@ -11,6 +11,6 @@ public class CartItemRequestDto {
 
     private Long productId;
     private Long productOptionId;
-    private String optionText;
+    private Long giftId;
     private Integer quantity;
 }

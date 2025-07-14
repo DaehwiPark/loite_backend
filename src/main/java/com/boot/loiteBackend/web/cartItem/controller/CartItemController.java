@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user/cart-items")
+@RequestMapping("/api/private/cart-items")
 @Tag(name = "장바구니 ", description = "장바구니 관련 기능 API")
 public class CartItemController {
     private final CartItemService cartItemService;

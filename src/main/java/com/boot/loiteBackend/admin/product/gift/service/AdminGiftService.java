@@ -11,6 +11,8 @@ public interface AdminGiftService {
 
     List<AdminGiftResponseDto> getAllGifts();
 
+    AdminGiftResponseDto getGift(Long giftId);
+
     void updateGift(Long giftId, AdminGiftRequestDto dto);
 
     void deleteGift(Long giftId);

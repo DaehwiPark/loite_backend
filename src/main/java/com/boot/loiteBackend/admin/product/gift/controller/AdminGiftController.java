@@ -23,10 +23,7 @@ public class AdminGiftController {
 
     @Operation(summary = "사은품 등록", description = "사은품을 등록합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Long> saveGift(
-            @ModelAttribute AdminGiftRequestDto dto,
-            @RequestParam("imageFile") MultipartFile imageFile) {
-
+    public ResponseEntity<Long> saveGift(@ModelAttribute AdminGiftRequestDto dto, @RequestParam("imageFile") MultipartFile imageFile) {
         Long giftId = adminGiftService.saveGift(dto, imageFile);
         return ResponseEntity.ok(giftId);
     }
@@ -42,6 +39,13 @@ public class AdminGiftController {
     @GetMapping
     public ResponseEntity<List<AdminGiftResponseDto>> getAllGifts() {
         return ResponseEntity.ok(adminGiftService.getAllGifts());
+    }
+
+    @Operation(summary = "사은품 상세 조회", description = "사은품 상세 정보를 조회합니다.")
+    @GetMapping("/{giftId}")
+    public ResponseEntity<AdminGiftResponseDto> getGift(@PathVariable Long giftId) {
+        AdminGiftResponseDto dto = adminGiftService.getGift(giftId);
+        return ResponseEntity.ok(dto);
     }
 
     @Operation(summary = "사은품 삭제", description = "사은품을 삭제합니다.")
