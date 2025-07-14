@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/private/user")
-@Tag(name = "회원탈퇴", description = "회원 계정 탈퇴 관련 API (비회원 접근 불가)")
+@Tag(name = "회원탈퇴 API", description = "회원 계정 탈퇴 관련 API (비회원 접근 불가)")
 public class PrivateUserController {
 
     private final UserService userService;

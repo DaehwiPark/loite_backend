@@ -7,8 +7,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminSupportNoticeService {
     AdminSupportNoticeDto createNotice(AdminSupportNoticeRequestDto requestDto);
+
     AdminSupportNoticeDto updateNotice(Long id, AdminSupportNoticeRequestDto requestDto);
+
     void deleteNotice(Long id);
+
     AdminSupportNoticeDto getNoticeById(Long id);
+
     Page<AdminSupportNoticeDto> getPagedNotices(String Keyword, Pageable pageable);
+
 }
