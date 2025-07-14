@@ -2,8 +2,8 @@ package com.boot.loiteBackend.admin.support.faq.category.service;
 
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqCategoryDto;
-import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqCategoryRequestDto;
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqCategoryEntity;
+import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryRequestDto;
+import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
 import com.boot.loiteBackend.admin.support.faq.category.error.AdminFaqCategoryErrorCode;
 import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqCategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +15,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AdminSupportFaqCategoryServiceImpl implements AdminSupportFaqCategoryService {
+public class AdminSupportFaqMediumCategoryServiceImpl implements AdminSupportFaqMediumCategoryService {
 
     private final AdminSupportFaqCategoryRepository adminSupportFaqcategoryRepository;
 
     @Override
     @Transactional
-    public AdminSupportFaqCategoryDto createCategory(AdminSupportFaqCategoryRequestDto request) {
-        AdminSupportFaqCategoryEntity entity = AdminSupportFaqCategoryEntity.builder()
+    public AdminSupportFaqCategoryDto createCategory(AdminSupportFaqMediumCategoryRequestDto request) {
+        AdminSupportFaqMediumCategoryEntity entity = AdminSupportFaqMediumCategoryEntity.builder()
                 .faqCategoryName(request.getFaqCategoryName())
                 .faqCategoryOrder(request.getFaqCategoryOrder())
                 .build();
@@ -41,15 +41,15 @@ public class AdminSupportFaqCategoryServiceImpl implements AdminSupportFaqCatego
     @Override
     @Transactional(readOnly = true)
     public AdminSupportFaqCategoryDto getCategoryById(Long id) {
-        AdminSupportFaqCategoryEntity entity = adminSupportFaqcategoryRepository.findById(id)
+        AdminSupportFaqMediumCategoryEntity entity = adminSupportFaqcategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.NOT_FOUND));
         return new AdminSupportFaqCategoryDto(entity);
     }
 
     @Override
     @Transactional
-    public AdminSupportFaqCategoryDto updateCategory(Long id, AdminSupportFaqCategoryRequestDto request) {
-        AdminSupportFaqCategoryEntity entity = adminSupportFaqcategoryRepository.findById(id)
+    public AdminSupportFaqCategoryDto updateCategory(Long id, AdminSupportFaqMediumCategoryRequestDto request) {
+        AdminSupportFaqMediumCategoryEntity entity = adminSupportFaqcategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.NOT_FOUND));
 
         entity.setFaqCategoryName(request.getFaqCategoryName());
