@@ -13,9 +13,16 @@ import java.util.List;
 public interface AdminSupportFaqRepository extends JpaRepository<AdminSupportFaqEntity, Long> {
 
     @Override
-    @EntityGraph(attributePaths = "faqCategory")
+    @EntityGraph(attributePaths = {
+            "faqCategory",
+            "faqCategory.faqMajorCategory"
+    })
     List<AdminSupportFaqEntity> findAll();
 
+    @EntityGraph(attributePaths = {
+            "faqCategory",
+            "faqCategory.faqMajorCategory"
+    })
     @Query("""
         SELECT f FROM AdminSupportFaqEntity f
         WHERE LOWER(f.faqQuestion) LIKE LOWER(CONCAT('%', :keyword, '%'))

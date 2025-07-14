@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.faq.general.entity;
 
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqCategoryEntity;
+import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,8 +27,8 @@ public class AdminSupportFaqEntity {
     private String faqAnswer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FAQ_CATEGORY_ID",nullable = false,foreignKey = @ForeignKey(name = "FK_FAQ_CATEGORY"))
-    private AdminSupportFaqCategoryEntity faqCategory;
+    @JoinColumn(name = "FAQ_MEDIUM_CATEGORY_ID", nullable = false, foreignKey = @ForeignKey(name = "FK_FAQ_CATEGORY"))
+    private AdminSupportFaqMediumCategoryEntity faqCategory;
 
     @Column(name = "DISPLAY_YN", nullable = false, length = 1, columnDefinition = "CHAR(1) DEFAULT 'Y' COMMENT '노출 여부'")
     private String displayYn;

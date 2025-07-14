@@ -1,8 +1,8 @@
 package com.boot.loiteBackend.admin.support.faq.category.controller;
 
-import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqCategoryDto;
-import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqCategoryRequestDto;
-import com.boot.loiteBackend.admin.support.faq.category.service.AdminSupportFaqCategoryService;
+import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryDto;
+import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryRequestDto;
+import com.boot.loiteBackend.admin.support.faq.category.service.AdminSupportFaqMediumCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,43 +13,51 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/admin/support/faqs/category")
-@Tag(name = "고객센터 자주 묻는 질문 카테고리 API", description = "고객센터 자주 묻는 질문(FAQ) 카테고리 관련 API")
-public class AdminSupportFaqCategoryController {
+@RequestMapping("/api/admin/support/faq/category/medium")
+@Tag(name = "FAQ 중분류 카테고리 API", description = "FAQ 중분류 관리 API (대분류 선택 필수)")
+public class AdminSupportFaqMediumCategoryController {
 
-    private final AdminSupportFaqCategoryService adminSupportFaqCategoryService;
+    private final AdminSupportFaqMediumCategoryService mediumCategoryService;
 
-    @Operation(summary = "FAQ 카테고리 생성", description = "새로운 FAQ 카테고리 항목을 생성합니다.")
+    @Operation(summary = "중분류 생성", description = "중분류 생성 시 반드시 대분류 ID를 포함해야 합니다.")
     @PostMapping
-    public ResponseEntity<AdminSupportFaqCategoryDto> createCategory(@RequestBody AdminSupportFaqCategoryRequestDto request) {
-        AdminSupportFaqCategoryDto created = adminSupportFaqCategoryService.createCategory(request);
-        return ResponseEntity.status(201).body(created); // 201 Created
+    public ResponseEntity<AdminSupportFaqMediumCategoryDto> createMedium(@RequestBody AdminSupportFaqMediumCategoryRequestDto request) {
+        return ResponseEntity.status(201).body(mediumCategoryService.createCategory(request));
     }
 
-    @Operation(summary = "FAQ 카테고리 전체 조회", description = "등록된 모든 FAQ 카테고리를 조회합니다.")
+    @Operation(summary = "중분류 전체 조회")
     @GetMapping
-    public ResponseEntity<List<AdminSupportFaqCategoryDto>> getAllCategories() {
-        return ResponseEntity.ok(adminSupportFaqCategoryService.getAllCategories());
+    public ResponseEntity<List<AdminSupportFaqMediumCategoryDto>> getAllMediums() {
+        return ResponseEntity.ok(mediumCategoryService.getAllCategories());
     }
 
-    @Operation(summary = "FAQ 카테고리 단건 조회", description = "ID로 FAQ 카테고리 항목을 조회합니다.")
+    @Operation(summary = "중분류 단건 조회")
     @GetMapping("/{id}")
-    public ResponseEntity<AdminSupportFaqCategoryDto> getCategoryById(@PathVariable Long id) {
-        return ResponseEntity.ok(adminSupportFaqCategoryService.getCategoryById(id));
+    public ResponseEntity<AdminSupportFaqMediumCategoryDto> getMediumById(@PathVariable Long id) {
+        return ResponseEntity.ok(mediumCategoryService.getCategoryById(id));
     }
 
-    @Operation(summary = "FAQ 카테고리 수정", description = "기존 FAQ 카테고리 정보를 수정합니다.")
+    @Operation(summary = "중분류 수정")
     @PutMapping("/{id}")
-    public ResponseEntity<AdminSupportFaqCategoryDto> updateCategory(
+    public ResponseEntity<AdminSupportFaqMediumCategoryDto> updateMedium(
             @PathVariable Long id,
-            @RequestBody AdminSupportFaqCategoryRequestDto request) {
-        return ResponseEntity.ok(adminSupportFaqCategoryService.updateCategory(id, request));
+            @RequestBody AdminSupportFaqMediumCategoryRequestDto request) {
+        return ResponseEntity.ok(mediumCategoryService.updateCategory(id, request));
     }
 
-    @Operation(summary = "FAQ 카테고리 삭제", description = "FAQ 카테고리를 삭제합니다. (카테고리가 삽입된 FAQ 목록도 함께 삭제)")
+    @Operation(summary = "중분류 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        adminSupportFaqCategoryService.deleteCategory(id);
+    public ResponseEntity<Void> deleteMedium(@PathVariable Long id) {
+        mediumCategoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "대분류 ID 기준 중분류 조회")
+    @GetMapping(params = "majorId")
+    public ResponseEntity<List<AdminSupportFaqMediumCategoryDto>> getByMajorId(
+            @RequestParam Long majorId
+    ) {
+        return ResponseEntity.ok(mediumCategoryService.getMediumsByMajorCategoryId(majorId));
+    }
+
 }

@@ -4,31 +4,30 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "tb_support_faq_medium_category")
+@Table(name = "tb_support_faq_major_category")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AdminSupportFaqMediumCategoryEntity {
+public class AdminSupportFaqMajorCategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "FAQ_MEDIUM_CATEGORY_ID")
-    private Long faqMediumCategoryId;
+    @Column(name = "FAQ_MAJOR_CATEGORY_ID")
+    private Long faqMajorCategoryId;
 
-    @Column(name = "FAQ_MEDIUM_CATEGORY_NAME", nullable = false, length = 100)
-    private String faqMediumCategoryName;
+    @Column(name = "FAQ_MAJOR_CATEGORY_NAME", nullable = false, length = 100)
+    private String faqMajorCategoryName;
 
-    @Column(name = "FAQ_MEDIUM_CATEGORY_ORDER")
-    private Integer faqMediumCategoryOrder;
+    @Column(name = "FAQ_MAJOR_CATEGORY_ORDER")
+    private Integer faqMajorCategoryOrder;
 
-    // 대분류 FK 연관관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FAQ_MAJOR_CATEGORY_ID", nullable = false)
-    private AdminSupportFaqMajorCategoryEntity faqMajorCategory;
+    @OneToMany(mappedBy = "faqMajorCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AdminSupportFaqMediumCategoryEntity> mediumCategories;
 
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -46,5 +45,4 @@ public class AdminSupportFaqMediumCategoryEntity {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }

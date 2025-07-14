@@ -18,15 +18,20 @@ public class AdminSupportFaqMapper {
         AdminSupportFaqDto dto = modelMapper.map(entity, AdminSupportFaqDto.class);
 
         if (entity.getFaqCategory() != null) {
-            dto.setFaqCategoryId(entity.getFaqCategory().getFaqCategoryId());
-            dto.setFaqCategoryName(entity.getFaqCategory().getFaqCategoryName());
+            dto.setFaqMediumCategoryId(entity.getFaqCategory().getFaqMediumCategoryId());
+            dto.setFaqMediumCategoryName(entity.getFaqCategory().getFaqMediumCategoryName());
+
+            if (entity.getFaqCategory().getFaqMajorCategory() != null) {
+                dto.setFaqMajorCategoryId(entity.getFaqCategory().getFaqMajorCategory().getFaqMajorCategoryId());
+                dto.setFaqMajorCategoryName(entity.getFaqCategory().getFaqMajorCategory().getFaqMajorCategoryName());
+            }
         }
+
         return dto;
     }
 
     public AdminSupportFaqEntity toEntity(AdminSupportFaqDto dto) {
         if (dto == null) return null;
-        AdminSupportFaqEntity entity = modelMapper.map(dto, AdminSupportFaqEntity.class);
-        return entity;
+        return modelMapper.map(dto, AdminSupportFaqEntity.class);
     }
 }

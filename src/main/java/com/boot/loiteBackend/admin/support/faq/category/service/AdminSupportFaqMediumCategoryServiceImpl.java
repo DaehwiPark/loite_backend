@@ -1,11 +1,13 @@
 package com.boot.loiteBackend.admin.support.faq.category.service;
 
-import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqCategoryDto;
+import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryDto;
 import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryRequestDto;
+import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMajorCategoryEntity;
 import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
 import com.boot.loiteBackend.admin.support.faq.category.error.AdminFaqCategoryErrorCode;
-import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqCategoryRepository;
+import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqMajorCategoryRepository;
+import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqMediumCategoryRepository;
+import com.boot.loiteBackend.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,54 +19,81 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminSupportFaqMediumCategoryServiceImpl implements AdminSupportFaqMediumCategoryService {
 
-    private final AdminSupportFaqCategoryRepository adminSupportFaqcategoryRepository;
+    private final AdminSupportFaqMediumCategoryRepository mediumCategoryRepository;
+    private final AdminSupportFaqMajorCategoryRepository majorCategoryRepository;
 
     @Override
     @Transactional
-    public AdminSupportFaqCategoryDto createCategory(AdminSupportFaqMediumCategoryRequestDto request) {
+    public AdminSupportFaqMediumCategoryDto createCategory(AdminSupportFaqMediumCategoryRequestDto request) {
+        AdminSupportFaqMajorCategoryEntity majorCategory = majorCategoryRepository.findById(request.getFaqMajorCategoryId())
+                .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.MAJOR_CATEGORY_NOT_FOUND));
+
         AdminSupportFaqMediumCategoryEntity entity = AdminSupportFaqMediumCategoryEntity.builder()
-                .faqCategoryName(request.getFaqCategoryName())
-                .faqCategoryOrder(request.getFaqCategoryOrder())
+                .faqMediumCategoryName(request.getFaqMediumCategoryName())
+                .faqMediumCategoryOrder(request.getFaqMediumCategoryOrder())
+                .faqMajorCategory(majorCategory)
                 .build();
-        adminSupportFaqcategoryRepository.save(entity);
-        return new AdminSupportFaqCategoryDto(entity);
+
+        mediumCategoryRepository.save(entity);
+        return new AdminSupportFaqMediumCategoryDto(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<AdminSupportFaqCategoryDto> getAllCategories() {
-        return adminSupportFaqcategoryRepository.findAll().stream()
-                .map(AdminSupportFaqCategoryDto::new)
+    public List<AdminSupportFaqMediumCategoryDto> getAllCategories() {
+        return mediumCategoryRepository.findAll().stream()
+                .map(AdminSupportFaqMediumCategoryDto::new)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AdminSupportFaqCategoryDto getCategoryById(Long id) {
-        AdminSupportFaqMediumCategoryEntity entity = adminSupportFaqcategoryRepository.findById(id)
+    public AdminSupportFaqMediumCategoryDto getCategoryById(Long id) {
+        AdminSupportFaqMediumCategoryEntity entity = mediumCategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.NOT_FOUND));
-        return new AdminSupportFaqCategoryDto(entity);
+        return new AdminSupportFaqMediumCategoryDto(entity);
     }
 
     @Override
     @Transactional
-    public AdminSupportFaqCategoryDto updateCategory(Long id, AdminSupportFaqMediumCategoryRequestDto request) {
-        AdminSupportFaqMediumCategoryEntity entity = adminSupportFaqcategoryRepository.findById(id)
+    public AdminSupportFaqMediumCategoryDto updateCategory(Long id, AdminSupportFaqMediumCategoryRequestDto request) {
+        AdminSupportFaqMediumCategoryEntity entity = mediumCategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.NOT_FOUND));
 
-        entity.setFaqCategoryName(request.getFaqCategoryName());
-        entity.setFaqCategoryOrder(request.getFaqCategoryOrder());
+        AdminSupportFaqMajorCategoryEntity majorCategory = majorCategoryRepository.findById(request.getFaqMajorCategoryId())
+                .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.MAJOR_CATEGORY_NOT_FOUND));
 
-        adminSupportFaqcategoryRepository.save(entity);
-        return new AdminSupportFaqCategoryDto(entity);
+        entity.setFaqMediumCategoryName(request.getFaqMediumCategoryName());
+        entity.setFaqMediumCategoryOrder(request.getFaqMediumCategoryOrder());
+        entity.setFaqMajorCategory(majorCategory);
+
+        return new AdminSupportFaqMediumCategoryDto(entity);
     }
 
     @Override
     @Transactional
     public void deleteCategory(Long id) {
-        if (!adminSupportFaqcategoryRepository.existsById(id)) {
+        if (!mediumCategoryRepository.existsById(id)) {
             throw new CustomException(AdminFaqCategoryErrorCode.DELETE_FAILED);
         }
-        adminSupportFaqcategoryRepository.deleteById(id);
+        mediumCategoryRepository.deleteById(id);
     }
+
+
+    @Override
+    public List<AdminSupportFaqMediumCategoryDto> getMediumsByMajorCategoryId(Long majorId) {
+        List<AdminSupportFaqMediumCategoryEntity> entities =
+                mediumCategoryRepository.findByFaqMajorCategory_FaqMajorCategoryId(majorId);
+
+        return entities.stream()
+                .map(entity -> AdminSupportFaqMediumCategoryDto.builder()
+                        .faqMediumCategoryId(entity.getFaqMediumCategoryId())
+                        .faqMediumCategoryName(entity.getFaqMediumCategoryName())
+                        .faqMediumCategoryOrder(entity.getFaqMediumCategoryOrder())
+                        .faqMajorCategoryId(entity.getFaqMajorCategory().getFaqMajorCategoryId())
+                        .faqMajorCategoryName(entity.getFaqMajorCategory().getFaqMajorCategoryName())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }
