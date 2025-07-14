@@ -66,6 +66,22 @@ public class AdminGiftServiceImpl implements AdminGiftService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public AdminGiftResponseDto getGift(Long giftId) {
+        AdminGiftEntity gift = adminGiftRepository.findById(giftId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사은품이 존재하지 않습니다."));
+
+        return AdminGiftResponseDto.builder()
+                .giftId(gift.getGiftId())
+                .giftName(gift.getGiftName())
+                .giftStock(gift.getGiftStock())
+                .giftImageUrl(gift.getGiftImageUrl())
+                .activeYn(gift.getActiveYn())
+                .deleteYn(gift.getDeleteYn())
+                .build();
+    }
+
+    @Override
     public void deleteGift(Long giftId) {
         AdminGiftEntity entity = adminGiftRepository.findById(giftId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 사은품이 존재하지 않습니다."));

@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,20 +35,26 @@ public class CartItemServiceImpl implements CartItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 옵션은 장바구니에 담을 수 없습니다.");
         }
 
-        CartItemEntity existingItem = cartItemRepository
-                .findByUserIdAndProductIdAndOptionText(userId, requestDto.getProductId(), requestDto.getOptionText())
-                .orElse(null);
+        Optional<CartItemEntity> existingItem = cartItemRepository
+                .findByUserIdAndProductIdAndProductOptionIdAndGiftId(
+                        userId,
+                        requestDto.getProductId(),
+                        requestDto.getProductOptionId(),
+                        requestDto.getGiftId()
+                );
 
-        if (existingItem != null) {
-            int newQuantity = existingItem.getQuantity() + requestDto.getQuantity();
-            existingItem.setQuantity(newQuantity);
-            existingItem.setUpdatedAt(LocalDateTime.now());
+
+        if (existingItem.isPresent()) {
+            CartItemEntity item = existingItem.get();
+            int newQuantity = item.getQuantity() + requestDto.getQuantity();
+            item.setQuantity(newQuantity);
+            item.setUpdatedAt(LocalDateTime.now());
         } else {
             CartItemEntity newItem = CartItemEntity.builder()
                     .userId(userId)
                     .productId(requestDto.getProductId())
                     .productOptionId(requestDto.getProductOptionId())
-                    .optionText(requestDto.getOptionText())
+                    .giftId(requestDto.getGiftId())
                     .quantity(requestDto.getQuantity())
                     .checkedYn("1")
                     .createdAt(LocalDateTime.now())
@@ -55,6 +62,7 @@ public class CartItemServiceImpl implements CartItemService {
 
             cartItemRepository.save(newItem);
         }
+
     }
 
     @Override
@@ -86,6 +94,8 @@ public class CartItemServiceImpl implements CartItemService {
                             .discountedPrice(p.getDiscountedPrice())
                             .discountRate(p.getDiscountRate())
                             .checked(p.getChecked() == 1)
+                            .giftName(p.getGiftName())
+                            .giftImageUrl(p.getGiftImageUrl())
                             .build();
                 })
                 .toList();
@@ -98,8 +108,6 @@ public class CartItemServiceImpl implements CartItemService {
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
 
         if (!item.getUserId().equals(userId)) {
-            System.out.println("요청한 유저 ID: " + userId);
-            System.out.println("장바구니 항목의 유저 ID: " + item.getUserId());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 장바구니 항목만 수정할 수 있습니다.");
         }
 

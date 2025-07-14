@@ -14,6 +14,9 @@ public interface CartItemProjection {
     String getOptionValue();
     Integer getOptionAdditionalPrice();
 
+    String getGiftName();
+    String getGiftImageUrl();
+
     Integer getQuantity();
     BigDecimal getUnitPrice();
     BigDecimal getDiscountedPrice();
