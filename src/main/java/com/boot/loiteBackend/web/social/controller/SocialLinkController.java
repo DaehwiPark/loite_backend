@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/private/link")
 @RequiredArgsConstructor
-@Tag(name = "소셜 계정 연동", description = "일반 계정과 소셜 계정을 연동하는 API")
+@Tag(name = "소셜 계정 연동 및 인증 API ", description = "일반 계정과 소셜 계정을 연동하는 API 및 인증 API")
 public class SocialLinkController {
 
     private final OAuthHandlerResolver handlerResolver;
