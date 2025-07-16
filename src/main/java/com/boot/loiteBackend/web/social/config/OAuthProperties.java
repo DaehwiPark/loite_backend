@@ -28,6 +28,7 @@ public class OAuthProperties {
         private String linkRedirectUri;
         private String verifyRedirectUri;
         private String responseType;
+        private String adminKey;
         private String scope;
     }
 }

@@ -19,7 +19,8 @@ public enum SocialErrorCode implements ErrorCode {
     UNSUPPORTED_PROVIDER("SOCIAL_008", "지원하지 않는 소셜 로그인 타입입니다.", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND_FOR_LINKING("SOCIAL_009", "기존 계정을 찾을 수 없습니다. 로그인 후 연동을 시도해주세요.", HttpStatus.NOT_FOUND),
     ALREADY_LINKED("SOCIAL_010", "해당 소셜 계정은 이미 연동되어 있습니다.", HttpStatus.CONFLICT),
-    SOCIAL_NOT_LINKED("SOCIAL_011", "해당 소셜 계정은 연동되어 있지 않습니다.", HttpStatus.BAD_REQUEST);
+    SOCIAL_NOT_LINKED("SOCIAL_011", "해당 소셜 계정은 연동되어 있지 않습니다.", HttpStatus.BAD_REQUEST),
+    UNLINK_FAILED("SOCIAL_012", "소셜 연동 해제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;
