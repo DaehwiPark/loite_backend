@@ -1,9 +1,9 @@
-package com.boot.loiteBackend.web.support.resource.controller;
+package com.boot.loiteBackend.web.support.resource.general.controller;
 
-import com.boot.loiteBackend.web.support.resource.dto.SupportResourceDto;
-import com.boot.loiteBackend.web.support.resource.service.SupportResourceService;
+import com.boot.loiteBackend.web.support.resource.category.dto.SupportResourceCategoryDto;
+import com.boot.loiteBackend.web.support.resource.general.dto.SupportResourceDto;
+import com.boot.loiteBackend.web.support.resource.general.service.SupportResourceService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -32,10 +32,11 @@ public class SupportResourceController {
     )
     @GetMapping
     public ResponseEntity<Page<SupportResourceDto>> getManualList(
-            @Parameter(description = "검색 키워드") @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long categoryId,
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        return ResponseEntity.ok(supportResourceService.getManuals(keyword, pageable));
+        return ResponseEntity.ok(supportResourceService.getManuals(keyword, categoryId, pageable));
     }
 
     @Operation(summary = "매뉴얼 파일 다운로드", description = "지정된 매뉴얼 ID를 기반으로 첨부파일을 다운로드합니다.")

@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.support.resource.entity;
+package com.boot.loiteBackend.web.support.resource.general.entity;
 
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import jakarta.persistence.*;
