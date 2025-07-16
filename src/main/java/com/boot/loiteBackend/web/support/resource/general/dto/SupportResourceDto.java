@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.support.resource.dto;
+package com.boot.loiteBackend.web.support.resource.general.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -23,6 +23,9 @@ public class SupportResourceDto {
 
     @Schema(description = "모델명", example = "AC-1234X")
     private String productModelName;
+
+    @Schema(description = "카테고리 이름", example = "주전자")
+    private String categoryName;
 
     @Schema(description = "Uploaded file name", example = "ac_manual.pdf")
     private String resourceFileName;

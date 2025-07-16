@@ -1,13 +1,11 @@
-package com.boot.loiteBackend.web.support.resource.service;
+package com.boot.loiteBackend.web.support.resource.general.service;
 
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
-import com.boot.loiteBackend.common.file.FileService;
-import com.boot.loiteBackend.common.file.FileStorageProperties;
 import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.web.support.resource.dto.SupportResourceDto;
-import com.boot.loiteBackend.web.support.resource.entity.SupportResourceEntity;
-import com.boot.loiteBackend.web.support.resource.error.ResourceErrorCode;
-import com.boot.loiteBackend.web.support.resource.repository.SupportResourceRepository;
+import com.boot.loiteBackend.web.support.resource.general.dto.SupportResourceDto;
+import com.boot.loiteBackend.web.support.resource.general.entity.SupportResourceEntity;
+import com.boot.loiteBackend.web.support.resource.general.error.ResourceErrorCode;
+import com.boot.loiteBackend.web.support.resource.general.repository.SupportResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -34,17 +32,10 @@ public class SupportResourceServiceImpl implements SupportResourceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<SupportResourceDto> getManuals(String keyword, Pageable pageable) {
-        Page<SupportResourceEntity> page;
-
-        if (StringUtils.hasText(keyword)) {
-            page = resourceRepository
-                    .findByProduct_ProductNameContainingIgnoreCaseOrProduct_ProductModelNameContainingIgnoreCase(keyword, keyword, pageable);
-        } else {
-            page = resourceRepository.findAll(pageable);
-        }
-
-        return page.map(this::toDto);
+    public Page<SupportResourceDto> getManuals(String keyword, Long categoryId, Pageable pageable) {
+        String trimmedKeyword = StringUtils.hasText(keyword) ? keyword.trim() : null;
+        return resourceRepository.searchWithKeywordAndCategory(categoryId, trimmedKeyword, pageable)
+                .map(this::toDto);
     }
 
 
@@ -80,12 +71,18 @@ public class SupportResourceServiceImpl implements SupportResourceService {
         if (entity == null) return null;
 
         AdminProductEntity product = entity.getProduct();
+        String categoryName = null;
+
+        if (product != null && product.getProductCategory() != null) {
+            categoryName = product.getProductCategory().getCategoryName();
+        }
 
         return SupportResourceDto.builder()
                 .resourceId(entity.getResourceId())
                 .productId(product != null ? product.getProductId() : null)
                 .productName(product != null ? product.getProductName() : null)
                 .productModelName(product != null ? product.getProductModelName() : null)
+                .categoryName(categoryName)
                 .resourceFileName(entity.getResourceFileName())
                 .resourceFilePath(entity.getResourceFilePath())
                 .resourceFileUrl(entity.getResourceFileUrl())

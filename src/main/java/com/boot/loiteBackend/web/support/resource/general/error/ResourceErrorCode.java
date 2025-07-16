@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.support.resource.error;
+package com.boot.loiteBackend.web.support.resource.general.error;
 
 import com.boot.loiteBackend.global.error.ErrorCode;
 import lombok.Getter;

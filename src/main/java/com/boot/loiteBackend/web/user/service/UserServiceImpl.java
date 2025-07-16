@@ -57,10 +57,10 @@ public class UserServiceImpl implements UserService {
         UserEntity currentUser = getCurrentUser();
 
         // 소프트 삭제 방식 권장
-        currentUser.setUserStatus("DELETED");
-        userRepository.save(currentUser);
+//        currentUser.setUserStatus("DELETED");
+//        userRepository.save(currentUser);
 
-        // 만약 물리 삭제를 원한다면 아래 코드 사용
+        // 물리 삭제
         userRepository.delete(currentUser);
     }
 
