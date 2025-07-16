@@ -76,8 +76,7 @@ public class ProductServiceImpl implements ProductService {
                             .imageUrl(imageUrl)
                             .soldOutYn(entity.getProductOptions() != null &&
                                     !entity.getProductOptions().isEmpty() &&
-                                    entity.getProductOptions().stream().allMatch(opt -> opt.getOptionStock() <= 0) ? "Y" : "N")
-
+                                    entity.getProductOptions().stream().allMatch(opt -> opt.getOptionStock() <= 0))
                             .build();
                 })
                 .toList();
@@ -106,7 +105,7 @@ public class ProductServiceImpl implements ProductService {
                         .optionColorCode(option.getOptionColorCode())
                         .optionAdditionalPrice(option.getOptionAdditionalPrice())
                         .optionStock(option.getOptionStock())
-                        .soldOutYn(option.getSoldOutYn())
+                        .soldOutYn("Y".equalsIgnoreCase(option.getSoldOutYn()))
                         .build())
                 .toList();
 
@@ -118,6 +117,7 @@ public class ProductServiceImpl implements ProductService {
                             .giftId(gift.getGiftId())
                             .giftName(gift.getGiftName())
                             .giftStock(gift.getGiftStock())
+                            .soldOutYn("Y".equalsIgnoreCase(gift.getSoldOutYn()))
                             .build();
                 })
                 .toList();

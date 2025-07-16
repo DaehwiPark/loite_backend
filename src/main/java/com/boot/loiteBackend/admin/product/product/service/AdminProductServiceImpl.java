@@ -253,6 +253,19 @@ public class AdminProductServiceImpl implements AdminProductService {
             adminProductSectionService.updateSections(product, dto.getSections());
         }
 
+        // 기존 사은품 삭제 후 재삽입
+        adminProductGiftRepository.deleteByProduct(product);
+
+        if (dto.getGiftIdList() != null && !dto.getGiftIdList().isEmpty()) {
+            List<AdminGiftEntity> giftEntities = adminGiftRepository.findAllById(dto.getGiftIdList());
+
+            List<AdminProductGiftEntity> giftMaps = giftEntities.stream()
+                    .map(gift -> adminProductGiftMapper.toEntity(gift, product))
+                    .toList();
+
+            adminProductGiftRepository.saveAll(giftMaps);
+        }
+
         // 기존 이미지 삭제 후 재삽입
         adminProductImageRepository.deleteByProduct(product);
 

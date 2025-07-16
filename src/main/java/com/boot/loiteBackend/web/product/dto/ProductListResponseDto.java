@@ -20,7 +20,7 @@ public class ProductListResponseDto {
     private Integer discountRate;
     private String imageUrl;
     private Integer stock;
-    private String soldOutYn;
+    private boolean soldOutYn;
     // private Double reviewRating;  // 추후 확장 예정
 
     public static ProductListResponseDto from(AdminProductEntity entity) {

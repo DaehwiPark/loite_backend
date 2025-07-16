@@ -1,13 +1,18 @@
 package com.boot.loiteBackend.web.cartItem.service;
 
+import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
+import com.boot.loiteBackend.admin.product.gift.repository.AdminGiftRepository;
 import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
+import com.boot.loiteBackend.web.cartItem.dto.CartItemGiftUpdateRequestDto;
+import com.boot.loiteBackend.web.cartItem.dto.CartItemOptionUpdateRequestDto;
 import com.boot.loiteBackend.web.cartItem.dto.CartItemRequestDto;
 import com.boot.loiteBackend.web.cartItem.dto.CartItemResponseDto;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemEntity;
 import com.boot.loiteBackend.web.cartItem.projection.CartItemProjection;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +29,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     private final CartItemRepository cartItemRepository;
     private final AdminProductOptionRepository productOptionRepository;
+    private final AdminGiftRepository adminGiftRepository;
 
     @Override
     @Transactional
@@ -138,6 +144,40 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         cartItemRepository.deleteAll(checkedItems);
+    }
+
+    @Override
+    @Transactional
+    public void updateCartItemOption(Long userId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto) {
+        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+
+        AdminProductOptionEntity newOption = productOptionRepository.findById(requestDto.getProductOptionId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 옵션이 존재하지 않습니다."));
+
+        if ("Y".equals(newOption.getSoldOutYn())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 옵션으로 변경할 수 없습니다.");
+        }
+
+        cartItem.setProductOptionId(newOption.getOptionId());
+        cartItem.setUpdatedAt(LocalDateTime.now());
+    }
+
+    @Override
+    @Transactional
+    public void updateCartItemGift(Long userId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto) {
+        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+
+        AdminGiftEntity newGift = adminGiftRepository.findById(requestDto.getGiftId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 사은품이 존재하지 않습니다."));
+
+        if ("Y".equals(newGift.getSoldOutYn())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 사은품으로 변경할 수 없습니다.");
+        }
+
+        cartItem.setGiftId(newGift.getGiftId());
+        cartItem.setUpdatedAt(LocalDateTime.now());
     }
 
 }

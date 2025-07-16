@@ -28,6 +28,9 @@ public class AdminGiftEntity {
     @Column(name = "GIFT_STOCK")
     private Integer giftStock;
 
+    @Column(name = "SOLD_OUT_YN")
+    private String soldOutYn;
+
     @Column(name = "ACTIVE_YN", length = 1)
     private String activeYn;
 
@@ -52,5 +55,9 @@ public class AdminGiftEntity {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isSoldOut() {
+        return "Y".equalsIgnoreCase(this.soldOutYn);
     }
 }
