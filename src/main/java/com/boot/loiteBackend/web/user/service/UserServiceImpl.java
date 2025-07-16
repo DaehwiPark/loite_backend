@@ -1,6 +1,11 @@
 package com.boot.loiteBackend.web.user.service;
 
 import com.boot.loiteBackend.global.error.exception.CustomException;
+import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
+import com.boot.loiteBackend.web.social.handler.OAuthUnLinkHandlers;
+import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
+import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.user.dto.UserCreateRequestDto;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import com.boot.loiteBackend.web.user.error.UserErrorCode;
@@ -13,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +27,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final SocialUserRepository socialUserRepository;
+    private final OAuthHandlerResolver resolver;
 
     @Override
     public Long signup(UserCreateRequestDto dto) {
@@ -52,17 +60,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void withdraw() {
-        // 인증된 사용자 조회 (SecurityContext 기반)
-        UserEntity currentUser = getCurrentUser();
+    public void withdraw(CustomUserDetails loginUser, String accessToken) {
+        UserEntity user = userRepository.findById(loginUser.getUserId())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        // 소프트 삭제 방식 권장
-//        currentUser.setUserStatus("DELETED");
-//        userRepository.save(currentUser);
+        if (!"EMAIL".equalsIgnoreCase(user.getUserRegisterType())) {
+            List<SocialUserEntity> socialLinks = socialUserRepository.findAllByUser(user);
+            for (SocialUserEntity social : socialLinks) {
+                try {
+                    String provider = social.getSocialType().toLowerCase();
+                    String email = social.getSocialEmail();
 
-        // 물리 삭제
-        userRepository.delete(currentUser);
+                    if (accessToken == null || accessToken.isBlank()) {
+                        throw new CustomException(UserErrorCode.SOCIAL_UNLINK_FAILED);
+                    }
+
+                    OAuthUnLinkHandlers handler = resolver.resolveUnlink(provider);
+                    handler.unlinkSocialAccount(accessToken, email);
+
+                    socialUserRepository.delete(social);
+                } catch (Exception e) {
+                    throw new CustomException(UserErrorCode.SOCIAL_UNLINK_FAILED);
+                }
+            }
+        }
+
+        user.setUserStatus("DELETED");
+        userRepository.save(user);
     }
+
 
     private UserEntity getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

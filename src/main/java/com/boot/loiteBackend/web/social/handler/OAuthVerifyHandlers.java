@@ -12,4 +12,5 @@ public interface OAuthVerifyHandlers {
     String requestVerifyAccessToken(String code);
 
     OAuthUserInfo getUserInfo(String accessToken);
+
 }
