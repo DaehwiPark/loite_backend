@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin/support/faq")
-@Tag(name = "고객센터 자주 묻는 질문 API", description = "고객센터 자주 묻는 질문(FAQ) 관련 API")
+@Tag(name = "고객센터 자주 묻는 질문(FAQ) API", description = "고객센터 자주 묻는 질문(FAQ) 관련 API")
 public class AdminSupportFaqController {
 
     private final AdminSupportFaqService adminSupportFaqService;

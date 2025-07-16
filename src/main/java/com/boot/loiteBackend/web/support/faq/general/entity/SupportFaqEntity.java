@@ -1,6 +1,6 @@
-package com.boot.loiteBackend.admin.support.faq.general.entity;
+package com.boot.loiteBackend.web.support.faq.general.entity;
 
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
+import com.boot.loiteBackend.web.support.faq.category.entity.SupportFaqMediumCategoryEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AdminSupportFaqEntity {
+public class SupportFaqEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,7 @@ public class AdminSupportFaqEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FAQ_MEDIUM_CATEGORY_ID", nullable = false, foreignKey = @ForeignKey(name = "FK_FAQ_CATEGORY"))
-    private AdminSupportFaqMediumCategoryEntity faqCategory;
+    private SupportFaqMediumCategoryEntity faqCategory;
 
     @Column(name = "DISPLAY_YN", nullable = false, length = 1, columnDefinition = "CHAR(1) DEFAULT 'Y' COMMENT '노출 여부'")
     private String displayYn;

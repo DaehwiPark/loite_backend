@@ -1,8 +1,8 @@
 package com.boot.loiteBackend.admin.support.faq.general.service;
 
+import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqMediumCategoryRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqCategoryEntity;
-import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqCategoryRepository;
+import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
 import com.boot.loiteBackend.admin.support.faq.general.dto.AdminSupportFaqDto;
 import com.boot.loiteBackend.admin.support.faq.general.dto.AdminSupportFaqRequestDto;
 import com.boot.loiteBackend.admin.support.faq.general.entity.AdminSupportFaqEntity;
@@ -21,7 +21,7 @@ import org.springframework.util.StringUtils;
 public class AdminSupportFaqServiceImpl implements AdminSupportFaqService {
 
     private final AdminSupportFaqRepository adminSupportFaqRepository;
-    private final AdminSupportFaqCategoryRepository faqCategoryRepository;
+    private final AdminSupportFaqMediumCategoryRepository faqCategoryRepository;
     private final AdminSupportFaqMapper adminSupportFaqMapper;
 
     @Override
@@ -39,7 +39,7 @@ public class AdminSupportFaqServiceImpl implements AdminSupportFaqService {
     @Override
     @Transactional
     public AdminSupportFaqDto createFaq(AdminSupportFaqRequestDto request) {
-        AdminSupportFaqCategoryEntity category = faqCategoryRepository.findById(request.getFaqCategoryId())
+        AdminSupportFaqMediumCategoryEntity category = faqCategoryRepository.findById(request.getFaqMediumCategoryId())
                 .orElseThrow(() -> new CustomException(AdminFaqErrorCode.CATEGORY_NOT_FOUND));
 
         AdminSupportFaqEntity faq = AdminSupportFaqEntity.builder()
@@ -67,9 +67,11 @@ public class AdminSupportFaqServiceImpl implements AdminSupportFaqService {
     public AdminSupportFaqDto updateFaq(Long id, AdminSupportFaqRequestDto request) {
         AdminSupportFaqEntity entity = adminSupportFaqRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqErrorCode.NOT_FOUND));
-        AdminSupportFaqCategoryEntity newCategory = faqCategoryRepository.findById(request.getFaqCategoryId())
+
+        AdminSupportFaqMediumCategoryEntity category = faqCategoryRepository.findById(request.getFaqMediumCategoryId())
                 .orElseThrow(() -> new CustomException(AdminFaqErrorCode.CATEGORY_NOT_FOUND));
-        entity.setFaqCategory(newCategory);
+
+        entity.setFaqCategory(category);
         entity.setFaqQuestion(request.getFaqQuestion());
         entity.setFaqAnswer(request.getFaqAnswer());
         entity.setDisplayYn(request.getDisplayYn());
