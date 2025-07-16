@@ -1,5 +1,7 @@
 package com.boot.loiteBackend.web.cartItem.service;
 
+import com.boot.loiteBackend.web.cartItem.dto.CartItemGiftUpdateRequestDto;
+import com.boot.loiteBackend.web.cartItem.dto.CartItemOptionUpdateRequestDto;
 import com.boot.loiteBackend.web.cartItem.dto.CartItemRequestDto;
 import com.boot.loiteBackend.web.cartItem.dto.CartItemResponseDto;
 
@@ -16,5 +18,9 @@ public interface CartItemService {
     void deleteCartItems(Long userId, List<Long> cartItemIds);
 
     void deleteCheckedCartItems(Long userId);
+
+    void updateCartItemOption(Long userId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto);
+
+    void updateCartItemGift(Long userId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto);
 
 }

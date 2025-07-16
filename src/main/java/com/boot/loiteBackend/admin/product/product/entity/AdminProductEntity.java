@@ -74,7 +74,7 @@ public class AdminProductEntity {
     @Column(name = "ACTIVE_YN")
     private String activeYn;
 
-    @Column(name = "main_exposure_yn", columnDefinition = "CHAR(1) DEFAULT 'N'")
+    @Column(name = "MAIN_EXPOSURE_YN", columnDefinition = "CHAR(1) DEFAULT 'N'")
     private String mainExposureYn;
 
     @Column(name = "PRODUCT_PRICE")
@@ -83,10 +83,10 @@ public class AdminProductEntity {
     @Column(name = "PRODUCT_SUPPLY_PRICE")
     private BigDecimal productSupplyPrice;
 
-    @Column(name = "discount_rate")
+    @Column(name = "DISCOUNT_RATE")
     private Integer discountRate;
 
-    @Column(name = "discounted_price")
+    @Column(name = "DISCOUNTED_PRICE")
     private BigDecimal discountedPrice;
 
     @Column(name = "PRODUCT_STOCK")

@@ -1,8 +1,6 @@
 package com.boot.loiteBackend.web.cartItem.controller;
 
-import com.boot.loiteBackend.web.cartItem.dto.CartItemDeleteRequestDto;
-import com.boot.loiteBackend.web.cartItem.dto.CartItemRequestDto;
-import com.boot.loiteBackend.web.cartItem.dto.CartItemResponseDto;
+import com.boot.loiteBackend.web.cartItem.dto.*;
 import com.boot.loiteBackend.web.cartItem.service.CartItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,5 +52,19 @@ public class CartItemController {
     public ResponseEntity<Void> deleteCheckedCartItems(@RequestHeader("X-USER-ID") Long userId) {
         cartItemService.deleteCheckedCartItems(userId);
         return ResponseEntity.noContent().build(); // 204 응답
+    }
+
+    @Operation(summary = "장바구니 상품 옵션 변경", description = "장바구니에 추가된 상품의 옵션을 변경합니다.")
+    @PutMapping("/{cartItemId}/updateOption")
+    public ResponseEntity<Void> updateCartItemOption(@PathVariable Long cartItemId, @RequestBody CartItemOptionUpdateRequestDto requestDto, @RequestHeader("X-USER-ID") Long userId) {
+        cartItemService.updateCartItemOption(userId, cartItemId, requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니에 추가된 상품의 사은품을 변경합니다.")
+    @PutMapping("/{cartItemId}/updateGift")
+    public ResponseEntity<Void> updateCartItemGift(@PathVariable Long cartItemId, @RequestBody CartItemGiftUpdateRequestDto requestDto, @RequestHeader("X-USER-ID") Long userId) {
+        cartItemService.updateCartItemGift(userId, cartItemId, requestDto);
+        return ResponseEntity.ok().build();
     }
 }

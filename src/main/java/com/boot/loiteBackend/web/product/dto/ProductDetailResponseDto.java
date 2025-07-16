@@ -41,7 +41,7 @@ public class ProductDetailResponseDto {
         private String optionColorCode;
         private int optionAdditionalPrice;
         private int optionStock;
-        private String soldOutYn;
+        private Boolean soldOutYn;
     }
 
     // 사은품
@@ -51,6 +51,7 @@ public class ProductDetailResponseDto {
         private Long giftId;
         private String giftName;
         private int giftStock;
+        private Boolean soldOutYn;
     }
 
     // 상세 섹션

@@ -53,6 +53,7 @@ public class AdminGiftServiceImpl implements AdminGiftService {
 
         gift.setGiftName(dto.getGiftName());
         gift.setGiftStock(dto.getGiftStock());
+        gift.setSoldOutYn(dto.getGiftStock() <= 0 ? "Y" : "N");
         gift.setActiveYn(dto.getActiveYn() != null ? dto.getActiveYn() : gift.getActiveYn());
         gift.setUpdatedAt(LocalDateTime.now());
     }
