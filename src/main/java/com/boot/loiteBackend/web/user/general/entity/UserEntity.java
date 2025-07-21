@@ -1,5 +1,7 @@
 package com.boot.loiteBackend.web.user.entity;
 
+import com.boot.loiteBackend.global.code.entity.UserRoleCodeEntity;
+import com.boot.loiteBackend.global.code.entity.UserStatusCodeEntity;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -62,11 +64,13 @@ public class UserEntity {
     @Column(name = "EMAIL_VERIFIED_AT", columnDefinition = "TIMESTAMP NULL DEFAULT NULL")
     private LocalDateTime emailVerifiedAt;
 
-    @Column(name = "USER_ROLE", nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'USER'")
-    private String userRole;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ROLE", referencedColumnName = "ROLE_CODE", nullable = false)
+    private UserRoleCodeEntity userRole;
 
-    @Column(name = "USER_STATUS", nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
-    private String userStatus;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_STATUS", referencedColumnName = "STATUS_CODE", nullable = false)
+    private UserStatusCodeEntity userStatus;
 
     @Column(name = "LAST_LOGIN_AT", columnDefinition = "TIMESTAMP NULL DEFAULT NULL")
     private LocalDateTime lastLoginAt;

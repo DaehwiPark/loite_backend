@@ -1,19 +1,20 @@
 package com.boot.loiteBackend.web.user.service;
 
+import com.boot.loiteBackend.global.code.entity.UserRoleCodeEntity;
+import com.boot.loiteBackend.global.code.entity.UserStatusCodeEntity;
+import com.boot.loiteBackend.global.code.repository.UserRoleCodeRepository;
+import com.boot.loiteBackend.global.code.repository.UserStatusCodeRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
+import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
-import com.boot.loiteBackend.web.social.handler.OAuthUnLinkHandlers;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
-import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.user.dto.UserCreateRequestDto;
 import com.boot.loiteBackend.web.user.entity.UserEntity;
 import com.boot.loiteBackend.web.user.error.UserErrorCode;
 import com.boot.loiteBackend.web.user.mapper.UserMapper;
 import com.boot.loiteBackend.web.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +26,10 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final SocialUserRepository socialUserRepository;
-    private final OAuthHandlerResolver resolver;
+    private final UserRoleCodeRepository userRoleCodeRepository;
+    private final UserStatusCodeRepository userStatusCodeRepository;
 
     @Override
     public Long signup(UserCreateRequestDto dto) {
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
         LocalDate birthdate;
         try {
-            birthdate = LocalDate.parse(dto.getUserBirthdate());  // "yyyy-MM-dd" 형식이어야 함
+            birthdate = LocalDate.parse(dto.getUserBirthdate());
         } catch (Exception e) {
             throw new CustomException(UserErrorCode.INVALID_BIRTHDATE_FORMAT);
         }
@@ -52,49 +53,34 @@ public class UserServiceImpl implements UserService {
         user.setUserPassword(dto.getUserPassword());
         user.setUserBirthdate(birthdate);
         user.setEmailVerified(false);
-        user.setUserRole("USER");
-        user.setUserStatus("ACTIVE");
+
+        // Set role and status as foreign key entities
+        UserRoleCodeEntity role = userRoleCodeRepository.findById("USER")
+                .orElseThrow(() -> new CustomException(UserErrorCode.ROLE_NOT_FOUND));
+        user.setUserRole(role);
+
+        UserStatusCodeEntity status = userStatusCodeRepository.findById("ACTIVE")
+                .orElseThrow(() -> new CustomException(UserErrorCode.STATUS_NOT_FOUND));
+        user.setUserStatus(status);
+
         user.setUserRegisterType("EMAIL");
 
         return userRepository.save(user).getUserId();
     }
 
     @Override
-    public void withdraw(CustomUserDetails loginUser, String accessToken) {
+    public ApiResponse<String> withdraw(CustomUserDetails loginUser, String accessToken) {
         UserEntity user = userRepository.findById(loginUser.getUserId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        if (!"EMAIL".equalsIgnoreCase(user.getUserRegisterType())) {
-            List<SocialUserEntity> socialLinks = socialUserRepository.findAllByUser(user);
-            for (SocialUserEntity social : socialLinks) {
-                try {
-                    String provider = social.getSocialType().toLowerCase();
-                    String email = social.getSocialEmail();
-
-                    if (accessToken == null || accessToken.isBlank()) {
-                        throw new CustomException(UserErrorCode.SOCIAL_UNLINK_FAILED);
-                    }
-
-                    OAuthUnLinkHandlers handler = resolver.resolveUnlink(provider);
-                    handler.unlinkSocialAccount(accessToken, email);
-
-                    socialUserRepository.delete(social);
-                } catch (Exception e) {
-                    throw new CustomException(UserErrorCode.SOCIAL_UNLINK_FAILED);
-                }
-            }
+        List<SocialUserEntity> socialLinks = socialUserRepository.findAllByUser(user);
+        if (!socialLinks.isEmpty()) {
+            return ApiResponse.error(UserErrorCode.SOCIAL_LINK_EXISTS);
         }
 
-        user.setUserStatus("DELETED");
-        userRepository.save(user);
-    }
+        userRepository.delete(user);
 
-
-    private UserEntity getCurrentUser() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return userRepository.findByUserEmail(email)
-                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        return ApiResponse.ok("회원 탈퇴가 완료되었습니다.");
     }
 
     @Override
@@ -102,11 +88,6 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        // 소프트 삭제
-        user.setUserStatus("DELETED");
-        userRepository.save(user);
-
-        // 물리 삭제를 원한다면 아래 한 줄로 대체 가능
         userRepository.delete(user);
     }
 

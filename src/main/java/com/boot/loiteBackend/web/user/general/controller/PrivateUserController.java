@@ -2,9 +2,7 @@ package com.boot.loiteBackend.web.user.controller;
 
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
-import com.boot.loiteBackend.web.social.dto.SocialLinkingStatusResponseDto;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
-import com.boot.loiteBackend.web.user.dto.UserCreateRequestDto;
 import com.boot.loiteBackend.web.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,10 +26,9 @@ public class PrivateUserController {
             @AuthenticationPrincipal CustomUserDetails loginUser,
             @RequestParam(required = false) String token
     ) {
-        userService.withdraw(loginUser, token);
-        return ResponseEntity.ok(ApiResponse.ok("회원 탈퇴가 완료되었습니다."));
+        ApiResponse<String> result = userService.withdraw(loginUser, token);
+        return ResponseEntity.ok(result);
     }
-
 
     @Operation(summary = "특정 회원 탈퇴", description = "userId를 입력 받아 해당 사용자의 계정을 삭제합니다. (관리자 전용)")
     @DeleteMapping("/withdraw/{userId}")
