@@ -133,9 +133,7 @@ public class SocialLinkService {
     }
 
 
-
     public ApiResponse<SocialVerificationResultDto> verifySocialAuthentication(String provider, String code, CustomUserDetails loginUser) {
-        // 인증용 핸들러 resolve
         OAuthVerifyHandlers handler = resolver.resolveVerify(provider);
 
         // 인증 코드로 access token 요청
@@ -153,19 +151,28 @@ public class SocialLinkService {
                 provider.toUpperCase()
         );
 
-        boolean verified = false;
-
-        if (linkedOpt.isPresent()) {
-            SocialUserEntity linked = linkedOpt.get();
-            boolean emailMatches = linked.getSocialEmail().equalsIgnoreCase(authenticatedEmail);
-            boolean socialNumberMatches = linked.getSocialNumber().equals(authenticatedSocialNumber);
-            verified = emailMatches && socialNumberMatches;
+        // 연동 정보 없을 경우 실패 반환
+        if (linkedOpt.isEmpty()) {
+            return ApiResponse.error(
+                    SocialErrorCode.SOCIAL_VERIFICATION_FAILED
+            );
         }
 
+        // 정보 비교
+        SocialUserEntity linked = linkedOpt.get();
+        boolean emailMatches = linked.getSocialEmail().equalsIgnoreCase(authenticatedEmail);
+        boolean socialNumberMatches = linked.getSocialNumber().equals(authenticatedSocialNumber);
+
+        if (!emailMatches || !socialNumberMatches) {
+            return ApiResponse.error(
+                    SocialErrorCode.SOCIAL_VERIFICATION_FAILED
+            );
+        }
+
+        // 성공 응답
         return ApiResponse.ok(
-                new SocialVerificationResultDto(verified, accessToken),
-                "소셜 인증 비교 결과 반환"
+                new SocialVerificationResultDto(true, accessToken),
+                "소셜 인증이 성공적으로 확인되었습니다."
         );
     }
-
 }
