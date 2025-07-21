@@ -1,25 +1,28 @@
-package com.boot.loiteBackend.web.user.service;
+package com.boot.loiteBackend.web.user.general.service;
 
-import com.boot.loiteBackend.global.code.entity.UserRoleCodeEntity;
-import com.boot.loiteBackend.global.code.entity.UserStatusCodeEntity;
-import com.boot.loiteBackend.global.code.repository.UserRoleCodeRepository;
-import com.boot.loiteBackend.global.code.repository.UserStatusCodeRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
-import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
+import com.boot.loiteBackend.web.social.error.SocialErrorCode;
+import com.boot.loiteBackend.web.social.handler.OAuthUnLinkHandlers;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
-import com.boot.loiteBackend.web.user.dto.UserCreateRequestDto;
-import com.boot.loiteBackend.web.user.entity.UserEntity;
-import com.boot.loiteBackend.web.user.error.UserErrorCode;
-import com.boot.loiteBackend.web.user.mapper.UserMapper;
-import com.boot.loiteBackend.web.user.repository.UserRepository;
+import com.boot.loiteBackend.web.social.service.SocialLinkService;
+import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.error.UserErrorCode;
+import com.boot.loiteBackend.web.user.general.mapper.UserMapper;
+import com.boot.loiteBackend.web.user.general.repository.UserRepository;
+import com.boot.loiteBackend.web.user.role.entity.UserRoleEntity;
+import com.boot.loiteBackend.web.user.role.error.UserRoleErrorCode;
+import com.boot.loiteBackend.web.user.role.repository.UserRoleRepository;
+import com.boot.loiteBackend.web.user.status.entity.UserStatusEntity;
+import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
+import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +30,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final SocialUserRepository socialUserRepository;
-    private final UserRoleCodeRepository userRoleCodeRepository;
-    private final UserStatusCodeRepository userStatusCodeRepository;
+    private final SocialLinkService socialLinkService;
+    private final UserRoleRepository userRoleCodeRepository;
+    private final UserStatusRepository userStatusCodeRepository;
 
     @Override
     public Long signup(UserCreateRequestDto dto) {
@@ -54,13 +57,12 @@ public class UserServiceImpl implements UserService {
         user.setUserBirthdate(birthdate);
         user.setEmailVerified(false);
 
-        // Set role and status as foreign key entities
-        UserRoleCodeEntity role = userRoleCodeRepository.findById("USER")
-                .orElseThrow(() -> new CustomException(UserErrorCode.ROLE_NOT_FOUND));
+        UserRoleEntity role = userRoleCodeRepository.findById("USER")
+                .orElseThrow(() -> new CustomException(UserRoleErrorCode.ROLE_NOT_FOUND));
         user.setUserRole(role);
 
-        UserStatusCodeEntity status = userStatusCodeRepository.findById("ACTIVE")
-                .orElseThrow(() -> new CustomException(UserErrorCode.STATUS_NOT_FOUND));
+        UserStatusEntity status = userStatusCodeRepository.findById("ACTIVE")
+                .orElseThrow(() -> new CustomException(UserStatusErrorCode.STATUS_NOT_FOUND));
         user.setUserStatus(status);
 
         user.setUserRegisterType("EMAIL");
@@ -69,17 +71,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ApiResponse<String> withdraw(CustomUserDetails loginUser, String accessToken) {
+
         UserEntity user = userRepository.findById(loginUser.getUserId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        List<SocialUserEntity> socialLinks = socialUserRepository.findAllByUser(user);
-        if (!socialLinks.isEmpty()) {
-            return ApiResponse.error(UserErrorCode.SOCIAL_LINK_EXISTS);
-        }
+        String provider = loginUser.getUserRegisterType();
+        // 소셜 연동 끊기
+        socialLinkService.unlinkAccount(provider, loginUser,accessToken);
 
         userRepository.delete(user);
-
         return ApiResponse.ok("회원 탈퇴가 완료되었습니다.");
     }
 

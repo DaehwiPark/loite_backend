@@ -2,7 +2,7 @@ package com.boot.loiteBackend.domain.token.service;
 
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.dto.TokenRequestDto;
-import com.boot.loiteBackend.web.user.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Optional;

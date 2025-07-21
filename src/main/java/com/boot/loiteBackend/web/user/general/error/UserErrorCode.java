@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.user.error;
+package com.boot.loiteBackend.web.user.general.error;
 
 import com.boot.loiteBackend.global.error.ErrorCode;
 import lombok.Getter;
@@ -17,9 +17,7 @@ public enum UserErrorCode implements ErrorCode {
     UNAUTHORIZED_ACCESS("USER_401_02", "인증되지 않은 요청입니다.", HttpStatus.UNAUTHORIZED),
     FORBIDDEN_ACCESS("USER_403_02", "접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
     SOCIAL_LINK_EXISTS("USER_400_03", "소셜 계정 연동이 남아 있습니다. 연동 해제 후 탈퇴가 가능합니다.", HttpStatus.BAD_REQUEST),
-    SOCIAL_UNLINK_FAILED("USER_500_01", "소셜 연동 해제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    ROLE_NOT_FOUND("USER_404_02", "지정된 역할(Role)을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    STATUS_NOT_FOUND("USER_404_03", "지정된 회원 상태(Status)를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    SOCIAL_UNLINK_FAILED("USER_500_01", "소셜 연동 해제 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;

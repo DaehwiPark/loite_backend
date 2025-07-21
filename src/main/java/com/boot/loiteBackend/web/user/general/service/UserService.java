@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.web.user.service;
+package com.boot.loiteBackend.web.user.general.service;
 
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
-import com.boot.loiteBackend.web.user.dto.UserCreateRequestDto;
+import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
 import org.springframework.stereotype.Service;
 
 @Service

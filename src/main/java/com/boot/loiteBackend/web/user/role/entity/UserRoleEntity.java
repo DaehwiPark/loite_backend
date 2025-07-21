@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Schema(description = "사용자 역할 코드")
-public class UserRoleCodeEntity {
+public class UserRoleEntity {
 
     @Id
     @Column(name = "ROLE_CODE", length = 20)

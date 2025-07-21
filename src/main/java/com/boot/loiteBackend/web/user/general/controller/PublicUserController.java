@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.web.user.controller;
+package com.boot.loiteBackend.web.user.general.controller;
 
 import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.web.user.dto.UserCreateRequestDto;
-import com.boot.loiteBackend.web.user.service.UserService;
+import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
+import com.boot.loiteBackend.web.user.general.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -64,7 +64,6 @@ public class SocialLinkController {
         return ResponseEntity.ok(result);
     }
 
-
     @GetMapping("/{provider}/verify")
     @Operation(summary = "소셜 인증 URL 발급", description = "카카오/구글/네이버 등의 인증 URL을 생성합니다.")
     public ResponseEntity<ApiResponse<String>> getVerifyUrl(@PathVariable String provider) {
@@ -82,6 +81,5 @@ public class SocialLinkController {
         ApiResponse<SocialVerificationResultDto> result = socialLinkService.verifySocialAuthentication(provider, code, loginUser);
         return ResponseEntity.ok(result);
     }
-
 
 }

@@ -8,8 +8,14 @@ import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
-import com.boot.loiteBackend.web.user.entity.UserEntity;
-import com.boot.loiteBackend.web.user.repository.UserRepository;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.repository.UserRepository;
+import com.boot.loiteBackend.web.user.role.entity.UserRoleEntity;
+import com.boot.loiteBackend.web.user.role.error.UserRoleErrorCode;
+import com.boot.loiteBackend.web.user.role.repository.UserRoleRepository;
+import com.boot.loiteBackend.web.user.status.entity.UserStatusEntity;
+import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
+import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +31,8 @@ public class SocialRegisterService {
     private final UserRepository userRepository;
     private final SocialUserRepository socialUserRepository;
     private final TokenService tokenService;
+    private final UserRoleRepository userRoleRepository;
+    private final UserStatusRepository userStatusRepository;
 
     public LoginResponseDto register(
             String providerName,
@@ -39,13 +47,20 @@ public class SocialRegisterService {
             throw new CustomException(SocialErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER);
         }
 
+        // 역할/상태 코드 엔티티 조회
+        UserRoleEntity role = userRoleRepository.findById("USER")
+                .orElseThrow(() -> new CustomException(UserRoleErrorCode.ROLE_NOT_FOUND));
+
+        UserStatusEntity status = userStatusRepository.findById("ACTIVE")
+                .orElseThrow(() -> new CustomException(UserStatusErrorCode.STATUS_NOT_FOUND));
+
         // 사용자 계정 등록
         UserEntity user = UserEntity.builder()
                 .userEmail(dto.getUserEmail())
                 .userName(dto.getUserName())
                 .userRegisterType(provider.name())   // 가입 방식
-                .userStatus("ACTIVE")
-                .userRole("USER")
+                .userStatus(status)
+                .userRole(role)
                 .emailVerified(true)
                 .emailVerifiedAt(LocalDateTime.now())
                 .isOver14(dto.isOver14())

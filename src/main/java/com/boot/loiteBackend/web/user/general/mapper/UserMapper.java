@@ -1,8 +1,8 @@
-package com.boot.loiteBackend.web.user.mapper;
+package com.boot.loiteBackend.web.user.general.mapper;
 
-import com.boot.loiteBackend.web.user.dto.UserCreateRequestDto;
-import com.boot.loiteBackend.web.user.dto.UserDto;
-import com.boot.loiteBackend.web.user.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
+import com.boot.loiteBackend.web.user.general.dto.UserDto;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

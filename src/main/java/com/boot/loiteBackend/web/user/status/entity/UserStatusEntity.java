@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Schema(description = "사용자 상태 코드")
-public class UserStatusCodeEntity {
+public class UserStatusEntity {
 
     @Id
     @Column(name = "STATUS_CODE", length = 20)

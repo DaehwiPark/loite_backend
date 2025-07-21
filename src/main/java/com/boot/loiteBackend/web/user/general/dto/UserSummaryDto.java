@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.user.dto;
+package com.boot.loiteBackend.web.user.general.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

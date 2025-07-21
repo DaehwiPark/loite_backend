@@ -1,13 +1,13 @@
 package com.boot.loiteBackend.web.user.status.repository;
 
-import com.boot.loiteBackend.global.code.entity.UserStatusCodeEntity;
+import com.boot.loiteBackend.web.user.status.entity.UserStatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface UserStatusCodeRepository extends JpaRepository<UserStatusCodeEntity, String> {
+public interface UserStatusRepository extends JpaRepository<UserStatusEntity, String> {
 
-    List<UserStatusCodeEntity> findAllByActiveTrueOrderByDisplayOrderAsc();
+    List<UserStatusEntity> findAllByActiveTrueOrderByDisplayOrderAsc();
 
-    UserStatusCodeEntity findByStatusCode(String statusCode);
+    UserStatusEntity findByStatusCode(String statusCode);
 }

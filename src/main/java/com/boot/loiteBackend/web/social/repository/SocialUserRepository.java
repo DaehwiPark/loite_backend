@@ -1,8 +1,7 @@
 package com.boot.loiteBackend.web.social.repository;
 
-import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
-import com.boot.loiteBackend.web.user.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
