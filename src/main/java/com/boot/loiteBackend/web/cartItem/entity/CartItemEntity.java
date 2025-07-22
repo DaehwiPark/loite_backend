@@ -34,9 +34,11 @@ public class CartItemEntity {
     @Column(name = "cart_item_quantity", nullable = false)
     private Integer quantity;
 
+    @Builder.Default
     @Column(name = "CHECKED_YN", length = 1)
     private String checkedYn = "1";
 
+    @Builder.Default
     @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

@@ -49,8 +49,8 @@ public class CartItemController {
 
     @Operation(summary = "장바구니 상품 중복 삭제", description = "장바구니에 추가된 상품을 선택하여 중복 삭제합니다.")
     @DeleteMapping("/checkedDelete")
-    public ResponseEntity<Void> deleteCheckedCartItems(@RequestHeader("X-USER-ID") Long userId) {
-        cartItemService.deleteCheckedCartItems(userId);
+    public ResponseEntity<Void> deleteCheckedCartItems(@RequestHeader("X-USER-ID") Long userId, @RequestBody CartItemDeleteRequestDto requestDto) {
+        cartItemService.deleteCartItems(userId, requestDto.getCartItemIds());
         return ResponseEntity.noContent().build(); // 204 응답
     }
 

@@ -120,7 +120,7 @@ public class CartItemServiceImpl implements CartItemService {
         item.setCheckedYn(checked ? "1" : "0");
     }
 
-    @Override
+    /*@Override
     @Transactional
     public void deleteCartItems(Long userId, List<Long> cartItemIds) {
         List<CartItemEntity> items = cartItemRepository.findAllById(cartItemIds);
@@ -132,19 +132,20 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         cartItemRepository.deleteAll(items);
-    }
+    }*/
 
     @Override
     @Transactional
-    public void deleteCheckedCartItems(Long userId) {
-        List<CartItemEntity> checkedItems = cartItemRepository.findByUserIdAndCheckedYn(userId, "1");
+    public void deleteCartItems(Long userId, List<Long> cartItemIds) {
+        List<CartItemEntity> cartItems = cartItemRepository.findByUserIdAndIdIn(userId, cartItemIds);
 
-        if (checkedItems.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 체크된 항목이 없습니다.");
+        if (cartItems.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 장바구니 항목이 없습니다.");
         }
 
-        cartItemRepository.deleteAll(checkedItems);
+        cartItemRepository.deleteAll(cartItems);
     }
+
 
     @Override
     @Transactional

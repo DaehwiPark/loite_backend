@@ -42,5 +42,8 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
 """, nativeQuery = true)
     List<CartItemProjection> findCartItemsByUserId(@Param("userId") Long userId, @Param("after") LocalDateTime after);
 
+    List<CartItemEntity> findByUserIdAndIdIn(Long userId, List<Long> ids);
+
+
     List<CartItemEntity> findByUserIdAndCheckedYn(Long userId, String checkedYn);
 }

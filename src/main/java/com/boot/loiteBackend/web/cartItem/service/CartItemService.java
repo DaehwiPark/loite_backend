@@ -17,7 +17,7 @@ public interface CartItemService {
 
     void deleteCartItems(Long userId, List<Long> cartItemIds);
 
-    void deleteCheckedCartItems(Long userId);
+//    void deleteCheckedCartItems(Long userId);
 
     void updateCartItemOption(Long userId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto);
 

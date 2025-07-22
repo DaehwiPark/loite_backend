@@ -15,6 +15,7 @@ public class AdminProductCategoryResponseDto {
     private Long categoryId;
     private Long ParentId;
     private String categoryName;
+    private String categoryPath;
     private Integer categoryDepth;
     private int categorySortOrder;
     private String activeYn;

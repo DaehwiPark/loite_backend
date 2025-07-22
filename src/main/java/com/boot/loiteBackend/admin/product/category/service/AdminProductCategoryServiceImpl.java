@@ -54,6 +54,7 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
                     .orElseThrow(() -> new EntityNotFoundException("카테고리가 존재하지 않습니다."));
 
             category.setCategoryName(dto.getCategoryName());
+            category.setCategoryPath(dto.getCategoryPath());
             category.setCategorySortOrder(dto.getCategorySortOrder());
             category.setActiveYn(dto.getActiveYn());
             category.setUpdatedAt(LocalDateTime.now());

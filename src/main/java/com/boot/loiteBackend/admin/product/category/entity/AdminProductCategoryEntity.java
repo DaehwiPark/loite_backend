@@ -40,6 +40,9 @@ public class AdminProductCategoryEntity {
     @Column(name = "CATEGORY_NAME", nullable = false, length = 100)
     private String categoryName;
 
+    @Column(name = "CATEGORY_PATH", nullable = false, length = 255)
+    private String categoryPath;
+
     @Column(name = "CATEGORY_DEPTH")
     private Integer categoryDepth;
 
