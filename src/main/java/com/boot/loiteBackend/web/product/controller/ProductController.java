@@ -7,6 +7,7 @@ import com.boot.loiteBackend.web.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,9 +35,9 @@ public class ProductController {
     @Operation(summary = "상품리스트 페이지 목록 조회", description = "상품리스트 페이지 목록을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<Page<ProductListResponseDto>> getListProducts(
-            @RequestParam Long categoryId,
-            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(productService.getListProducts(categoryId, pageable));
+            @RequestParam String categoryPath,
+            @ParameterObject @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(productService.getListProducts(categoryPath, pageable));
     }
 
     @Operation(summary = "상품상세 페이지 상품정보 조회", description = "상품상세 페이지 상품정보를 조회합니다.")
