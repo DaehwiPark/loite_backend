@@ -39,8 +39,8 @@ public interface AdminProductRepository extends JpaRepository<AdminProductEntity
     WHERE p.mainExposureYn = 'Y'
       AND p.activeYn = 'Y'
       AND p.deleteYn = 'N'
-      AND p.productCategory.categoryId = :categoryId
+      AND p.productCategory.categoryPath = :categoryPath
 """)
-    Page<AdminProductEntity> findListByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
+    Page<AdminProductEntity> findListByCategoryId(@Param("categoryPath") String categoryPath, Pageable pageable);
 
 }

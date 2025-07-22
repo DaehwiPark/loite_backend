@@ -54,8 +54,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductListResponseDto> getListProducts(Long categoryId, Pageable pageable) {
-        Page<AdminProductEntity> productPage = productRepository.findListByCategoryId(categoryId, pageable);
+    public Page<ProductListResponseDto> getListProducts(String categoryPath, Pageable pageable) {
+        Page<AdminProductEntity> productPage = productRepository.findListByCategoryId(categoryPath, pageable);
 
         List<ProductListResponseDto> dtoList = productPage.getContent().stream()
                 .map(entity -> {
