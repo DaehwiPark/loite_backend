@@ -4,6 +4,7 @@ import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.dto.SocialLinkingStatusResponseDto;
+import com.boot.loiteBackend.web.social.dto.SocialVerificationResultDto;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,12 +54,13 @@ public class SocialLinkController {
     }
 
     @DeleteMapping("/{provider}/unlink")
-    @Operation(summary = "소셜 연동 해제", description = "선택한 소셜 계정의 연동을 해제합니다.")
+    @Operation(summary = "소셜 연동 해제", description = "선택한 소셜 계정의 연동을 해제합니다. 소셜 인증 후 받은 accessToken을 함께 전달해야 합니다.")
     public ResponseEntity<ApiResponse<String>> unlinkAccount(
             @PathVariable String provider,
-            @AuthenticationPrincipal CustomUserDetails loginUser
+            @AuthenticationPrincipal CustomUserDetails loginUser,
+            @RequestParam("token") String accessToken
     ) {
-        ApiResponse<String> result = socialLinkService.unlinkAccount(provider, loginUser);
+        ApiResponse<String> result = socialLinkService.unlinkAccount(provider, loginUser, accessToken);
         return ResponseEntity.ok(result);
     }
 
@@ -71,13 +73,13 @@ public class SocialLinkController {
 
     @GetMapping("/{provider}/verify/callback")
     @Operation(summary = "소셜 인증 콜백", description = "소셜 인증 후 callback URL로 접근되며, 현재 로그인 사용자 정보와 비교하여 일치 여부를 확인합니다.")
-    public ResponseEntity<ApiResponse<Boolean>> verifyCallback(
+    public ResponseEntity<ApiResponse<SocialVerificationResultDto>> verifyCallback(
             @PathVariable String provider,
             @RequestParam String code,
             @AuthenticationPrincipal CustomUserDetails loginUser
     ) {
-        boolean result = socialLinkService.verifySocialAuthentication(provider, code, loginUser);
-        return ResponseEntity.ok(ApiResponse.ok(result, "소셜 인증 비교 결과 반환"));
+        ApiResponse<SocialVerificationResultDto> result = socialLinkService.verifySocialAuthentication(provider, code, loginUser);
+        return ResponseEntity.ok(result);
     }
 
 }

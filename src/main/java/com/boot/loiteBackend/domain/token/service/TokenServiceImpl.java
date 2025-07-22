@@ -6,8 +6,8 @@ import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.dto.TokenRequestDto;
 import com.boot.loiteBackend.domain.token.error.TokenErrorCode;
-import com.boot.loiteBackend.web.user.entity.UserEntity;
-import com.boot.loiteBackend.web.user.repository.UserRepository;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -70,7 +70,7 @@ public class TokenServiceImpl implements TokenService {
         String newAccessToken = jwtTokenProvider.createToken(
                 user.getUserId(),
                 user.getUserEmail(),
-                user.getUserRole(),
+                user.getUserRole().getRoleCode(),
                 user.getUserRegisterType(),
                 userLoginType
         );
@@ -91,7 +91,7 @@ public class TokenServiceImpl implements TokenService {
         String accessToken = jwtTokenProvider.createToken(
                 user.getUserId(),
                 user.getUserEmail(),
-                user.getUserRole(),
+                user.getUserRole().getRoleCode(),
                 user.getUserRegisterType(),
                 userLoginType
         );

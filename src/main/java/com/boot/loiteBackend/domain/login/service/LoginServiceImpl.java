@@ -8,16 +8,14 @@ import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.login.error.LoginErrorCode;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
-import com.boot.loiteBackend.web.user.dto.UserSummaryDto;
-import com.boot.loiteBackend.web.user.entity.UserEntity;
-import com.boot.loiteBackend.web.user.repository.UserRepository;
+import com.boot.loiteBackend.web.user.general.dto.UserSummaryDto;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.PrivateKey;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +27,6 @@ public class LoginServiceImpl implements LoginService {
     private final JwtCookieUtil jwtCookieUtil;
     private final JwtTokenProvider jwtTokenProvider;
 
-
     // 일반 로그인 처리
     @Override
     public LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response, String userLoginType) {
@@ -40,10 +37,8 @@ public class LoginServiceImpl implements LoginService {
             throw new CustomException(LoginErrorCode.INVALID_PASSWORD);
         }
 
-        // 로그인 방식 정보를 포함하여 토큰 생성 및 응답 처리
         return tokenService.getLoginToken(user, response, userLoginType);
     }
-
 
     // 로그아웃 처리 - RefreshToken 제거 + 쿠키 삭제
     @Override
@@ -52,7 +47,6 @@ public class LoginServiceImpl implements LoginService {
         tokenService.deleteRefreshToken(userId);
         jwtCookieUtil.deleteAccessTokenCookie(response);
     }
-
 
     // 로그인한 사용자 정보 조회
     @Override
@@ -71,7 +65,7 @@ public class LoginServiceImpl implements LoginService {
                 .userId(userEntity.getUserId())
                 .userEmail(userEntity.getUserEmail())
                 .userName(userEntity.getUserName())
-                .userRole(userEntity.getUserRole())
+                .userRole(userEntity.getUserRole() != null ? userEntity.getUserRole().getRoleName() : null)
                 .userRegisterType(userEntity.getUserRegisterType())
                 .userLoginType(userLoginType)
                 .build();

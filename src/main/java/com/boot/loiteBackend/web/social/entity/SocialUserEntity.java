@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.social.entity;
 
-import com.boot.loiteBackend.web.user.entity.UserEntity;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
