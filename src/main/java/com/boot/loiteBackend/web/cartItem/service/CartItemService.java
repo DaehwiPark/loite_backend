@@ -9,18 +9,18 @@ import java.util.List;
 
 public interface CartItemService {
 
-    void addToCart(Long userId, CartItemRequestDto requestDto);
+    void addToCart(Long loginUserId, CartItemRequestDto requestDto);
 
-    List<CartItemResponseDto> getCartItemsByUser(Long userId);
+    List<CartItemResponseDto> getCartItemsByUser(Long loginUserId);
 
-    void updateCheckedYn(Long userId, Long cartItemId, boolean checked);
+    void updateCheckedYn(Long loginUserId, Long cartItemId, boolean checked);
 
-    void deleteCartItems(Long userId, List<Long> cartItemIds);
+    void deleteCartItems(Long loginUserId, List<Long> cartItemIds);
 
 //    void deleteCheckedCartItems(Long userId);
 
-    void updateCartItemOption(Long userId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto);
+    void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto);
 
-    void updateCartItemGift(Long userId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto);
+    void updateCartItemGift(Long loginUserId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto);
 
 }

@@ -33,7 +33,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional
-    public void addToCart(Long userId, CartItemRequestDto requestDto) {
+    public void addToCart(Long loginUserId, CartItemRequestDto requestDto) {
         AdminProductOptionEntity option = productOptionRepository.findById(requestDto.getProductOptionId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 옵션이 존재하지 않습니다."));
 
@@ -43,7 +43,7 @@ public class CartItemServiceImpl implements CartItemService {
 
         Optional<CartItemEntity> existingItem = cartItemRepository
                 .findByUserIdAndProductIdAndProductOptionIdAndGiftId(
-                        userId,
+                        loginUserId,
                         requestDto.getProductId(),
                         requestDto.getProductOptionId(),
                         requestDto.getGiftId()
@@ -57,7 +57,7 @@ public class CartItemServiceImpl implements CartItemService {
             item.setUpdatedAt(LocalDateTime.now());
         } else {
             CartItemEntity newItem = CartItemEntity.builder()
-                    .userId(userId)
+                    .userId(loginUserId)
                     .productId(requestDto.getProductId())
                     .productOptionId(requestDto.getProductOptionId())
                     .giftId(requestDto.getGiftId())
@@ -73,9 +73,9 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CartItemResponseDto> getCartItemsByUser(Long userId) {
+    public List<CartItemResponseDto> getCartItemsByUser(Long loginUserId) {
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
-        List<CartItemProjection> items = cartItemRepository.findCartItemsByUserId(userId, oneMonthAgo);
+        List<CartItemProjection> items = cartItemRepository.findCartItemsByUserId(loginUserId, oneMonthAgo);
 
         return items.stream()
                 .map(p -> {
@@ -109,11 +109,11 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional
-    public void updateCheckedYn(Long userId, Long cartItemId, boolean checked) {
+    public void updateCheckedYn(Long loginUserId, Long cartItemId, boolean checked) {
         CartItemEntity item = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
 
-        if (!item.getUserId().equals(userId)) {
+        if (!item.getUserId().equals(loginUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 장바구니 항목만 수정할 수 있습니다.");
         }
 
@@ -136,8 +136,8 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional
-    public void deleteCartItems(Long userId, List<Long> cartItemIds) {
-        List<CartItemEntity> cartItems = cartItemRepository.findByUserIdAndIdIn(userId, cartItemIds);
+    public void deleteCartItems(Long loginUserId, List<Long> cartItemIds) {
+        List<CartItemEntity> cartItems = cartItemRepository.findByUserIdAndIdIn(loginUserId, cartItemIds);
 
         if (cartItems.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제할 장바구니 항목이 없습니다.");
@@ -149,7 +149,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional
-    public void updateCartItemOption(Long userId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto) {
+    public void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto) {
         CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
 
@@ -166,7 +166,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional
-    public void updateCartItemGift(Long userId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto) {
+    public void updateCartItemGift(Long loginUserId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto) {
         CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
 
