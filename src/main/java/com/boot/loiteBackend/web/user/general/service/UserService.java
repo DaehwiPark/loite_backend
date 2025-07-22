@@ -10,7 +10,7 @@ public interface UserService {
 
     Long signup(UserCreateRequestDto dto);
 
-    ApiResponse<String> withdraw(CustomUserDetails loginUser, String token);
+    void withdraw(CustomUserDetails loginUser, String token);
 
     void withdrawById(Long userId);
 

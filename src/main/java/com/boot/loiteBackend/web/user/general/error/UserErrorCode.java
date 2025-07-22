@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum UserErrorCode implements ErrorCode {
 
     EMAIL_DUPLICATED("USER_409_01", "이미 사용 중인 이메일입니다.", HttpStatus.CONFLICT),

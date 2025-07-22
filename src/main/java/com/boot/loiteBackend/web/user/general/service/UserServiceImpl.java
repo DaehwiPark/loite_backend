@@ -1,11 +1,7 @@
 package com.boot.loiteBackend.web.user.general.service;
 
 import com.boot.loiteBackend.global.error.exception.CustomException;
-import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
-import com.boot.loiteBackend.web.social.error.SocialErrorCode;
-import com.boot.loiteBackend.web.social.handler.OAuthUnLinkHandlers;
-import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
@@ -72,24 +68,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ApiResponse<String> withdraw(CustomUserDetails loginUser, String accessToken) {
-
+    public void withdraw(CustomUserDetails loginUser, String accessToken) {
         UserEntity user = userRepository.findById(loginUser.getUserId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         String provider = loginUser.getUserRegisterType();
-        // 소셜 연동 끊기
-        socialLinkService.unlinkAccount(provider, loginUser,accessToken);
+        socialLinkService.unlinkAccount(provider, loginUser, accessToken);
 
         userRepository.delete(user);
-        return ApiResponse.ok("회원 탈퇴가 완료되었습니다.");
     }
 
     @Override
     public void withdrawById(Long userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-
         userRepository.delete(user);
     }
 
