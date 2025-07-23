@@ -25,13 +25,13 @@ public class PrivateUserController {
             @RequestParam(required = false) String token
     ) {
         userService.withdraw(loginUser, token);
-        return ResponseEntity.ok(ApiResponse.ok(null, "회원 탈퇴가 완료되었습니다."));
+        return ResponseEntity.ok(ApiResponse.ok("회원 탈퇴가 완료되었습니다."));
     }
 
     @DeleteMapping("/withdraw/{userId}")
     @Operation(summary = "특정 회원 탈퇴", description = "userId를 입력 받아 해당 사용자의 계정을 삭제합니다. (관리자 전용)")
     public ResponseEntity<ApiResponse<Void>> withdrawById(@PathVariable Long userId) {
         userService.withdrawById(userId);
-        return ResponseEntity.ok(ApiResponse.ok(null, "회원 탈퇴가 완료되었습니다."));
+        return ResponseEntity.ok(ApiResponse.ok("회원 탈퇴가 완료되었습니다."));
     }
 }
