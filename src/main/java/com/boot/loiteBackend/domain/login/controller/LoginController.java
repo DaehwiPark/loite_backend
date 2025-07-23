@@ -1,11 +1,11 @@
 package com.boot.loiteBackend.domain.login.controller;
 
-import com.boot.loiteBackend.domain.login.dto.VerifyRequestDto;
-import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.domain.login.dto.LoginRequestDto;
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.domain.login.dto.VerifyRequestDto;
 import com.boot.loiteBackend.domain.login.service.LoginService;
+import com.boot.loiteBackend.global.response.ApiResponse;
+import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.user.general.dto.UserSummaryDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,28 +29,27 @@ public class LoginController {
                     "loginType 파라미터로 EMAIL, GOOGLE, KAKAO, NAVER 등의 로그인 유형을 구분할 수 있습니다."
     )
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(
+    public ResponseEntity<ApiResponse<LoginResponseDto>> login(
             @RequestBody LoginRequestDto dto,
             @RequestParam(name = "loginType", defaultValue = "EMAIL") String userLoginType,
             HttpServletResponse response
     ) {
-        return ResponseEntity.ok(loginService.login(dto, response, userLoginType));
+        LoginResponseDto result = loginService.login(dto, response, userLoginType);
+        return ResponseEntity.ok(ApiResponse.ok(result, "로그인이 완료되었습니다."));
     }
-
 
     @Operation(
             summary = "로그아웃",
             description = "현재 로그인된 사용자의 RefreshToken을 Redis에서 제거하고, 브라우저에 저장된 AccessToken 쿠키를 만료시켜 로그아웃 처리합니다."
     )
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
+    public ResponseEntity<ApiResponse<Void>> logout(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletResponse response
     ) {
         loginService.logout(userDetails, response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.ok("로그아웃이 완료되었습니다."));
     }
-
 
     @Operation(
             summary = "현재 로그인된 사용자 정보 조회",
@@ -58,14 +57,13 @@ public class LoginController {
                     "AccessToken은 쿠키로 전달되며, 유효하지 않을 경우 401 응답을 받을 수 있습니다."
     )
     @GetMapping("/me")
-    public ResponseEntity<UserSummaryDto> myInfo(
+    public ResponseEntity<ApiResponse<UserSummaryDto>> myInfo(
             @AuthenticationPrincipal CustomUserDetails user,
             @CookieValue(name = "AccessToken", required = false) String token
     ) {
         UserSummaryDto result = loginService.myInfo(user, token);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
-
 
     @Operation(
             summary = "비밀번호 인증 (본인 확인)",
