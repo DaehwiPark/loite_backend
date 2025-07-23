@@ -27,7 +27,6 @@ public class LoginServiceImpl implements LoginService {
     private final JwtCookieUtil jwtCookieUtil;
     private final JwtTokenProvider jwtTokenProvider;
 
-    // 일반 로그인 처리
     @Override
     public LoginResponseDto login(LoginRequestDto dto, HttpServletResponse response, String userLoginType) {
         UserEntity user = userRepository.findByUserEmail(dto.getEmail())
@@ -40,7 +39,6 @@ public class LoginServiceImpl implements LoginService {
         return tokenService.getLoginToken(user, response, userLoginType);
     }
 
-    // 로그아웃 처리 - RefreshToken 제거 + 쿠키 삭제
     @Override
     public void logout(CustomUserDetails userDetails, HttpServletResponse response) {
         String userId = String.valueOf(userDetails.getUserId());
@@ -48,7 +46,6 @@ public class LoginServiceImpl implements LoginService {
         jwtCookieUtil.deleteAccessTokenCookie(response);
     }
 
-    // 로그인한 사용자 정보 조회
     @Override
     @Transactional(readOnly = true)
     public UserSummaryDto myInfo(CustomUserDetails user, String token) {
