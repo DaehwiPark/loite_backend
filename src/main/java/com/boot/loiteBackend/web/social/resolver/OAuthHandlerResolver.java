@@ -25,7 +25,7 @@ public class OAuthHandlerResolver {
         return loginHandlers.stream()
                 .filter(handler -> handler.getProvider().name().equalsIgnoreCase(providerName))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(SocialErrorCode.UNSUPPORTED_PROVIDER));
+                .orElseThrow(() -> new CustomException(SocialErrorCode.INVALID_PROVIDER));
     }
 
     // 연동용 핸들러
@@ -33,7 +33,7 @@ public class OAuthHandlerResolver {
         return linkHandlers.stream()
                 .filter(handler -> handler.getProvider().name().equalsIgnoreCase(providerName))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(SocialErrorCode.UNSUPPORTED_PROVIDER));
+                .orElseThrow(() -> new CustomException(SocialErrorCode.INVALID_PROVIDER));
     }
 
     // 인증용 핸들러
@@ -41,7 +41,7 @@ public class OAuthHandlerResolver {
         return verifyHandlers.stream()
                 .filter(handler -> handler.getProvider().name().equalsIgnoreCase(providerName))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(SocialErrorCode.UNSUPPORTED_PROVIDER));
+                .orElseThrow(() -> new CustomException(SocialErrorCode.INVALID_PROVIDER));
     }
 
     //얀동 끊기 핸들러
@@ -49,6 +49,6 @@ public class OAuthHandlerResolver {
         return unlinkHandlers.stream()
                 .filter(handler -> handler.getProvider().name().equalsIgnoreCase(providerName))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(SocialErrorCode.UNSUPPORTED_PROVIDER));
+                .orElseThrow(() -> new CustomException(SocialErrorCode.INVALID_PROVIDER));
     }
 }

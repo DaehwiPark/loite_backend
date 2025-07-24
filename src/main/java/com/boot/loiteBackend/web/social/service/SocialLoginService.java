@@ -2,7 +2,10 @@ package com.boot.loiteBackend.web.social.service;
 
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.service.TokenService;
+import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.response.ApiResponse;
+import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.web.social.handler.OAuthUnLinkHandlers;
 import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
 import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
@@ -12,6 +15,7 @@ import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,8 +81,26 @@ public class SocialLoginService {
                         "email", email,
                         "socialId", socialId,
                         "name", name,
-                        "provider", userLoginType
+                        "provider", userLoginType,
+                        "accessToken", accessToken
                 )
         );
+    }
+
+    @Transactional
+    public void unlinkAccount(String provider, String accessToken) {
+        if (accessToken == null || accessToken.isBlank()) {
+            throw new CustomException(SocialErrorCode.INVALID_SOCIAL_TOKEN);
+        }
+
+        OAuthUnLinkHandlers handler = resolver.resolveUnlink(provider);
+
+        try {
+            handler.unlinkSocialAccount(accessToken, null); // email은 없어도 됨
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException(SocialErrorCode.UNLINK_FAILED);
+        }
     }
 }

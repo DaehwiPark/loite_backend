@@ -69,6 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void withdraw(CustomUserDetails loginUser, String accessToken) {
+
         UserEntity user = userRepository.findById(loginUser.getUserId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 

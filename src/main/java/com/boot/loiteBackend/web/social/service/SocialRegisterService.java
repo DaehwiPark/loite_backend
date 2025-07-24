@@ -92,7 +92,7 @@ public class SocialRegisterService {
         try {
             return ProviderType.valueOf(providerName.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new CustomException(SocialErrorCode.UNSUPPORTED_PROVIDER);
+            throw new CustomException(SocialErrorCode.INVALID_PROVIDER);
         }
     }
 }
