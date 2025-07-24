@@ -1,7 +1,9 @@
 package com.boot.loiteBackend.web.social.controller;
 
+import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.dto.SocialUserRegistrationDto;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
+import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import com.boot.loiteBackend.web.social.service.SocialLoginService;
 import com.boot.loiteBackend.web.social.service.SocialRegisterService;
 import com.boot.loiteBackend.global.response.ApiResponse;
@@ -12,7 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 @RestController
@@ -24,6 +29,7 @@ public class SocialLoginController {
     private final OAuthHandlerResolver handlerResolver;
     private final SocialLoginService socialLoginService;
     private final SocialRegisterService socialRegisterService;
+    private final SocialLinkService socialLinkService;
 
     @GetMapping("/{provider}")
     @Operation(
@@ -33,7 +39,7 @@ public class SocialLoginController {
     )
     public ResponseEntity<ApiResponse<String>> getLoginUrl(@PathVariable String provider) {
         String url = handlerResolver.resolveLogin(provider).getUrl();
-        return ResponseEntity.ok(ApiResponse.ok(url));
+        return ResponseEntity.ok(ApiResponse.ok(url, "소셜 로그인 url 생성 완료"));
     }
 
     @GetMapping("/{provider}/callback")
@@ -80,5 +86,15 @@ public class SocialLoginController {
         return ResponseEntity.ok(
                 ApiResponse.ok(loginResult, userLoginType + " 사용자 등록 및 로그인 성공")
         );
+    }
+
+    @PostMapping("/{provider}/unlink")
+    public ResponseEntity<ApiResponse<Void>> unlinkAccount(
+            @PathVariable String provider,
+            @RequestBody Map<String, String> body
+    ) {
+        String accessToken = body.get("accessToken");
+        socialLoginService.unlinkAccount(provider, accessToken);
+        return ResponseEntity.ok(ApiResponse.ok("소셜 연동이 해제되었습니다."));
     }
 }

@@ -2,6 +2,7 @@ package com.boot.loiteBackend.web.social.service;
 
 import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.service.TokenService;
+import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.dto.SocialVerificationResultDto;
@@ -18,6 +19,7 @@ import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +62,7 @@ public class SocialLinkService {
     }
 
 
-    public ApiResponse<LoginResponseDto> link(String provider, String code, CustomUserDetails loginUser, HttpServletResponse response, String userLoginType) {
+    public LoginResponseDto link(String provider, String code, CustomUserDetails loginUser, HttpServletResponse response, String userLoginType) {
         OAuthLinkHandler handler = resolver.resolveLink(provider);
         String accessToken = handler.requestLinkingAccessToken(code);
         OAuthUserInfo userInfo = handler.getUserInfo(accessToken);
@@ -68,111 +70,77 @@ public class SocialLinkService {
         String email = userInfo.getEmail();
         String socialId = userInfo.getSocialId();
 
-        // 소셜 계정이 이미 다른 사용자에 의해 연동되었는지 확인
         Optional<SocialUserEntity> existingSocialOpt = socialUserRepository
                 .findBySocialTypeAndSocialNumber(provider.toUpperCase(), socialId);
 
         if (existingSocialOpt.isPresent()) {
             if (!existingSocialOpt.get().getUser().getUserId().equals(loginUser.getUserId())) {
-                return ApiResponse.error(
-                        SocialErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER,
-                        Map.of("email", email, "provider", provider)
-                );
+                throw new CustomException(SocialErrorCode.ALREADY_REGISTERED_WITH_OTHER_PROVIDER);
             } else {
-                return ApiResponse.error(
-                        SocialErrorCode.ALREADY_LINKED,
-                        Map.of("email", email, "provider", provider)
-                );
+                throw new CustomException(SocialErrorCode.ALREADY_LINKED);
             }
         }
+
         UserEntity user = userRepository.findById(loginUser.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(SocialErrorCode.USER_NOT_FOUND));
 
         SocialUserEntity socialUser = SocialUserEntity.builder()
                 .user(user)
                 .socialType(provider.toUpperCase())
                 .socialNumber(socialId)
-                .socialEmail(userInfo.getEmail())
+                .socialEmail(email)
                 .socialUserName(userInfo.getName())
                 .connectedAt(LocalDateTime.now())
                 .build();
 
         socialUserRepository.save(socialUser);
 
-        return ApiResponse.ok(tokenService.getLoginToken(user, response, userLoginType),
-                provider.toUpperCase() + " 계정 연동 완료");
+        return tokenService.getLoginToken(user, response, userLoginType);
     }
 
-
-    public ApiResponse<String> unlinkAccount(String provider, CustomUserDetails loginUser, String accessToken) {
-        UserEntity user = userRepository.findById(loginUser.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
-
-        // 연동된 소셜 계정 확인
-        Optional<SocialUserEntity> socialUserOpt = socialUserRepository
-                .findByUserAndSocialType(user, provider.toUpperCase());
-
-        if (socialUserOpt.isEmpty()) {
-            return ApiResponse.error(SocialErrorCode.SOCIAL_NOT_LINKED);
+    @Transactional
+    public void unlinkAccount(String provider, CustomUserDetails loginUser, String accessToken) {
+        if (accessToken == null || accessToken.isBlank()) {
+            throw new CustomException(SocialErrorCode.INVALID_SOCIAL_TOKEN);
         }
 
-        SocialUserEntity socialUser = socialUserOpt.get();
+        UserEntity user = userRepository.findById(loginUser.getUserId())
+                .orElseThrow(() -> new CustomException(SocialErrorCode.USER_NOT_FOUND));
+
+        SocialUserEntity socialUser = socialUserRepository.findByUserAndSocialType(user, provider.toUpperCase())
+                .orElseThrow(() -> new CustomException(SocialErrorCode.SOCIAL_NOT_LINKED));
+
+        OAuthUnLinkHandlers handler = resolver.resolveUnlink(provider);
 
         try {
-            // accessToken 사용하여 플랫폼 unlink API 호출
-            OAuthUnLinkHandlers handler = resolver.resolveUnlink(provider);
             handler.unlinkSocialAccount(accessToken, socialUser.getSocialEmail());
-
+        } catch (CustomException e) {
+            throw e; // 인증 실패 등
         } catch (Exception e) {
-            return ApiResponse.error(SocialErrorCode.UNLINK_FAILED, "플랫폼 연동 해제 실패: " + e.getMessage());
+            throw new CustomException(SocialErrorCode.UNLINK_FAILED);
         }
 
-        // 연동 정보 삭제
         socialUserRepository.delete(socialUser);
-        return ApiResponse.ok(provider.toUpperCase() + " 연동이 성공적으로 해제되었습니다.");
     }
 
-
-    public ApiResponse<SocialVerificationResultDto> verifySocialAuthentication(String provider, String code, CustomUserDetails loginUser) {
+    public SocialVerificationResultDto verifySocialAuthentication(String provider, String code, CustomUserDetails loginUser) {
         OAuthVerifyHandlers handler = resolver.resolveVerify(provider);
-
-        // 인증 코드로 access token 요청
         String accessToken = handler.requestVerifyAccessToken(code);
-
-        // access token으로 사용자 정보 요청
         OAuthUserInfo userInfo = handler.getUserInfo(accessToken);
-        String authenticatedEmail = userInfo.getEmail();
-        String authenticatedSocialNumber = userInfo.getSocialId();
 
-        // 현재 로그인된 사용자 기준 연동된 소셜 계정 조회
-        Optional<SocialUserEntity> linkedOpt = socialUserRepository.findByUserAndSocialType(
-                userRepository.findById(loginUser.getUserId())
-                        .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다.")),
-                provider.toUpperCase()
-        );
+        UserEntity user = userRepository.findById(loginUser.getUserId())
+                .orElseThrow(() -> new CustomException(SocialErrorCode.USER_NOT_FOUND));
 
-        // 연동 정보 없을 경우 실패 반환
-        if (linkedOpt.isEmpty()) {
-            return ApiResponse.error(
-                    SocialErrorCode.SOCIAL_VERIFICATION_FAILED
-            );
-        }
+        SocialUserEntity linked = socialUserRepository.findByUserAndSocialType(user, provider.toUpperCase())
+                .orElseThrow(() -> new CustomException(SocialErrorCode.SOCIAL_VERIFICATION_FAILED));
 
-        // 정보 비교
-        SocialUserEntity linked = linkedOpt.get();
-        boolean emailMatches = linked.getSocialEmail().equalsIgnoreCase(authenticatedEmail);
-        boolean socialNumberMatches = linked.getSocialNumber().equals(authenticatedSocialNumber);
+        boolean emailMatches = linked.getSocialEmail().equalsIgnoreCase(userInfo.getEmail());
+        boolean socialNumberMatches = linked.getSocialNumber().equals(userInfo.getSocialId());
 
         if (!emailMatches || !socialNumberMatches) {
-            return ApiResponse.error(
-                    SocialErrorCode.SOCIAL_VERIFICATION_FAILED
-            );
+            throw new CustomException(SocialErrorCode.SOCIAL_VERIFICATION_FAILED);
         }
 
-        // 성공 응답
-        return ApiResponse.ok(
-                new SocialVerificationResultDto(true, accessToken),
-                "소셜 인증이 성공적으로 확인되었습니다."
-        );
+        return new SocialVerificationResultDto(true, accessToken);
     }
 }
