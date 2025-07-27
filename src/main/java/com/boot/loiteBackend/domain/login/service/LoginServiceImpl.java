@@ -42,8 +42,13 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public void logout(CustomUserDetails userDetails, HttpServletResponse response) {
         String userId = String.valueOf(userDetails.getUserId());
+        // redis 에서 token 저장 정보 삭제
         tokenService.deleteRefreshToken(userId);
+        // 브라우저에서 AccessToken 삭제
         jwtCookieUtil.deleteAccessTokenCookie(response);
+        // 브라우저에서 RefreshToken 삭제
+        jwtCookieUtil.deleteRefreshTokenCookie(response);
+
     }
 
     @Override
