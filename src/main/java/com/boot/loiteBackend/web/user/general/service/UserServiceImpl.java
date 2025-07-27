@@ -6,6 +6,9 @@ import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.global.security.jwt.JwtCookieUtil;
 import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
+import com.boot.loiteBackend.web.user.general.dto.FindUserIdRequestDto;
+import com.boot.loiteBackend.web.user.general.dto.ResetPasswordRequestDto;
+import com.boot.loiteBackend.web.user.general.dto.UpdatePasswordRequestDto;
 import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.error.UserErrorCode;
@@ -106,5 +109,31 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public boolean isEmailDuplicated(String userEmail) {
         return userRepository.existsByUserEmail(userEmail);
+    }
+
+    @Override
+    public String findUserId(FindUserIdRequestDto dto) {
+        UserEntity user = userRepository.findByUserNameAndUserPhone(dto.getName(), dto.getPhone())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        return user.getUserEmail();
+    }
+
+    @Override
+    public void validateUserForPasswordReset(ResetPasswordRequestDto dto) {
+        boolean exists = userRepository.existsByUserEmailAndUserNameAndUserPhone(
+                dto.getEmail(), dto.getName(), dto.getPhone());
+
+        if (!exists) {
+            throw new CustomException(UserErrorCode.USER_NOT_FOUND);
+        }
+    }
+    
+    @Override
+    public void updatePassword(UpdatePasswordRequestDto dto) {
+        UserEntity user = userRepository.findByUserEmail(dto.getEmail())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+        user.setUserPassword(dto.getNewPassword());
+        userRepository.save(user);
     }
 }
