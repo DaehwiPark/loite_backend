@@ -5,6 +5,7 @@ import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.user.general.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,9 +23,10 @@ public class PrivateUserController {
     @Operation(summary = "회원 탈퇴", description = "현재 로그인된 사용자의 회원 정보를 삭제(탈퇴)합니다.")
     public ResponseEntity<ApiResponse<Void>> withdraw(
             @AuthenticationPrincipal CustomUserDetails loginUser,
-            @RequestParam(required = false) String token
+            @RequestParam(required = false) String token,
+            HttpServletResponse response
     ) {
-        userService.withdraw(loginUser, token);
+        userService.withdraw(loginUser, token, response);
         return ResponseEntity.ok(ApiResponse.ok("회원 탈퇴가 완료되었습니다."));
     }
 

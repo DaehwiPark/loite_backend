@@ -1,7 +1,10 @@
 package com.boot.loiteBackend.web.user.general.service;
 
+import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.global.security.jwt.JwtCookieUtil;
+import com.boot.loiteBackend.global.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
@@ -14,6 +17,7 @@ import com.boot.loiteBackend.web.user.role.repository.UserRoleRepository;
 import com.boot.loiteBackend.web.user.status.entity.UserStatusEntity;
 import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
 import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +33,8 @@ public class UserServiceImpl implements UserService {
     private final SocialLinkService socialLinkService;
     private final UserRoleRepository userRoleCodeRepository;
     private final UserStatusRepository userStatusCodeRepository;
+    private final TokenService tokenService;
+    private final JwtCookieUtil jwtCookieUtil;
 
     @Override
     public Long signup(UserCreateRequestDto dto) {
@@ -68,14 +74,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void withdraw(CustomUserDetails loginUser, String accessToken) {
+    public void withdraw(CustomUserDetails loginUser, String accessToken, HttpServletResponse response) {
 
         UserEntity user = userRepository.findById(loginUser.getUserId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         String provider = loginUser.getUserRegisterType();
-        socialLinkService.unlinkAccount(provider, loginUser, accessToken);
 
+        if (!"email".equalsIgnoreCase(provider)) {
+            socialLinkService.unlinkAccount(provider, loginUser, accessToken);
+        }
+
+        // redis 에서 token 저장 정보 삭제
+        tokenService.deleteRefreshToken(String.valueOf(user.getUserId()));
+        // 브라우저에서 AccessToken 삭제
+        jwtCookieUtil.deleteAccessTokenCookie(response);
+        // 브라우저에서 RefreshToken 삭제
+        jwtCookieUtil.deleteRefreshTokenCookie(response);
+        // db 에서 회원 정보 삭제
         userRepository.delete(user);
     }
 

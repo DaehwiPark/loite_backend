@@ -33,4 +33,14 @@ public class JwtCookieUtil {
         cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
     }
+
+    public void deleteRefreshTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 즉시 만료
+        cookie.setSecure(env.isSecureCookieEnabled());
+        cookie.setAttribute("SameSite", "Strict");
+        response.addCookie(cookie);
+    }
 }
