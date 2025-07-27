@@ -16,23 +16,46 @@ public class SupportFaqMediumCategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "FAQ_MEDIUM_CATEGORY_ID")
+    @Column(
+            name = "FAQ_MEDIUM_CATEGORY_ID",
+            columnDefinition = "BIGINT COMMENT '중분류 고유 ID'"
+    )
     private Long faqMediumCategoryId;
 
-    @Column(name = "FAQ_MEDIUM_CATEGORY_NAME", nullable = false, length = 100)
+    @Column(
+            name = "FAQ_MEDIUM_CATEGORY_NAME",
+            nullable = false,
+            length = 100,
+            columnDefinition = "VARCHAR(100) COMMENT '중분류 이름'"
+    )
     private String faqMediumCategoryName;
 
-    @Column(name = "FAQ_MEDIUM_CATEGORY_ORDER")
+    @Column(
+            name = "FAQ_MEDIUM_CATEGORY_ORDER",
+            columnDefinition = "INT COMMENT '중분류 정렬 순서'"
+    )
     private Integer faqMediumCategoryOrder;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FAQ_MAJOR_CATEGORY_ID", nullable = false)
+    @JoinColumn(
+            name = "FAQ_MAJOR_CATEGORY_ID",
+            nullable = false
+    )
     private SupportFaqMajorCategoryEntity faqMajorCategory;
 
-    @Column(name = "CREATED_AT", nullable = false, updatable = false)
+    @Column(
+            name = "CREATED_AT",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "DATETIME COMMENT '등록일'"
+    )
     private LocalDateTime createdAt;
 
-    @Column(name = "UPDATED_AT", nullable = false)
+    @Column(
+            name = "UPDATED_AT",
+            nullable = false,
+            columnDefinition = "DATETIME COMMENT '수정일'"
+    )
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -45,5 +68,4 @@ public class SupportFaqMediumCategoryEntity {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }

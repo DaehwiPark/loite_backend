@@ -1,8 +1,8 @@
 package com.boot.loiteBackend.admin.news.general.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,33 +12,39 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "새소식 엔티티")
 public class AdminNewsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "뉴스 식별자", example = "1")
+    @Column(name = "NEWS_ID", columnDefinition = "BIGINT COMMENT '식별자'")
     private Long newsId;
 
-    @Column(nullable = false)
-    @Schema(description = "뉴스 제목", example = "서비스 점검 안내")
+    @Column(name = "NEWS_TITLE", nullable = false, columnDefinition = "VARCHAR(255) COMMENT '제목'")
     private String newsTitle;
 
-    @Schema(description = "문의처 (전화번호 등)", example = "02-1234-5678")
+    @Column(name = "NEWS_CONTACT", columnDefinition = "VARCHAR(100) COMMENT '문의처 (전화번호 등)'")
     private String newsContact;
 
-    @Schema(description = "썸네일 이미지 URL", example = "https://cdn.loite.com/thumb.jpg")
+    @Column(name = "NEWS_THUMBNAIL_URL", columnDefinition = "VARCHAR(500) COMMENT '썸네일 이미지 또는 대표 이미지 URL'")
     private String newsThumbnailUrl;
 
     @Lob
-    @Schema(description = "본문 내용 (HTML 가능)", example = "<p>점검 안내입니다.</p>")
+    @Column(name = "NEWS_CONTENT", columnDefinition = "TEXT COMMENT '본문 내용 (HTML 또는 텍스트)'")
     private String newsContent;
 
-    @Column(updatable = false)
-    @Schema(description = "생성일시", example = "2024-05-30T14:35:00")
+    @Column(
+            name = "CREATED_AT",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일'"
+    )
     private LocalDateTime createdAt;
 
-    @Schema(description = "수정일시", example = "2024-06-01T09:20:00")
+    @Column(
+            name = "UPDATED_AT",
+            nullable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시'"
+    )
     private LocalDateTime updatedAt;
 
     @PrePersist
