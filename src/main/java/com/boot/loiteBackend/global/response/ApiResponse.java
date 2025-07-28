@@ -51,6 +51,15 @@ public class ApiResponse<T> {
                 .build();
     }
 
+    public static <T> ApiResponse<T> ok(T data, String message, Map<String, Object> extra) {
+        return ApiResponse.<T>builder()
+                .success(true)
+                .message(message)
+                .data(data)
+                .extra(extra)
+                .build();
+    }
+
     // 실패 응답 헬퍼
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
         return ApiResponse.<T>builder()
