@@ -33,6 +33,13 @@ public class PublicUserController {
         return ResponseEntity.ok(ApiResponse.ok(duplicated, message));
     }
 
+    @Operation(summary = "핸드폰 번호 중복 확인", description = "회원가입 시 입력한 핸드폰 번호가 이미 사용 중인지 확인합니다.")
+    @GetMapping("/phone/check")
+    public ResponseEntity<ApiResponse<Boolean>> checkPhone(@RequestParam String phone) {
+        boolean duplicated = userService.isPhoneDuplicated(phone);
+        String message = duplicated ? "이미 사용 중인 핸드폰 번호입니다." : "사용 가능한 핸드폰 번호입니다.";
+        return ResponseEntity.ok(ApiResponse.ok(duplicated, message));    }
+
 
     @Operation(summary = "아이디(이메일) 찾기", description = "회원가입 시 등록한 이름과 휴대폰 번호를 입력받아 해당 이메일을 반환합니다.")
     @PostMapping("/emails/search")
