@@ -26,4 +26,6 @@ public interface UserService {
     String findUserId(@Valid FindUserIdRequestDto dto);
 
     void validateUserForPasswordReset(@Valid ResetPasswordRequestDto dto);
+
+    boolean isPhoneDuplicated(String phone);
 }

@@ -112,6 +112,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean isPhoneDuplicated(String userPhone) {
+        return userRepository.existsByUserPhone(userPhone);
+    }
+
+    @Override
     public String findUserId(FindUserIdRequestDto dto) {
         UserEntity user = userRepository.findByUserNameAndUserPhone(dto.getName(), dto.getPhone())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
