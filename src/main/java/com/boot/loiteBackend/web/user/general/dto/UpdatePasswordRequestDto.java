@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(description = "비밀번호 변경 요청 DTO")
 public class UpdatePasswordRequestDto {
 
     @Schema(description = "비밀번호를 변경할 계정의 이메일", example = "user@example.com", required = true)
