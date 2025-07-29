@@ -2,12 +2,11 @@ package com.boot.loiteBackend.web.user.general.service;
 
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
-import com.boot.loiteBackend.web.user.general.dto.FindUserIdRequestDto;
-import com.boot.loiteBackend.web.user.general.dto.ResetPasswordRequestDto;
-import com.boot.loiteBackend.web.user.general.dto.UpdatePasswordRequestDto;
-import com.boot.loiteBackend.web.user.general.dto.UserCreateRequestDto;
+import com.boot.loiteBackend.web.user.general.dto.*;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,4 +27,16 @@ public interface UserService {
     void validateUserForPasswordReset(@Valid ResetPasswordRequestDto dto);
 
     boolean isPhoneDuplicated(String phone);
+
+    void updateUserInfo(CustomUserDetails loginUser, UserUpdateInfoRequestDto request);
+
+    void updateMarketingAgreement(CustomUserDetails loginUser, UserMarketingAgreementRequestDto request);
+
+    UserInfoDto getUserInfo(CustomUserDetails loginUser);
+
+    boolean check(CustomUserDetails user, String password);
+
+    void changePassword(CustomUserDetails loginUser, @Valid UpdatePasswordRequestDto request);
+
+    UserEntity findUserEntity(@Valid FindUserIdRequestDto dto);
 }
