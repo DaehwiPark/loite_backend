@@ -2,13 +2,19 @@ package com.boot.loiteBackend.web.user.general.controller;
 
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.web.user.general.dto.*;
+import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -38,14 +44,18 @@ public class PublicUserController {
     public ResponseEntity<ApiResponse<Boolean>> checkPhone(@RequestParam String phone) {
         boolean duplicated = userService.isPhoneDuplicated(phone);
         String message = duplicated ? "이미 사용 중인 핸드폰 번호입니다." : "사용 가능한 핸드폰 번호입니다.";
-        return ResponseEntity.ok(ApiResponse.ok(duplicated, message));    }
+        return ResponseEntity.ok(ApiResponse.ok(duplicated, message));
+    }
 
-
-    @Operation(summary = "아이디(이메일) 찾기", description = "회원가입 시 등록한 이름과 휴대폰 번호를 입력받아 해당 이메일을 반환합니다.")
+    @Operation(summary = "아이디(이메일) 찾기", description = "회원가입 시 등록한 이름과 휴대폰 번호를 입력받아 해당 이메일과 가입일자를 반환합니다.")
     @PostMapping("/emails/search")
     public ResponseEntity<ApiResponse<String>> searchUserEmail(@Valid @RequestBody FindUserIdRequestDto dto) {
-        String email = userService.findUserId(dto);
-        return ResponseEntity.ok(ApiResponse.ok(email, "가입된 이메일입니다."));
+        UserEntity user = userService.findUserEntity(dto);
+        String email = user.getUserEmail();
+        LocalDateTime createdAt = user.getCreatedAt();
+        Map<String, Object> extra = new HashMap<>();
+        extra.put("createdAt", createdAt);
+        return ResponseEntity.ok(ApiResponse.ok(email, "가입된 이메일입니다.", extra));
     }
 
     @Operation(summary = "비밀번호 재설정 본인 확인",
