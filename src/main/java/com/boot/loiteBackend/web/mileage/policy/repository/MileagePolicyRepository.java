@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.web.mileage.policy.respository;
+package com.boot.loiteBackend.web.mileage.policy.repository;
 
 import com.boot.loiteBackend.web.mileage.policy.entity.MileagePolicyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

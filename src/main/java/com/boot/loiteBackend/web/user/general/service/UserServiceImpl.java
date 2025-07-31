@@ -1,10 +1,16 @@
 package com.boot.loiteBackend.web.user.general.service;
 
+import com.boot.loiteBackend.domain.mileage.outbok.processor.MileageOutboxProcessor;
+import com.boot.loiteBackend.domain.mileage.outbok.repository.MileageOutboxRepository;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.global.security.jwt.JwtCookieUtil;
-import com.boot.loiteBackend.web.mileage.history.event.UserSignUpEvent;
+import com.boot.loiteBackend.web.mileage.outbox.entity.MileageOutboxEntity;
+import com.boot.loiteBackend.web.mileage.outbox.model.MileageOutboxEventType;
+import com.boot.loiteBackend.web.mileage.outbox.model.MileageOutboxStatus;
+import com.boot.loiteBackend.web.mileage.policy.entity.MileagePolicyEntity;
+import com.boot.loiteBackend.web.mileage.policy.repository.MileagePolicyRepository;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import com.boot.loiteBackend.web.user.general.dto.*;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
@@ -20,7 +26,6 @@ import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
 import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,12 +43,13 @@ public class UserServiceImpl implements UserService {
     private final TokenService tokenService;
     private final JwtCookieUtil jwtCookieUtil;
     private final UserInfoDtoMapper userInfoDtoMapper;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final MileageOutboxRepository mileageOutboxRepository;
+    private final MileagePolicyRepository mileagePolicyRepository;
+    private final MileageOutboxProcessor mileageOutboxProcessor;
 
     @Override
     @Transactional
     public Long signup(UserCreateRequestDto dto) {
-
         if (userRepository.existsByUserEmail(dto.getUserEmail())) {
             throw new CustomException(UserErrorCode.EMAIL_DUPLICATED);
         }
@@ -77,8 +83,21 @@ public class UserServiceImpl implements UserService {
         // 1. 유저 저장
         UserEntity savedUser = userRepository.save(user);
 
-        // 2. 마일리지 적립 이벤트 발행 (AFTER_COMMIT에서 처리됨)
-        applicationEventPublisher.publishEvent(new UserSignUpEvent(savedUser.getUserId()));
+        // 2. 마일리지 정책 조회
+        MileagePolicyEntity policy = mileagePolicyRepository
+                .findByMileagePolicyCodeAndMileagePolicyYn("SIGN_UP_BONUS", "Y")
+                .orElseThrow(() -> new IllegalStateException("회원가입 마일리지 정책이 존재하지 않습니다."));
+
+        // 3. Outbox 테이블에 이벤트 저장
+        MileageOutboxEntity outbox = MileageOutboxEntity.builder()
+                .userId(savedUser.getUserId())
+                .policyId(policy.getMileagePolicyId())
+                .eventType(MileageOutboxEventType.SIGN_UP_BONUS)
+                .status(MileageOutboxStatus.PENDING)
+                .retryCount(0)
+                .build();
+
+        mileageOutboxRepository.save(outbox);
 
         return savedUser.getUserId();
     }

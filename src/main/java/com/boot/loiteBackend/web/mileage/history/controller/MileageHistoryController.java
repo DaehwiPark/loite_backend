@@ -21,17 +21,6 @@ public class MileageHistoryController {
 
     private final MileageHistoryService mileageHistoryService;
 
-//    @PostMapping
-//    @Operation(summary = "마일리지 등록", description = "EARN / USE / EXPIRE 타입으로 마일리지를 등록합니다.")
-//    public ResponseEntity<ApiResponse<Void>> register(
-//            @AuthenticationPrincipal CustomUserDetails loginUser,
-//            @RequestBody MileageHistoryDto dto
-//    ) {
-//        dto.setUserId(loginUser.getUserId());
-//        mileageHistoryService.addHistory(dto);
-//        return ResponseEntity.ok(ApiResponse.ok("마일리지가 등록되었습니다."));
-//    }
-
     @GetMapping
     @Operation(summary = "마일리지 이력 조회", description = "현재 로그인한 회원의 마일리지 적립/사용/소멸 내역을 조회합니다.")
     public ResponseEntity<ApiResponse<List<MileageHistoryDto>>> getHistory(

@@ -1,8 +1,9 @@
 package com.boot.loiteBackend.web.mileage.history.entity;
 
+import com.boot.loiteBackend.web.mileage.history.model.MileageHistoryType;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+        import lombok.*;
+        import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -23,8 +24,9 @@ public class MileageHistoryEntity {
     @Column(name = "USER_ID", nullable = false, columnDefinition = "bigint(20) NOT NULL COMMENT '회원 ID (마일리지 소유자)'")
     private Long userId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "MILEAGE_HISTORY_TYPE", nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '타입: EARN=적립, USE=사용, EXPIRE=소멸'")
-    private String mileageHistoryType;
+    private MileageHistoryType mileageHistoryType;
 
     @Column(name = "MILEAGE_HISTORY_SOURCE", length = 50, columnDefinition = "varchar(50) DEFAULT NULL COMMENT '적립/사용 사유: 주문번호, 회원가입 등'")
     private String mileageHistorySource;

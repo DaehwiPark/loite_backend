@@ -2,6 +2,7 @@ package com.boot.loiteBackend.web.mileage.history.service;
 
 import com.boot.loiteBackend.web.mileage.history.dto.MileageHistoryDto;
 import com.boot.loiteBackend.web.mileage.history.entity.MileageHistoryEntity;
+import com.boot.loiteBackend.web.mileage.history.model.MileageHistoryType;
 import com.boot.loiteBackend.web.mileage.history.respository.MileageHistoryRepository;
 import com.boot.loiteBackend.web.mileage.total.respository.MileageTotalRepository;
 import com.boot.loiteBackend.web.mileage.total.service.MileageTotalService;
@@ -27,7 +28,7 @@ public class MileageHistoryServiceImpl implements MileageHistoryService {
         return mileageHistoryRepository.findByUserId(userId).stream()
                 .map(entity -> MileageHistoryDto.builder()
                         .userId(entity.getUserId())
-                        .mileageHistoryType(entity.getMileageHistoryType())
+                        .mileageHistoryType(entity.getMileageHistoryType().name())
                         .mileageHistorySource(entity.getMileageHistorySource())
                         .mileageHistoryAmount(entity.getMileageHistoryAmount())
                         .mileageHistoryTotalAmount(entity.getMileageHistoryTotalAmount())
@@ -38,14 +39,13 @@ public class MileageHistoryServiceImpl implements MileageHistoryService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void earnSignupMileage(Long userId, int point, String reason, Long policyId) {
         MileageHistoryEntity history = MileageHistoryEntity.builder()
                 .userId(userId)
                 .mileageHistoryAmount(point)
-                .mileageHistoryType("EARN") // TODO: 정적 문자열 대신 Enum 도입 고려
+                .mileageHistoryType(MileageHistoryType.EARN)
                 .mileageHistorySource(reason)
                 .mileagePolicyId(policyId)
                 .build();
