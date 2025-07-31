@@ -51,6 +51,7 @@ public class PrivateUserController {
         return ResponseEntity.ok(ApiResponse.ok("마케팅 수신 동의 정보가 수정되었습니다."));
     }
 
+    // TODO: 현재 Hard delete 로 구현되어있으나 추후 soft delete 로 변경 필요
     @Operation(summary = "회원 탈퇴", description = "현재 로그인된 사용자의 회원 정보를 삭제(탈퇴)합니다.")
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> withdraw(
