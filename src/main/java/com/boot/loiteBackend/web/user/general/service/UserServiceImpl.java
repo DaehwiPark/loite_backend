@@ -4,6 +4,7 @@ import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.global.security.jwt.JwtCookieUtil;
+import com.boot.loiteBackend.web.mileage.history.event.UserSignUpEvent;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import com.boot.loiteBackend.web.user.general.dto.*;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
@@ -19,7 +20,7 @@ import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
 import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +38,10 @@ public class UserServiceImpl implements UserService {
     private final TokenService tokenService;
     private final JwtCookieUtil jwtCookieUtil;
     private final UserInfoDtoMapper userInfoDtoMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
+    @Transactional
     public Long signup(UserCreateRequestDto dto) {
 
         if (userRepository.existsByUserEmail(dto.getUserEmail())) {
@@ -71,7 +74,13 @@ public class UserServiceImpl implements UserService {
 
         user.setUserRegisterType("EMAIL");
 
-        return userRepository.save(user).getUserId();
+        // 1. 유저 저장
+        UserEntity savedUser = userRepository.save(user);
+
+        // 2. 마일리지 적립 이벤트 발행 (AFTER_COMMIT에서 처리됨)
+        applicationEventPublisher.publishEvent(new UserSignUpEvent(savedUser.getUserId()));
+
+        return savedUser.getUserId();
     }
 
     @Override
