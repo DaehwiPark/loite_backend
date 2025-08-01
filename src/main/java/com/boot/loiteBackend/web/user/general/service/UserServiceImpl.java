@@ -12,6 +12,7 @@ import com.boot.loiteBackend.web.mileage.outbox.model.MileageOutboxStatus;
 import com.boot.loiteBackend.web.mileage.policy.entity.MileagePolicyEntity;
 import com.boot.loiteBackend.web.mileage.policy.repository.MileagePolicyRepository;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
+import com.boot.loiteBackend.web.user.event.UserSignedUpEvent;
 import com.boot.loiteBackend.web.user.general.dto.*;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.error.UserErrorCode;
@@ -26,6 +27,7 @@ import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
 import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +45,7 @@ public class UserServiceImpl implements UserService {
     private final TokenService tokenService;
     private final JwtCookieUtil jwtCookieUtil;
     private final UserInfoDtoMapper userInfoDtoMapper;
-    private final MileageOutboxRepository mileageOutboxRepository;
-    private final MileagePolicyRepository mileagePolicyRepository;
-    private final MileageOutboxProcessor mileageOutboxProcessor;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -70,34 +70,17 @@ public class UserServiceImpl implements UserService {
         user.setUserBirthdate(birthdate);
         user.setEmailVerified(false);
 
-        UserRoleEntity role = userRoleCodeRepository.findById("USER")
-                .orElseThrow(() -> new CustomException(UserRoleErrorCode.ROLE_NOT_FOUND));
-        user.setUserRole(role);
+        user.setUserRole(userRoleCodeRepository.findById("USER")
+                .orElseThrow(() -> new CustomException(UserRoleErrorCode.ROLE_NOT_FOUND)));
 
-        UserStatusEntity status = userStatusCodeRepository.findById("ACTIVE")
-                .orElseThrow(() -> new CustomException(UserStatusErrorCode.STATUS_NOT_FOUND));
-        user.setUserStatus(status);
+        user.setUserStatus(userStatusCodeRepository.findById("ACTIVE")
+                .orElseThrow(() -> new CustomException(UserStatusErrorCode.STATUS_NOT_FOUND)));
 
         user.setUserRegisterType("EMAIL");
 
-        // 1. 유저 저장
         UserEntity savedUser = userRepository.save(user);
 
-        // 2. 마일리지 정책 조회
-        MileagePolicyEntity policy = mileagePolicyRepository
-                .findByMileagePolicyCodeAndMileagePolicyYn("SIGN_UP_BONUS", "Y")
-                .orElseThrow(() -> new IllegalStateException("회원가입 마일리지 정책이 존재하지 않습니다."));
-
-        // 3. Outbox 테이블에 이벤트 저장
-        MileageOutboxEntity outbox = MileageOutboxEntity.builder()
-                .userId(savedUser.getUserId())
-                .policyId(policy.getMileagePolicyId())
-                .eventType(MileageOutboxEventType.SIGN_UP_BONUS)
-                .status(MileageOutboxStatus.PENDING)
-                .retryCount(0)
-                .build();
-
-        mileageOutboxRepository.save(outbox);
+        eventPublisher.publishEvent(new UserSignedUpEvent(savedUser.getUserId()));
 
         return savedUser.getUserId();
     }

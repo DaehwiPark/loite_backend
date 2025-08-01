@@ -4,7 +4,6 @@ import com.boot.loiteBackend.web.mileage.history.dto.MileageHistoryDto;
 import com.boot.loiteBackend.web.mileage.history.entity.MileageHistoryEntity;
 import com.boot.loiteBackend.web.mileage.history.model.MileageHistoryType;
 import com.boot.loiteBackend.web.mileage.history.respository.MileageHistoryRepository;
-import com.boot.loiteBackend.web.mileage.total.respository.MileageTotalRepository;
 import com.boot.loiteBackend.web.mileage.total.service.MileageTotalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 public class MileageHistoryServiceImpl implements MileageHistoryService {
 
     private final MileageHistoryRepository mileageHistoryRepository;
-    private final MileageTotalRepository mileageTotalRepository;
     private final MileageTotalService mileageTotalService;
 
     @Override

@@ -30,7 +30,6 @@ public class MileageOutboxProcessor {
     @Scheduled(fixedDelay = 60000)
     public void processOutboxEvents() {
         System.out.println("스케줄러 실행");
-
         List<MileageOutboxEntity> events = mileageOutboxRepository
                 .findTop10ByStatusInAndRetryCountLessThanOrderByLastAttemptAtAsc(
                         List.of(MileageOutboxStatus.PENDING, MileageOutboxStatus.FAILED), 3
