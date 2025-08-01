@@ -65,8 +65,19 @@ public class CartItemController {
 
     @Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니에 추가된 상품의 사은품을 변경합니다.")
     @PutMapping("/{cartItemId}/updateGift")
-    public ResponseEntity<Void> updateCartItemGift(@PathVariable Long cartItemId, @RequestBody CartItemGiftUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
-        cartItemService.updateCartItemGift(loginUser.getUserId(), cartItemId, requestDto);
+    public ResponseEntity<Void> updateCartItemGifts(
+            @AuthenticationPrincipal CustomUserDetails loginUser,
+            @PathVariable Long cartItemId,
+            @RequestBody List<CartItemGiftUpdateRequestDto.GiftItem> requestDtoList
+    ){
+        cartItemService.updateCartItemGifts(loginUser.getUserId(), cartItemId, requestDtoList);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "장바구니 상품 수량 변경", description = "장바구니에 추가된 상품의 수량을 변경합니다.")
+    @PatchMapping("/{cartItemId}/updateProductQuantity")
+    public ResponseEntity<Void> updateCartItemQuantity(@PathVariable Long cartItemId, @RequestBody CartItemQuantityUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
+        cartItemService.updateCartItemQuantity(loginUser.getUserId(), cartItemId, requestDto);
         return ResponseEntity.ok().build();
     }
 }

@@ -66,6 +66,9 @@ public class AdminProductRequestDto {
     @Schema(description = "조회수", example = "120")
     private int viewCount;
 
+    @Schema(description = "총 재고 수량", example = "100")
+    private int productStock;
+
     @Schema(description = "누적 판매 수량", example = "35")
     private int salesCount;
 

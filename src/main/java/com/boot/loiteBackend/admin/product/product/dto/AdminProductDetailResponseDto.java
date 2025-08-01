@@ -67,6 +67,9 @@ public class AdminProductDetailResponseDto {
     @Schema(description = "카테고리명", example = "소파")
     private String categoryName;
 
+    @Schema(description = "총 재고 수량", example = "100")
+    private int productStock;
+
     private List<TagDto> tags;
     private List<ImageDto> productImages;
     private List<ProductOptionDto> productOptions;

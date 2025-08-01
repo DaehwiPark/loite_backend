@@ -25,6 +25,9 @@ public class AdminProductListResponseDto {
     @Schema(description = "브랜드명", example = "로이테가구")
     private String brandName;
 
+    @Schema(description = "총 재고 수량", example = "100")
+    private Integer productStock;
+
     @Schema(description = "판매가", example = "199000.00")
     private BigDecimal productPrice;
 

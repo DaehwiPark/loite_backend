@@ -152,6 +152,12 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         adminProductOptionRepository.saveAll(optionEntities);
 
+        // 옵션 재고 총합 계산
+        int totalStock = optionEntities.stream()
+                .mapToInt(AdminProductOptionEntity::getOptionStock)
+                .sum();
+        savedProduct.setProductStock(totalStock);
+
         //태그 연결
         if (dto.getTagIdList() != null && !dto.getTagIdList().isEmpty()) {
             List<AdminTagEntity> tagEntities = adminTagRepository.findAllById(dto.getTagIdList());
@@ -204,7 +210,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         product.setProductPrice(dto.getProductPrice());
         product.setProductSupplyPrice(dto.getProductSupplyPrice());
         product.setDiscountRate(dto.getDiscountRate());
-        //product.setProductStock(dto.getProductStock());
+        product.setProductStock(dto.getProductStock());
         product.setProductDeliveryCharge(dto.getProductDeliveryCharge());
         product.setProductFreeDelivery(dto.getProductFreeDelivery());
         product.setActiveYn(dto.getActiveYn());
@@ -232,6 +238,12 @@ public class AdminProductServiceImpl implements AdminProductService {
                     return option;
                 }).toList();
         adminProductOptionRepository.saveAll(optionEntities);
+
+        // 옵션 재고 총합 계산
+        int totalStock = optionEntities.stream()
+                .mapToInt(AdminProductOptionEntity::getOptionStock)
+                .sum();
+        product.setProductStock(totalStock);
 
         //기존 태그 삭제 후 재삽입
         adminProductTagRepository.deleteByProduct(product);
@@ -327,7 +339,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             dto.setProductPrice(product.getProductPrice());
             dto.setDiscountRate(product.getDiscountRate());
             dto.setDiscountedPrice(product.getDiscountedPrice());
-            //dto.setProductStock(product.getProductStock());
+            dto.setProductStock(product.getProductStock());
             dto.setSalesCount(product.getSalesCount());
             dto.setViewCount(product.getViewCount());
 
@@ -357,7 +369,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         dto.setProductSupplyPrice(product.getProductSupplyPrice());
         dto.setDiscountRate(product.getDiscountRate());
         dto.setDiscountedPrice(product.getDiscountedPrice());
-        //dto.setProductStock(product.getProductStock());
+        dto.setProductStock(product.getProductStock());
         dto.setProductDeliveryCharge(product.getProductDeliveryCharge());
         dto.setProductFreeDelivery(product.getProductFreeDelivery());
         dto.setDeleteYn(product.getDeleteYn());

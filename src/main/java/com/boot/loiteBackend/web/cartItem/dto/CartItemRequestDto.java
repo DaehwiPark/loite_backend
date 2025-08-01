@@ -3,6 +3,8 @@ package com.boot.loiteBackend.web.cartItem.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,8 +18,8 @@ public class CartItemRequestDto {
     @Schema(description = "선택한 상품 옵션 ID", example = "12")
     private Long productOptionId;
 
-    @Schema(description = "선택한 사은품 ID (선택 사항)", example = "5")
-    private Long giftId;
+    @Schema(description = "선택한 사은품 ID 리스트", example = "[2,4]")
+    private List<Long> giftIdList;
 
     @Schema(description = "주문 수량", example = "2")
     private Integer quantity;
