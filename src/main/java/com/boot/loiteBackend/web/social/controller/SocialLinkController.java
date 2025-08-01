@@ -37,7 +37,7 @@ public class SocialLinkController {
     @Operation(summary = "소셜 연동 URL 발급", description = "카카오/구글/네이버 등의 연동 URL을 생성합니다.")
     public ResponseEntity<ApiResponse<String>> getLoginUrl(@PathVariable String provider) {
         String url = handlerResolver.resolveLink(provider).getLinkUrl();
-        return ResponseEntity.ok(ApiResponse.ok(url));
+        return ResponseEntity.ok(ApiResponse.ok(url, "소셜 연동 URL이 생성되었습니다."));
     }
 
     @GetMapping("/{provider}/callback")
@@ -49,26 +49,26 @@ public class SocialLinkController {
             HttpServletResponse response
     ) {
         String userLoginType = provider.toUpperCase();
-        ApiResponse<LoginResponseDto> result = socialLinkService.link(provider, code, loginUser, response, userLoginType);
-        return ResponseEntity.ok(result);
+        LoginResponseDto result = socialLinkService.link(provider, code, loginUser, response, userLoginType);
+        return ResponseEntity.ok(ApiResponse.ok(result, "소셜 연동이 완료되었습니다."));
     }
 
     @DeleteMapping("/{provider}/unlink")
     @Operation(summary = "소셜 연동 해제", description = "선택한 소셜 계정의 연동을 해제합니다. 소셜 인증 후 받은 accessToken을 함께 전달해야 합니다.")
-    public ResponseEntity<ApiResponse<String>> unlinkAccount(
+    public ResponseEntity<ApiResponse<Void>> unlinkAccount(
             @PathVariable String provider,
             @AuthenticationPrincipal CustomUserDetails loginUser,
             @RequestParam("token") String accessToken
     ) {
-        ApiResponse<String> result = socialLinkService.unlinkAccount(provider, loginUser, accessToken);
-        return ResponseEntity.ok(result);
+        socialLinkService.unlinkAccount(provider, loginUser, accessToken);
+        return ResponseEntity.ok(ApiResponse.ok("소셜 연동이 해제되었습니다."));
     }
 
     @GetMapping("/{provider}/verify")
     @Operation(summary = "소셜 인증 URL 발급", description = "카카오/구글/네이버 등의 인증 URL을 생성합니다.")
     public ResponseEntity<ApiResponse<String>> getVerifyUrl(@PathVariable String provider) {
         String url = handlerResolver.resolveVerify(provider).getVerifyUrl();
-        return ResponseEntity.ok(ApiResponse.ok(url));
+        return ResponseEntity.ok(ApiResponse.ok(url, "소셜 인증 URL이 생성되었습니다."));
     }
 
     @GetMapping("/{provider}/verify/callback")
@@ -78,8 +78,8 @@ public class SocialLinkController {
             @RequestParam String code,
             @AuthenticationPrincipal CustomUserDetails loginUser
     ) {
-        ApiResponse<SocialVerificationResultDto> result = socialLinkService.verifySocialAuthentication(provider, code, loginUser);
-        return ResponseEntity.ok(result);
+        SocialVerificationResultDto result = socialLinkService.verifySocialAuthentication(provider, code, loginUser);
+        return ResponseEntity.ok(ApiResponse.ok(result, "소셜 인증이 완료되었습니다."));
     }
 
 }
