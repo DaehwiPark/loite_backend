@@ -1,10 +1,18 @@
 package com.boot.loiteBackend.web.user.general.service;
 
+import com.boot.loiteBackend.domain.mileage.outbok.processor.MileageOutboxProcessor;
+import com.boot.loiteBackend.domain.mileage.outbok.repository.MileageOutboxRepository;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.global.security.jwt.JwtCookieUtil;
+import com.boot.loiteBackend.web.mileage.outbox.entity.MileageOutboxEntity;
+import com.boot.loiteBackend.web.mileage.outbox.model.MileageOutboxEventType;
+import com.boot.loiteBackend.web.mileage.outbox.model.MileageOutboxStatus;
+import com.boot.loiteBackend.web.mileage.policy.entity.MileagePolicyEntity;
+import com.boot.loiteBackend.web.mileage.policy.repository.MileagePolicyRepository;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
+import com.boot.loiteBackend.web.user.event.UserSignedUpEvent;
 import com.boot.loiteBackend.web.user.general.dto.*;
 import com.boot.loiteBackend.web.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.error.UserErrorCode;
@@ -19,7 +27,7 @@ import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
 import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +45,11 @@ public class UserServiceImpl implements UserService {
     private final TokenService tokenService;
     private final JwtCookieUtil jwtCookieUtil;
     private final UserInfoDtoMapper userInfoDtoMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public Long signup(UserCreateRequestDto dto) {
-
         if (userRepository.existsByUserEmail(dto.getUserEmail())) {
             throw new CustomException(UserErrorCode.EMAIL_DUPLICATED);
         }
@@ -61,17 +70,19 @@ public class UserServiceImpl implements UserService {
         user.setUserBirthdate(birthdate);
         user.setEmailVerified(false);
 
-        UserRoleEntity role = userRoleCodeRepository.findById("USER")
-                .orElseThrow(() -> new CustomException(UserRoleErrorCode.ROLE_NOT_FOUND));
-        user.setUserRole(role);
+        user.setUserRole(userRoleCodeRepository.findById("USER")
+                .orElseThrow(() -> new CustomException(UserRoleErrorCode.ROLE_NOT_FOUND)));
 
-        UserStatusEntity status = userStatusCodeRepository.findById("ACTIVE")
-                .orElseThrow(() -> new CustomException(UserStatusErrorCode.STATUS_NOT_FOUND));
-        user.setUserStatus(status);
+        user.setUserStatus(userStatusCodeRepository.findById("ACTIVE")
+                .orElseThrow(() -> new CustomException(UserStatusErrorCode.STATUS_NOT_FOUND)));
 
         user.setUserRegisterType("EMAIL");
 
-        return userRepository.save(user).getUserId();
+        UserEntity savedUser = userRepository.save(user);
+
+        eventPublisher.publishEvent(new UserSignedUpEvent(savedUser.getUserId()));
+
+        return savedUser.getUserId();
     }
 
     @Override
