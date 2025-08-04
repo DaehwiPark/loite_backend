@@ -17,12 +17,12 @@ public class CartItemGiftEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CART_ITEM_GIFT_ID")
-    private Long id;
+    private Long Id;
 
     @Column(name = "CART_ITEM_ID", nullable = false)
     private Long cartItemId;
 
-    @Column(name = "GIFT_ID", nullable = false)
+    @Column(name = "PRODUCT_GIFT_ID", nullable = false)
     private Long giftId;
 
     @Column(name = "GIFT_QUANTITY", nullable = false)

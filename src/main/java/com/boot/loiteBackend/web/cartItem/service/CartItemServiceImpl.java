@@ -221,7 +221,7 @@ public class CartItemServiceImpl implements CartItemService {
 
         // 2. 전달받은 giftId 리스트 추출
         List<Long> giftIds = dtoList.stream()
-                .map(CartItemGiftUpdateRequestDto.GiftItem::getGiftId)
+                .map(CartItemGiftUpdateRequestDto.GiftItem::getProductGiftId)
                 .toList();
 
         // 3. 한 번에 사은품 엔티티들 조회
@@ -237,9 +237,9 @@ public class CartItemServiceImpl implements CartItemService {
         // 6. 새로운 사은품 목록 저장
         List<CartItemGiftEntity> newGifts = dtoList.stream()
                 .map(giftItem -> {
-                    AdminGiftEntity gift = giftMap.get(giftItem.getGiftId());
+                    AdminGiftEntity gift = giftMap.get(giftItem.getProductGiftId());
                     if (gift == null) {
-                        throw new IllegalArgumentException("유효하지 않은 사은품 ID입니다: " + giftItem.getGiftId());
+                        throw new IllegalArgumentException("유효하지 않은 사은품 ID입니다: " + giftItem.getProductGiftId());
                     }
                     if ("Y".equals(gift.getSoldOutYn())) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 사은품은 선택할 수 없습니다.");

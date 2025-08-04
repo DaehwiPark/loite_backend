@@ -29,7 +29,7 @@ public class CartItemEntity {
     private Long productOptionId;
 
     @Column(name = "PRODUCT_GIFT_ID")
-    private Long giftId;
+    private Long productGiftId;
 
     @Column(name = "cart_item_quantity", nullable = false)
     private Integer quantity;

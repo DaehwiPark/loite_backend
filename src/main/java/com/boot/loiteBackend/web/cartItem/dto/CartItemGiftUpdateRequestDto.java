@@ -25,7 +25,7 @@ public class CartItemGiftUpdateRequestDto {
     @AllArgsConstructor
     public static class GiftItem {
         @Schema(description = "사은품 ID", example = "5")
-        private Long giftId;
+        private Long productGiftId;
 
         @Schema(description = "수량", example = "2")
         private Integer quantity;
