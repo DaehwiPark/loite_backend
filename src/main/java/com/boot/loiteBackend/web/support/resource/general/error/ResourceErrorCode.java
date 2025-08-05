@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ResourceErrorCode implements ErrorCode {
 
-    NOT_FOUND("RESOURCE_404", "해당 자료를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    DB_RESOURCE_NOT_FOUND("RESOURCE_404_1", "요청한 자료 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    FILE_NOT_FOUND("RESOURCE_404_2", "자료 정보는 존재하지만, 실제 파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     FILE_UPLOAD_FAILED("RESOURCE_500_1", "파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_DELETE_FAILED("RESOURCE_500_2", "기존 파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 

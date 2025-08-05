@@ -38,19 +38,18 @@ public class SupportResourceServiceImpl implements SupportResourceService {
                 .map(this::toDto);
     }
 
-
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<Resource> fileDownload(Long id) {
-        SupportResourceEntity entity = resourceRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ResourceErrorCode.NOT_FOUND));
+    public ResponseEntity<Resource> fileDownload(Long resourceId) {
+        SupportResourceEntity entity = resourceRepository.findById(resourceId)
+                .orElseThrow(() -> new CustomException(ResourceErrorCode.DB_RESOURCE_NOT_FOUND));
 
         try {
             Path filePath = Paths.get(entity.getResourceFilePath()).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
-                throw new CustomException(ResourceErrorCode.NOT_FOUND);
+                throw new CustomException(ResourceErrorCode.FILE_NOT_FOUND);
             }
 
             String encodedFileName = URLEncoder.encode(entity.getResourceFileName(), StandardCharsets.UTF_8)
