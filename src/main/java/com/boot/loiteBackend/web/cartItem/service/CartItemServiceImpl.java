@@ -6,12 +6,9 @@ import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntit
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.cartItem.dto.*;
-import com.boot.loiteBackend.web.cartItem.dto.*;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemEntity;
 import com.boot.loiteBackend.web.cartItem.error.CartItemErrorCode;
-import com.boot.loiteBackend.web.cartItem.entity.CartItemGiftEntity;
 import com.boot.loiteBackend.web.cartItem.projection.CartItemProjection;
-import com.boot.loiteBackend.web.cartItem.repository.CartItemGiftRepository;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
@@ -23,16 +20,13 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CartItemServiceImpl implements CartItemService {
 
     private final CartItemRepository cartItemRepository;
-    private final CartItemGiftRepository cartItemGiftRepository;
     private final AdminProductOptionRepository productOptionRepository;
     private final AdminGiftRepository adminGiftRepository;
 
@@ -210,84 +204,5 @@ public class CartItemServiceImpl implements CartItemService {
 
         cartItem.setProductOptionId(newOption.getOptionId());
         cartItem.setUpdatedAt(LocalDateTime.now());
-    }
-
-/*
-    @Override
-    @Transactional
-    public void updateCartItemGift(Long loginUserId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto) {
-        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new CustomException(CartItemErrorCode.CART_ITEM_NOT_FOUND));
-
-        AdminGiftEntity newGift = adminGiftRepository.findById(requestDto.getGiftId())
-                .orElseThrow(() -> new CustomException(CartItemErrorCode.GIFT_NOT_FOUND));
-
-        if ("Y".equals(newGift.getSoldOutYn())) {
-            throw new CustomException(CartItemErrorCode.SOLD_OUT_GIFT);
-        }
-
-        cartItem.setGiftId(newGift.getGiftId());
-        cartItem.setUpdatedAt(LocalDateTime.now());
-    }
-*/
-
-    @Override
-    @Transactional
-    public void updateCartItemQuantity(Long loginUserId, Long cartItemId, CartItemQuantityUpdateRequestDto requestDto) {
-        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
-
-        if(!cartItem.getUserId().equals(loginUserId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 장바구니 항목에 대한 권한이 없습니다.");
-        }
-        if(requestDto.getQuantity() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수량은 1 이상이어야 합니다.");
-        }
-
-        cartItem.setQuantity(requestDto.getQuantity());
-        cartItem.setUpdatedAt(LocalDateTime.now());
-    }
-
-    @Override
-    @Transactional
-    public void updateCartItemGifts(Long loginUserId, Long cartItemId, List<CartItemGiftUpdateRequestDto.GiftItem> dtoList) {
-        // 1. 장바구니 항목 유효성 검사
-        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
-
-        // 2. 전달받은 giftId 리스트 추출
-        List<Long> giftIds = dtoList.stream()
-                .map(CartItemGiftUpdateRequestDto.GiftItem::getProductGiftId)
-                .toList();
-
-        // 3. 한 번에 사은품 엔티티들 조회
-        List<AdminGiftEntity> gifts = adminGiftRepository.findAllById(giftIds);
-
-        // 4. Map<giftId, AdminGiftEntity> 으로 매핑
-        Map<Long, AdminGiftEntity> giftMap = gifts.stream()
-                .collect(Collectors.toMap(AdminGiftEntity::getGiftId, gift -> gift));
-
-        // 5. 기존 사은품들 삭제
-        cartItemGiftRepository.deleteByCartItemId(cartItemId);
-
-        // 6. 새로운 사은품 목록 저장
-        List<CartItemGiftEntity> newGifts = dtoList.stream()
-                .map(giftItem -> {
-                    AdminGiftEntity gift = giftMap.get(giftItem.getProductGiftId());
-                    if (gift == null) {
-                        throw new IllegalArgumentException("유효하지 않은 사은품 ID입니다: " + giftItem.getProductGiftId());
-                    }
-                    if ("Y".equals(gift.getSoldOutYn())) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 사은품은 선택할 수 없습니다.");
-                    }
-                    return CartItemGiftEntity.builder()
-                            .cartItemId(cartItemId)
-                            .giftId(gift.getGiftId())
-                            .quantity(giftItem.getQuantity())
-                            .createdAt(LocalDateTime.now())
-                            .build();
-                }).toList();
-
-        cartItemGiftRepository.saveAll(newGifts);
     }
 }
