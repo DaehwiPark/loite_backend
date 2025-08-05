@@ -1,6 +1,7 @@
 package com.boot.loiteBackend.web.support.resource.general.controller;
 
 import com.boot.loiteBackend.web.support.resource.category.dto.SupportResourceCategoryDto;
+import com.boot.loiteBackend.web.support.resource.category.service.SupportResourceCategoryService;
 import com.boot.loiteBackend.web.support.resource.general.dto.SupportResourceDto;
 import com.boot.loiteBackend.web.support.resource.general.service.SupportResourceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,13 @@ import java.util.List;
 public class SupportResourceController {
 
     private final SupportResourceService supportResourceService;
+    private final SupportResourceCategoryService categoryService;
+
+    @Operation(summary = "매뉴얼이 존재하는 유효한 카테고리 목록 조회", description = "삭제되지 않고 활성화된 상태이며 매뉴얼이 하나 이상 존재하는 카테고리 목록을 조회합니다.")
+    @GetMapping("/categories")
+    public ResponseEntity<List<SupportResourceCategoryDto>> getUsableCategories() {
+        return ResponseEntity.ok(categoryService.getUsableCategories());
+    }
 
     @Operation(
             summary = "제품 매뉴얼 리스트 조회",
@@ -40,8 +48,8 @@ public class SupportResourceController {
     }
 
     @Operation(summary = "매뉴얼 파일 다운로드", description = "지정된 매뉴얼 ID를 기반으로 첨부파일을 다운로드합니다.")
-    @GetMapping("/{id}/download")
-    public ResponseEntity<Resource> downloadManual(@PathVariable Long id) {
-        return supportResourceService.fileDownload(id);
+    @GetMapping("/{resourceId}/download")
+    public ResponseEntity<Resource> downloadManual(@PathVariable Long resourceId) {
+        return supportResourceService.fileDownload(resourceId);
     }
 }
