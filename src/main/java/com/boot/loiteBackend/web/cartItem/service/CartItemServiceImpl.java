@@ -4,8 +4,11 @@ import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
 import com.boot.loiteBackend.admin.product.gift.repository.AdminGiftRepository;
 import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
+import com.boot.loiteBackend.global.error.exception.CustomException;
+import com.boot.loiteBackend.web.cartItem.dto.*;
 import com.boot.loiteBackend.web.cartItem.dto.*;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemEntity;
+import com.boot.loiteBackend.web.cartItem.error.CartItemErrorCode;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemGiftEntity;
 import com.boot.loiteBackend.web.cartItem.projection.CartItemProjection;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemGiftRepository;
@@ -36,50 +39,75 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     @Transactional
     public void addToCart(Long loginUserId, CartItemRequestDto requestDto) {
-        AdminProductOptionEntity option = productOptionRepository.findById(requestDto.getProductOptionId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 옵션이 존재하지 않습니다."));
+        for (CartItemOptionGiftDto item : requestDto.getItems()) {
+            validateCartItem(item);
 
-        if ("Y".equals(option.getSoldOutYn())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 옵션은 장바구니에 담을 수 없습니다.");
+            AdminProductOptionEntity option = productOptionRepository.findById(item.getProductOptionId())
+                    .orElseThrow(() -> new CustomException(CartItemErrorCode.OPTION_NOT_FOUND));
+
+            if ("Y".equals(option.getSoldOutYn())) {
+                throw new CustomException(CartItemErrorCode.SOLD_OUT_OPTION);
+            }
+
+            Optional<CartItemEntity> existingItem = cartItemRepository
+                    .findByUserIdAndProductIdAndProductOptionIdAndGiftId(
+                            loginUserId,
+                            requestDto.getProductId(),
+                            item.getProductOptionId(),
+                            item.getGiftId()
+                    );
+
+            if (existingItem.isPresent()) {
+                CartItemEntity entity = existingItem.get();
+                entity.setQuantity(entity.getQuantity() + item.getQuantity());
+                entity.setUpdatedAt(LocalDateTime.now());
+                cartItemRepository.save(entity);
+            } else {
+                CartItemEntity newItem = CartItemEntity.builder()
+                        .userId(loginUserId)
+                        .productId(requestDto.getProductId())
+                        .productOptionId(item.getProductOptionId())
+                        .giftId(item.getGiftId())
+                        .quantity(item.getQuantity())
+                        .checkedYn("1")
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+                cartItemRepository.save(newItem);
+            }
+        }
+    }
+
+    private void validateCartItem(CartItemOptionGiftDto item) {
+        if (item.getQuantity() == null || item.getQuantity() <= 0) {
+            throw new CustomException(CartItemErrorCode.INVALID_QUANTITY);
         }
 
-        Optional<CartItemEntity> existingItem = cartItemRepository
-                .findByUserIdAndProductIdAndProductOptionId(
-                        loginUserId,
-                        requestDto.getProductId(),
-                        requestDto.getProductOptionId()
-                );
+        if (item.getGiftId() == null) {
+            throw new CustomException(CartItemErrorCode.GIFT_REQUIRED);
+        }
+    }
 
+    private void handleCartItem(Long userId, Long productId, Long optionId, Long giftId, int quantity) {
+        Optional<CartItemEntity> existingItem = cartItemRepository
+                .findByUserIdAndProductIdAndProductOptionIdAndGiftId(userId, productId, optionId, giftId);
 
         if (existingItem.isPresent()) {
             CartItemEntity item = existingItem.get();
-            int newQuantity = item.getQuantity() + requestDto.getQuantity();
-            item.setQuantity(newQuantity);
+            item.setQuantity(item.getQuantity() + quantity);
             item.setUpdatedAt(LocalDateTime.now());
         } else {
             CartItemEntity newItem = CartItemEntity.builder()
-                    .userId(loginUserId)
-                    .productId(requestDto.getProductId())
-                    .productOptionId(requestDto.getProductOptionId())
-                    .quantity(requestDto.getQuantity())
+                    .userId(userId)
+                    .productId(productId)
+                    .productOptionId(optionId)
+                    .giftId(giftId)
+                    .quantity(quantity)
                     .checkedYn("1")
                     .createdAt(LocalDateTime.now())
                     .build();
 
             cartItemRepository.save(newItem);
-
-            if (requestDto.getGiftIdList() != null && !requestDto.getGiftIdList().isEmpty()) {
-                List<CartItemGiftEntity> giftEntities = requestDto.getGiftIdList().stream()
-                        .map(giftId -> CartItemGiftEntity.builder()
-                                .cartItemId(newItem.getId())
-                                .giftId(giftId)
-                                .quantity(1)  // 기본 1개. 수량 조정 필요하면 여기에 로직 추가
-                                .createdAt(LocalDateTime.now())
-                                .build())
-                        .collect(Collectors.toList());
-
-                cartItemGiftRepository.saveAll(giftEntities);
-            }
         }
     }
 
@@ -91,12 +119,20 @@ public class CartItemServiceImpl implements CartItemService {
 
         return items.stream()
                 .map(p -> {
-                    BigDecimal basePrice = p.getDiscountedPrice() != null
-                            ? p.getDiscountedPrice()
-                            : p.getUnitPrice();
-                    BigDecimal totalPrice = basePrice
-                            .add(BigDecimal.valueOf(p.getOptionAdditionalPrice()))
-                            .multiply(BigDecimal.valueOf(p.getQuantity()));
+                    // 기본 가격: 할인 가격이 있으면 그것을 사용
+                    BigDecimal basePrice = Optional.ofNullable(p.getDiscountedPrice())
+                            .orElse(p.getUnitPrice());
+
+                    // 옵션 추가 금액: null일 경우 0으로 처리
+                    BigDecimal additionalPrice = Optional.ofNullable(p.getOptionAdditionalPrice())
+                            .map(BigDecimal::valueOf)
+                            .orElse(BigDecimal.ZERO);
+
+                    // 수량: null일 경우 기본값 1
+                    int quantity = Optional.ofNullable(p.getQuantity()).orElse(1);
+
+                    // 최종 가격 계산
+                    BigDecimal totalPrice = basePrice.add(additionalPrice).multiply(BigDecimal.valueOf(quantity));
 
                     return CartItemResponseDto.builder()
                             .cartItemId(p.getCartItemId())
@@ -107,11 +143,11 @@ public class CartItemServiceImpl implements CartItemService {
                             .optionType(p.getOptionType())
                             .optionValue(p.getOptionValue())
                             .optionAdditionalPrice(p.getOptionAdditionalPrice())
-                            .quantity(p.getQuantity())
+                            .quantity(quantity)
                             .unitPrice(p.getUnitPrice())
                             .discountedPrice(p.getDiscountedPrice())
-                            .discountRate(p.getDiscountRate())
-                            .checked(p.getChecked() == 1)
+                            .discountRate(Optional.ofNullable(p.getDiscountRate()).orElse(0)) // NPE 방지
+                            .checked(p.getChecked() != null && p.getChecked() == 1)
                             .giftName(p.getGiftName())
                             .giftImageUrl(p.getGiftImageUrl())
                             .build();
@@ -181,13 +217,13 @@ public class CartItemServiceImpl implements CartItemService {
     @Transactional
     public void updateCartItemGift(Long loginUserId, Long cartItemId, CartItemGiftUpdateRequestDto requestDto) {
         CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CartItemErrorCode.CART_ITEM_NOT_FOUND));
 
         AdminGiftEntity newGift = adminGiftRepository.findById(requestDto.getGiftId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 사은품이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CartItemErrorCode.GIFT_NOT_FOUND));
 
         if ("Y".equals(newGift.getSoldOutYn())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 사은품으로 변경할 수 없습니다.");
+            throw new CustomException(CartItemErrorCode.SOLD_OUT_GIFT);
         }
 
         cartItem.setGiftId(newGift.getGiftId());

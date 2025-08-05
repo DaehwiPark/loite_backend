@@ -46,4 +46,6 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
 
 
     List<CartItemEntity> findByUserIdAndCheckedYn(Long userId, String checkedYn);
+
+    Optional<CartItemEntity> findByUserIdAndProductIdAndProductOptionIdAndGiftId(Long loginUserId, Long productId, Long productOptionId, Long giftId);
 }
