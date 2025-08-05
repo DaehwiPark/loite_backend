@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/public/support/faq/category/major")
-@Tag(name = "고객센터 FAQ 대분류 카테고리 API", description = "FAQ 대분류 카테고리 조회용 API (공통 영역)")
+@Tag(name = "고객센터 FAQ 관련 API", description = "FAQ 대분류/중분류 카테고리 및 목록 조회 API")
 public class SupportFaqMajorCategoryController {
 
     private final SupportFaqMajorCategoryService supportFaqCategoryService;
