@@ -162,20 +162,6 @@ public class CartItemServiceImpl implements CartItemService {
         item.setCheckedYn(checked ? "1" : "0");
     }
 
-    /*@Override
-    @Transactional
-    public void deleteCartItems(Long userId, List<Long> cartItemIds) {
-        List<CartItemEntity> items = cartItemRepository.findAllById(cartItemIds);
-
-        for (CartItemEntity item : items) {
-            if (!item.getUserId().equals(userId)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 장바구니 항목만 삭제할 수 있습니다.");
-            }
-        }
-
-        cartItemRepository.deleteAll(items);
-    }*/
-
     @Override
     @Transactional
     public void deleteCartItems(Long loginUserId, List<Long> cartItemIds) {
@@ -203,6 +189,23 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         cartItem.setProductOptionId(newOption.getOptionId());
+        cartItem.setUpdatedAt(LocalDateTime.now());
+    }
+
+    @Override
+    @Transactional
+    public void updateCartItemQuantity(Long loginUserId, Long cartItemId, CartItemQuantityUpdateRequestDto requestDto) {
+        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+
+        if(!cartItem.getUserId().equals(loginUserId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 장바구니 항목에 대한 권한이 없습니다.");
+        }
+        if(requestDto.getQuantity() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수량은 1 이상이어야 합니다.");
+        }
+
+        cartItem.setQuantity(requestDto.getQuantity());
         cartItem.setUpdatedAt(LocalDateTime.now());
     }
 }
