@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> {
 
-    Optional<CartItemEntity> findByUserIdAndProductIdAndProductOptionId(Long loginUserId, Long productId, Long productOptionId);
+    Optional<CartItemEntity> findByUserIdAndProductIdAndProductOptionIdAndGiftId(Long loginUserId, Long productId, Long productOptionId);
 
     @Query(value = """
     SELECT
@@ -46,6 +46,4 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
 
 
     List<CartItemEntity> findByUserIdAndCheckedYn(Long userId, String checkedYn);
-
-    Optional<CartItemEntity> findByUserIdAndProductIdAndProductOptionIdAndGiftId(Long loginUserId, Long productId, Long productOptionId, Long giftId);
 }
