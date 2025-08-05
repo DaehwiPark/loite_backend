@@ -2,15 +2,14 @@ package com.boot.loiteBackend.web.cartItem.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CartItemRequestDto {
-
     private Long productId;
-    private Long productOptionId;
-    private Long giftId;
-    private Integer quantity;
+    private List<CartItemOptionGiftDto> items;
 }
