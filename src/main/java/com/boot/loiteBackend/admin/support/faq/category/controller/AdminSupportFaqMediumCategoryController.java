@@ -4,10 +4,13 @@ import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediu
 import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryRequestDto;
 import com.boot.loiteBackend.admin.support.faq.category.service.AdminSupportFaqMediumCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,13 +23,18 @@ public class AdminSupportFaqMediumCategoryController {
     private final AdminSupportFaqMediumCategoryService mediumCategoryService;
 
     @Operation(summary = "중분류 생성", description = "중분류 생성 시 반드시 대분류 ID를 포함해야 합니다.")
-    @PostMapping
-    public ResponseEntity<AdminSupportFaqMediumCategoryDto> createMedium(@RequestBody AdminSupportFaqMediumCategoryRequestDto request) {
-        return ResponseEntity.status(201).body(mediumCategoryService.createCategory(request));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AdminSupportFaqMediumCategoryDto> createMedium(
+            @Parameter(description = "중분류 DTO", required = true)
+            @RequestPart("request") AdminSupportFaqMediumCategoryRequestDto request,
+            @Parameter(description = "카테고리 이미지 파일", required = true)
+            @RequestPart("faqImage") MultipartFile faqImage
+    ) {
+        return ResponseEntity.status(201).body(mediumCategoryService.createCategory(request, faqImage));
     }
 
     @Operation(summary = "중분류 전체 조회")
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<AdminSupportFaqMediumCategoryDto>> getAllMediums() {
         return ResponseEntity.ok(mediumCategoryService.getAllCategories());
     }
@@ -37,12 +45,16 @@ public class AdminSupportFaqMediumCategoryController {
         return ResponseEntity.ok(mediumCategoryService.getCategoryById(id));
     }
 
-    @Operation(summary = "중분류 수정")
-    @PutMapping("/{id}")
+    @Operation(summary = "중분류 수정", description = "중분류 정보 및 이미지 수정 (이미지 선택 안하면 기존 이미지 유지)")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdminSupportFaqMediumCategoryDto> updateMedium(
             @PathVariable Long id,
-            @RequestBody AdminSupportFaqMediumCategoryRequestDto request) {
-        return ResponseEntity.ok(mediumCategoryService.updateCategory(id, request));
+            @Parameter(description = "중분류 DTO", required = true)
+            @RequestPart("request") AdminSupportFaqMediumCategoryRequestDto request,
+            @Parameter(description = "카테고리 이미지 파일", required = false)
+            @RequestPart(value = "faqImage", required = false) MultipartFile faqImage
+    ) {
+        return ResponseEntity.ok(mediumCategoryService.updateCategory(id, request, faqImage));
     }
 
     @Operation(summary = "중분류 삭제")
