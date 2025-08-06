@@ -8,5 +8,5 @@ public interface SupportFaqService {
 
     Page<SupportFaqDto> getFaqsByMediumCategory(Long mediumId, Pageable pageable);
 
-    Page<SupportFaqDto> getFaqsByMajorCategory(Long majorId, Pageable pageable);
+    Page<SupportFaqDto> getFaqsByMajorCategory(Long majorId, Pageable pageable, String keyword);
 }
