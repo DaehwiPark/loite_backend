@@ -31,7 +31,7 @@ public class SupportFaqServiceImpl implements SupportFaqService {
     }
 
     @Override
-    public Page<SupportFaqDto> getFaqsByMajorCategory(Long majorId, Pageable pageable) {
+    public Page<SupportFaqDto> getFaqsByMajorCategory(Long majorId, Pageable pageable, String keyword) {
         if (majorId == null) {
             throw new CustomException(SupportFaqErrorCode.INVALID_PARAMETER);
         }
@@ -42,9 +42,7 @@ public class SupportFaqServiceImpl implements SupportFaqService {
             return Page.empty();
         }
 
-        Page<SupportFaqEntity> page = faqRepository.findByFaqCategory_FaqMediumCategoryIdInAndDeleteYn(
-                mediumIds, "N", pageable
-        );
+        Page<SupportFaqEntity> page = faqRepository.searchByMediumCategoryIdsWithKeyword(mediumIds, keyword, pageable);
 
         return page.map(SupportFaqDto::from);
     }

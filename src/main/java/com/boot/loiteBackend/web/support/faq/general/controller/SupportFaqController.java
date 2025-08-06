@@ -29,7 +29,6 @@ public class SupportFaqController {
     public ResponseEntity<Page<SupportFaqDto>> getFaqListByMediumId(
             @Parameter(description = "중분류 카테고리 ID", example = "2", required = true)
             @RequestParam Long mediumId,
-
             @Parameter(description = "페이징 정보 (기본값: size=10, sort=faqOrder ASC)")
             @PageableDefault(size = 10, sort = "faqOrder", direction = Sort.Direction.ASC) Pageable pageable
     ) {
@@ -45,11 +44,12 @@ public class SupportFaqController {
     public ResponseEntity<Page<SupportFaqDto>> getFaqsByMajorId(
             @Parameter(description = "대분류 ID", example = "1", required = true)
             @RequestParam Long majorId,
-
             @Parameter(description = "페이징 정보 (기본값: size=10, sort=faqOrder ASC)")
-            @PageableDefault(size = 10, sort = "faqOrder", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(size = 10, sort = "faqOrder", direction = Sort.Direction.ASC) Pageable pageable,
+            @Parameter(description = "검색어")
+            @RequestParam(required = false) String keyword
     ) {
-        Page<SupportFaqDto> result = supportFaqService.getFaqsByMajorCategory(majorId, pageable);
+        Page<SupportFaqDto> result = supportFaqService.getFaqsByMajorCategory(majorId, pageable, keyword);
         return ResponseEntity.ok(result);
     }
 }
