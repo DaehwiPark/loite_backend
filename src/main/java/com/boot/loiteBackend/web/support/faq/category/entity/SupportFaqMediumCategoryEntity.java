@@ -29,6 +29,15 @@ public class SupportFaqMediumCategoryEntity {
     @JoinColumn(name = "FAQ_MAJOR_CATEGORY_ID", nullable = false)
     private SupportFaqMajorCategoryEntity faqMajorCategory;
 
+    @Column(name = "FAQ_IMAGE_NAME", columnDefinition = "VARCHAR(255) DEFAULT NULL COMMENT '업로드된 실제 파일명'")
+    private String faqImageName;
+
+    @Column(name = "FAQ_IMAGE_URL", columnDefinition = "VARCHAR(255) DEFAULT NULL COMMENT '카테고리 이미지 URL'")
+    private String faqImageUrl;
+
+    @Column(name = "FAQ_IMAGE_PATH", columnDefinition = "VARCHAR(255) DEFAULT NULL COMMENT '실제 서버 내 파일 경로'")
+    private String faqImagePath;
+
     @Column(name = "CREATED_AT", nullable = false, updatable = false, columnDefinition = "DATETIME COMMENT '등록일'")
     private LocalDateTime createdAt;
 

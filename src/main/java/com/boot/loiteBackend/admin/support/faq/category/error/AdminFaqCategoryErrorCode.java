@@ -22,8 +22,9 @@ public enum AdminFaqCategoryErrorCode implements ErrorCode {
 
     // ===== [중분류 관련] =====
     MEDIUM_CATEGORY_NOT_FOUND("ADMIN_FAQ_MEDIUM_CATEGORY_404", "FAQ 중분류를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    MEDIUM_CATEGORY_DELETE_FAILED("ADMIN_FAQ_MEDIUM_CATEGORY_400", "FAQ 중분류 삭제에 실패했습니다.", HttpStatus.BAD_REQUEST);
-
+    MEDIUM_CATEGORY_DELETE_FAILED("ADMIN_FAQ_MEDIUM_CATEGORY_400", "FAQ 중분류 삭제에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_THUMBNAIL("ADMIN_FAQ_MEDIUM_CATEGORY_422", "카테고리 이미지를 업로드해주세요.", HttpStatus.UNPROCESSABLE_ENTITY),
+    THUMBNAIL_UPLOAD_FAILED("ADMIN_FAQ_MEDIUM_CATEGORY_500", "카테고리 이미지 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;

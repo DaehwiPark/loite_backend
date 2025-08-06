@@ -176,7 +176,7 @@ public class ProductService {
     private final FileService fileService;
 
     public void saveProduct(MultipartFile file) {
-		    // 모듈화 해둔 fileService 의 save 메서드 호출 (file 과 저장 폴더 명 전달)
+        // 모듈화 해둔 fileService 의 save 메서드 호출 (file 과 저장 폴더 명 전달)
         FileUploadResult result = fileService.save(file, "product");
         // /uploads/product/uuid_filename.png
         String fileUrl = result.getUrlPath();      

@@ -24,25 +24,21 @@ public class AdminNewsServiceImpl implements AdminNewsService {
     private final FileService fileService;
     private final AdminNewsMapper adminNewsMapper;
 
-    private final String uploadCategory = "etc";
-
     @Override
     @Transactional
     public AdminNewsDto createNews(AdminNewsDto dto, MultipartFile thumbnail) {
         if (thumbnail == null || thumbnail.isEmpty()) {
             throw new CustomException(AdminNewsErrorCode.INVALID_THUMBNAIL);
         }
-
         FileUploadResult uploadResult;
         try {
+            String uploadCategory = "etc";
             uploadResult = fileService.save(thumbnail, uploadCategory);
         } catch (Exception e) {
             throw new CustomException(AdminNewsErrorCode.THUMBNAIL_UPLOAD_FAILED);
         }
-
         try {
             dto.setNewsThumbnailUrl(uploadResult.getUrlPath());
-
             AdminNewsEntity entity = adminNewsMapper.toEntity(dto);
             AdminNewsEntity saved = adminNewsRepository.save(entity);
             return adminNewsMapper.toDto(saved);
