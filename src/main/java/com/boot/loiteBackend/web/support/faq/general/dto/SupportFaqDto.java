@@ -29,6 +29,9 @@ public class SupportFaqDto {
     @Schema(description = "삭제 여부 (Y: 삭제됨, N: 유지)", example = "N")
     private String deleteYn;
 
+    @Schema(description = "중분류 카테고리 이름", example = "로그인/비밀번호")
+    private String faqMediumCategoryName;
+
     public static SupportFaqDto from(SupportFaqEntity entity) {
         return SupportFaqDto.builder()
                 .faqId(entity.getFaqId())
@@ -36,6 +39,7 @@ public class SupportFaqDto {
                 .faqAnswer(entity.getFaqAnswer())
                 .displayYn(entity.getDisplayYn())
                 .deleteYn(entity.getDeleteYn())
+                .faqMediumCategoryName(entity.getFaqCategory().getFaqMediumCategoryName())
                 .build();
     }
 }
