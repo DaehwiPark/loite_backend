@@ -28,6 +28,9 @@ public class CartItemResponseDto {
     @Schema(description = "대표 썸네일 이미지 URL", example = "https://cdn.loite.com/images/product/thumb-wood-table.jpg")
     private String thumbnailUrl;
 
+    @Schema(description = "재고", example = "100")
+    private Integer productStock;
+
     @Schema(description = "선택한 옵션 타입 (예: 색상)", example = "색상")
     private String optionType;
 
@@ -36,12 +39,6 @@ public class CartItemResponseDto {
 
     @Schema(description = "옵션 추가 금액", example = "5000")
     private Integer optionAdditionalPrice;
-
-    @Schema(description = "선택한 사은품명", example = "코튼 러그")
-    private String giftName;
-
-    @Schema(description = "사은품 이미지 URL", example = "https://cdn.loite.com/images/gift/rug.jpg")
-    private String giftImageUrl;
 
     @Schema(description = "주문 수량", example = "2")
     private int quantity;
@@ -57,6 +54,9 @@ public class CartItemResponseDto {
 
     @Schema(description = "체크 여부 (UI 선택용)", example = "true")
     private boolean checked;
+
+    private List<CartItemGiftResponseDto> gifts;
+
 
     public BigDecimal getTotalPrice() {
         BigDecimal basePrice = discountedPrice != null ? discountedPrice : unitPrice;

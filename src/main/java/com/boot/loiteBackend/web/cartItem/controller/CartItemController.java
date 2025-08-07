@@ -63,7 +63,7 @@ public class CartItemController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니에 추가된 상품의 사은품을 변경합니다.")
+    /*@Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니에 추가된 상품의 사은품을 변경합니다.")
     @PutMapping("/{cartItemId}/updateGift")
     public ResponseEntity<Void> updateCartItemGifts(
             @AuthenticationPrincipal CustomUserDetails loginUser,
@@ -72,7 +72,7 @@ public class CartItemController {
     ){
         cartItemService.updateCartItemGifts(loginUser.getUserId(), cartItemId, requestDtoList);
         return ResponseEntity.ok().build();
-    }
+    }*/
 
     @Operation(summary = "장바구니 상품 수량 변경", description = "장바구니에 추가된 상품의 수량을 변경합니다.")
     @PatchMapping("/{cartItemId}/updateProductQuantity")

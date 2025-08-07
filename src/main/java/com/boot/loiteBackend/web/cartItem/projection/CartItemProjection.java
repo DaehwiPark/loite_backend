@@ -9,6 +9,7 @@ public interface CartItemProjection {
     String getProductName();
     String getBrandName();
     String getThumbnailUrl();
+    Integer getProductStock();
 
     String getOptionType();
     String getOptionValue();

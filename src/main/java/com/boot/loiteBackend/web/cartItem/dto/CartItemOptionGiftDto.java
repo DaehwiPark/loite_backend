@@ -1,6 +1,9 @@
 package com.boot.loiteBackend.web.cartItem.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -8,7 +11,15 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CartItemOptionGiftDto {
+
+    @Schema(description = "옵션id", example = "1")
     private Long productOptionId;
-    private Long giftId;
+
+    /*@Schema(description = "사은품 id", example = "1")
+    private Long giftId;*/
+
+    @Schema(description = "수량", example = "1")
     private Integer quantity;
+
+    private List<CartItemGiftDto> gifts;
 }

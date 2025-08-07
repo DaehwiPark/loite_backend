@@ -16,7 +16,8 @@ public enum CartItemErrorCode implements ErrorCode {
     GIFT_REQUIRED("CART_005", "사은품을 선택해주세요.", HttpStatus.BAD_REQUEST),
     GIFT_NOT_FOUND("CART_006", "선택한 사은품이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     SOLD_OUT_GIFT("CART_007", "품절된 사은품으로 변경할 수 없습니다.", HttpStatus.BAD_REQUEST),
-    CART_ITEM_NOT_FOUND("CART_008", "장바구니 항목이 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
+    CART_ITEM_NOT_FOUND("CART_008", "장바구니 항목이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    EXCEED_GIFT_LIMIT("CART_009", "사은품은 상품 개수 만큼 담을 수 있습니다.", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

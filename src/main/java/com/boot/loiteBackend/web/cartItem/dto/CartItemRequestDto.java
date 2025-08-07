@@ -14,7 +14,6 @@ public class CartItemRequestDto {
     @Schema(description = "추가할 상품 ID", example = "1001")
     private Long productId;
 
-    @Schema(description = "옵션 및 사은품 배열", example = "items")
     private List<CartItemOptionGiftDto> items;
 
     /*@Schema(description = "추가할 상품 ID", example = "1001")
