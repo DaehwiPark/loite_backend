@@ -36,7 +36,6 @@ public class AdminSupportResourceController {
         return ResponseEntity.ok(productList);
     }
 
-
     @Operation(summary = "자료 등록", description = "파일과 제품 ID를 함께 등록합니다.")
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdminSupportResourceDto> uploadResource(
@@ -74,7 +73,6 @@ public class AdminSupportResourceController {
         Page<AdminSupportResourceDto> result = adminSupportResourceService.getPagedResources(keyword, pageable);
         return ResponseEntity.ok(result);
     }
-
 
     @Operation(summary = "자료 상세 조회", description = "자료 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{id}")
