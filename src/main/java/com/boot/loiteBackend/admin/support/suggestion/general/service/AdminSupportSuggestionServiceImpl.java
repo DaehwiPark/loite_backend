@@ -6,7 +6,7 @@ import com.boot.loiteBackend.admin.support.suggestion.file.entity.AdminSupportSu
 import com.boot.loiteBackend.admin.support.suggestion.file.repository.AdminSupportSuggestionFileRepository;
 import com.boot.loiteBackend.admin.support.suggestion.general.dto.AdminSupportSuggestionDto;
 import com.boot.loiteBackend.admin.support.suggestion.general.dto.AdminSupportSuggestionUpdateDto;
-import com.boot.loiteBackend.admin.support.suggestion.general.entity.AdminSupportSuggestionEntity;
+import com.boot.loiteBackend.domain.support.suggestion.general.entity.SupportSuggestionEntity;
 import com.boot.loiteBackend.admin.support.suggestion.general.error.AdminSuggestionErrorCode;
 import com.boot.loiteBackend.admin.support.suggestion.general.mapper.AdminSupportSuggestionMapper;
 import com.boot.loiteBackend.admin.support.suggestion.general.repository.AdminSupportSuggestionRepository;
@@ -42,7 +42,7 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
     @Override
     @Transactional(readOnly = true)
     public Page<AdminSupportSuggestionDto> getPagedSuggestions(String keyword, Pageable pageable) {
-        Page<AdminSupportSuggestionEntity> page;
+        Page<SupportSuggestionEntity> page;
 
         if (StringUtils.hasText(keyword)) {
             page = suggestionRepository.findByKeywordAndDeleteYn(keyword, "N", pageable);
@@ -58,7 +58,7 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
                 AdminUserSummaryDto userDto = adminUserRepository.findById(entity.getSuggestionUserId())
                         .map(user -> AdminUserSummaryDto.builder()
                                 .userId(user.getUserId())
-                                .name(user.getName())
+                                .name(user.getUserName())
                                 .build())
                         .orElse(null);
                 dto.setAdminUserSummaryDto(userDto);
@@ -72,7 +72,7 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
     @Override
     @Transactional(readOnly = true)
     public AdminSupportSuggestionDto getSuggestionById(Long id) {
-        AdminSupportSuggestionEntity entity = getEntityOrThrow(id);
+        SupportSuggestionEntity entity = getEntityOrThrow(id);
         AdminSupportSuggestionDto dto = adminSupportSuggestionMapper.toDto(entity);
 
         // 첨부파일 정보 주입
@@ -94,9 +94,9 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
                     .map(user -> AdminUserSummaryDto.builder()
                             .userId(user.getUserId())
                             .userEmail(user.getUserEmail())
-                            .name(user.getName())
-                            .role(user.getRole())
-                            .status(user.getStatus())
+                            .name(user.getUserName())
+                            .role(user.getUserRole() != null ? user.getUserRole().getRoleName() : null)
+                            .status(user.getUserStatus() != null ? user.getUserStatus().getStatusName() : null)
                             .createdAt(user.getCreatedAt())
                             .build())
                     .orElse(null);
@@ -109,7 +109,7 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
     @Override
     @Transactional
     public void deleteSuggestion(Long id) {
-        AdminSupportSuggestionEntity entity = getEntityOrThrow(id);
+        SupportSuggestionEntity entity = getEntityOrThrow(id);
         try {
             entity.setDeleteYn("Y");
             suggestionRepository.save(entity);
@@ -118,7 +118,7 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
         }
     }
 
-    private AdminSupportSuggestionEntity getEntityOrThrow(Long id) {
+    private SupportSuggestionEntity getEntityOrThrow(Long id) {
         return suggestionRepository.findBySuggestionIdAndDeleteYn(id, "N")
                 .orElseThrow(() -> new CustomException(AdminSuggestionErrorCode.NOT_FOUND));
     }
@@ -126,7 +126,7 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
     @Override
     @Transactional
     public void updateReviewStatus(Long id, AdminSupportSuggestionUpdateDto updateDto) {
-        AdminSupportSuggestionEntity entity = getEntityOrThrow(id);
+        SupportSuggestionEntity entity = getEntityOrThrow(id);
 
         entity.setSuggestionReviewStatus(updateDto.getSuggestionReviewStatus());
         entity.setSuggestionReviewer(updateDto.getSuggestionReviewer());

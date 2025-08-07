@@ -1,13 +1,13 @@
 package com.boot.loiteBackend.admin.support.counsel.spec;
 
-import com.boot.loiteBackend.admin.support.counsel.entity.AdminSupportCounselEntity;
+import com.boot.loiteBackend.domain.support.counsel.entity.SupportCounselEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 public class AdminSupportCounselSpecification {
 
     // 키워드로 제목 또는 내용 검색
-    public static Specification<AdminSupportCounselEntity> containsKeyword(String keyword) {
+    public static Specification<SupportCounselEntity> containsKeyword(String keyword) {
         return (root, query, cb) -> {
             if (keyword == null || keyword.isBlank()) return null;
 
@@ -19,12 +19,12 @@ public class AdminSupportCounselSpecification {
     }
 
     // 삭제 여부 필터
-    public static Specification<AdminSupportCounselEntity> isNotDeleted() {
+    public static Specification<SupportCounselEntity> isNotDeleted() {
         return (root, query, cb) -> cb.equal(root.get("deleteYn"), "N");
     }
 
     // 미답변 필터
-    public static Specification<AdminSupportCounselEntity> isUnanswered() {
+    public static Specification<SupportCounselEntity> isUnanswered() {
         return (root, query, cb) -> cb.isNull(root.get("counselReplyContent"));
     }
 }

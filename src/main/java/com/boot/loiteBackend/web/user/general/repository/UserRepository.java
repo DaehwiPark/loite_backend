@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.user.general.repository;
 
-import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

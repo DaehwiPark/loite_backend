@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.terms.dto;
 
-import com.boot.loiteBackend.admin.terms.entity.AdminTermsEntity;
+import com.boot.loiteBackend.domain.terms.entity.TermsEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -31,7 +31,7 @@ public class AdminTermsDto {
     @Schema(description = "수정일시", example = "2025-06-02T12:05:00")
     private LocalDateTime updatedAt;
 
-    public static AdminTermsDto fromEntity(AdminTermsEntity entity) {
+    public static AdminTermsDto fromEntity(TermsEntity entity) {
         return AdminTermsDto.builder()
                 .termsId(entity.getTermsId())
                 .termsTitle(entity.getTermsTitle())
@@ -42,8 +42,8 @@ public class AdminTermsDto {
                 .build();
     }
 
-    public AdminTermsEntity toEntity() {
-        return AdminTermsEntity.builder()
+    public TermsEntity toEntity() {
+        return TermsEntity.builder()
                 .termsTitle(this.termsTitle)
                 .termsContent(this.termsContent)
                 .displayYn(this.displayYn)

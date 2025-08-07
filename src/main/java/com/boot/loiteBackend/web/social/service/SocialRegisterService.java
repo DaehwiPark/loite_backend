@@ -1,19 +1,19 @@
 package com.boot.loiteBackend.web.social.service;
 
 import com.boot.loiteBackend.web.social.dto.SocialUserRegistrationDto;
-import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
+import com.boot.loiteBackend.domain.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.social.enums.ProviderType;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.domain.token.service.TokenService;
-import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
-import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.repository.UserRepository;
-import com.boot.loiteBackend.web.user.role.entity.UserRoleEntity;
+import com.boot.loiteBackend.domain.user.role.entity.UserRoleEntity;
 import com.boot.loiteBackend.web.user.role.error.UserRoleErrorCode;
 import com.boot.loiteBackend.web.user.role.repository.UserRoleRepository;
-import com.boot.loiteBackend.web.user.status.entity.UserStatusEntity;
+import com.boot.loiteBackend.domain.user.status.entity.UserStatusEntity;
 import com.boot.loiteBackend.web.user.status.error.UserStatusErrorCode;
 import com.boot.loiteBackend.web.user.status.repository.UserStatusRepository;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.support.counsel.repository;
 
-import com.boot.loiteBackend.web.support.counsel.entity.SupportCounselEntity;
+import com.boot.loiteBackend.domain.support.counsel.entity.SupportCounselEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

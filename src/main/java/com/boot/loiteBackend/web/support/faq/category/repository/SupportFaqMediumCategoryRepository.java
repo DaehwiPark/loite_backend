@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.support.faq.category.repository;
 
-import com.boot.loiteBackend.web.support.faq.category.entity.SupportFaqMediumCategoryEntity;
+import com.boot.loiteBackend.domain.support.faq.category.entity.SupportFaqMediumCategoryEntity;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

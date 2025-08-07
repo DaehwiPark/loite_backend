@@ -1,8 +1,8 @@
 package com.boot.loiteBackend.web.user.general.service;
 
-import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.web.user.general.dto.*;
-import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;

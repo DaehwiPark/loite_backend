@@ -1,13 +1,13 @@
 package com.boot.loiteBackend.admin.support.resource.service;
 
 import com.boot.loiteBackend.common.file.FileStorageProperties;
+import com.boot.loiteBackend.domain.support.resource.general.entity.SupportResourceEntity;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.admin.product.product.dto.AdminProductSummaryDto;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import com.boot.loiteBackend.admin.product.product.repository.AdminProductRepository;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceDto;
 import com.boot.loiteBackend.admin.support.resource.dto.AdminSupportResourceRequestDto;
-import com.boot.loiteBackend.admin.support.resource.entity.AdminSupportResourceEntity;
 import com.boot.loiteBackend.admin.support.resource.error.AdminResourceErrorCode;
 import com.boot.loiteBackend.admin.support.resource.mapper.AdminSupportResourceMapper;
 import com.boot.loiteBackend.admin.support.resource.repository.AdminSupportResourceRepository;
@@ -65,7 +65,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
             AdminProductEntity product = productRepository.findById(dto.getProductId())
                     .orElseThrow(() -> new CustomException(AdminResourceErrorCode.INVALID_PRODUCT));
 
-            AdminSupportResourceEntity entity = AdminSupportResourceEntity.builder()
+            SupportResourceEntity entity = SupportResourceEntity.builder()
                     .product(product)
                     .displayYn(dto.getDisplayYn())
                     .resourceFileName(file.getOriginalFilename())
@@ -85,7 +85,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
     @Override
     @Transactional(readOnly = true)
     public Page<AdminSupportResourceDto> getPagedResources(String keyword, Pageable pageable) {
-        Page<AdminSupportResourceEntity> page;
+        Page<SupportResourceEntity> page;
         if (StringUtils.hasText(keyword)) {
             page = resourceRepository.findByKeyword(keyword, pageable);
         } else {
@@ -97,7 +97,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
     @Override
     @Transactional(readOnly = true)
     public AdminSupportResourceDto getResourceById(Long id) {
-        AdminSupportResourceEntity entity = resourceRepository.findById(id)
+        SupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminResourceErrorCode.NOT_FOUND));
         return adminSupportResourceMapper.toDto(entity);
     }
@@ -105,7 +105,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
     @Override
     @Transactional
     public AdminSupportResourceDto updateResource(Long id, AdminSupportResourceRequestDto request, MultipartFile file) {
-        AdminSupportResourceEntity entity = resourceRepository.findById(id)
+        SupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminResourceErrorCode.NOT_FOUND));
 
        AdminProductEntity product = productRepository.findById(request.getProductId())
@@ -136,7 +136,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
     @Override
     @Transactional
     public void deleteResource(Long id) {
-        AdminSupportResourceEntity entity = resourceRepository.findById(id)
+        SupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminResourceErrorCode.NOT_FOUND));
 
         if (entity.getResourceFilePath() != null && !entity.getResourceFilePath().isBlank()) {
@@ -160,7 +160,7 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<Resource> fileDownload(Long id) {
-        AdminSupportResourceEntity entity = resourceRepository.findById(id)
+        SupportResourceEntity entity = resourceRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminResourceErrorCode.NOT_FOUND));
 
         try {

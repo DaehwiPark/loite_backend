@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.support.faq.general.repository;
 
-import com.boot.loiteBackend.web.support.faq.general.entity.SupportFaqEntity;
+import com.boot.loiteBackend.domain.support.faq.general.entity.SupportFaqEntity;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

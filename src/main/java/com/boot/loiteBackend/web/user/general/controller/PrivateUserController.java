@@ -1,8 +1,8 @@
 package com.boot.loiteBackend.web.user.general.controller;
 
-import com.boot.loiteBackend.domain.login.dto.VerifyRequestDto;
+import com.boot.loiteBackend.web.login.dto.VerifyRequestDto;
 import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.web.user.general.dto.*;
 import com.boot.loiteBackend.web.user.general.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

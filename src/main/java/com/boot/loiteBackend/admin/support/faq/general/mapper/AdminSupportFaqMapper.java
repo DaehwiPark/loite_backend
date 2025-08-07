@@ -1,7 +1,7 @@
 package com.boot.loiteBackend.admin.support.faq.general.mapper;
 
 import com.boot.loiteBackend.admin.support.faq.general.dto.AdminSupportFaqDto;
-import com.boot.loiteBackend.admin.support.faq.general.entity.AdminSupportFaqEntity;
+import com.boot.loiteBackend.domain.support.faq.general.entity.SupportFaqEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ public class AdminSupportFaqMapper {
 
     private final ModelMapper modelMapper;
 
-    public AdminSupportFaqDto toDto(AdminSupportFaqEntity entity) {
+    public AdminSupportFaqDto toDto(SupportFaqEntity entity) {
         if (entity == null) return null;
 
         AdminSupportFaqDto dto = modelMapper.map(entity, AdminSupportFaqDto.class);
@@ -30,8 +30,8 @@ public class AdminSupportFaqMapper {
         return dto;
     }
 
-    public AdminSupportFaqEntity toEntity(AdminSupportFaqDto dto) {
+    public SupportFaqEntity toEntity(AdminSupportFaqDto dto) {
         if (dto == null) return null;
-        return modelMapper.map(dto, AdminSupportFaqEntity.class);
+        return modelMapper.map(dto, SupportFaqEntity.class);
     }
 }

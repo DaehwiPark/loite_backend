@@ -1,7 +1,7 @@
 package com.boot.loiteBackend.web.mileage.total.controller;
 
 import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.web.mileage.total.dto.MileageTotalDto;
 import com.boot.loiteBackend.web.mileage.total.service.MileageTotalService;
 import io.swagger.v3.oas.annotations.Operation;

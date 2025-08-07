@@ -2,14 +2,13 @@ package com.boot.loiteBackend.web.user.general.controller;
 
 import com.boot.loiteBackend.global.response.ApiResponse;
 import com.boot.loiteBackend.web.user.general.dto.*;
-import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
