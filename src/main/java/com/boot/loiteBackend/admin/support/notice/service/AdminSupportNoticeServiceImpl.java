@@ -2,9 +2,9 @@ package com.boot.loiteBackend.admin.support.notice.service;
 
 import com.boot.loiteBackend.admin.support.notice.dto.AdminSupportNoticeDto;
 import com.boot.loiteBackend.admin.support.notice.dto.AdminSupportNoticeRequestDto;
-import com.boot.loiteBackend.admin.support.notice.entity.AdminSupportNoticeEntity;
 import com.boot.loiteBackend.admin.support.notice.error.AdminSupportNoticeErrorCode;
 import com.boot.loiteBackend.admin.support.notice.repository.AdminSupportNoticeRepository;
+import com.boot.loiteBackend.domain.support.notice.entity.SupportNoticeEntity;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +20,7 @@ public class AdminSupportNoticeServiceImpl implements AdminSupportNoticeService 
 
     @Transactional
     public AdminSupportNoticeDto createNotice(AdminSupportNoticeRequestDto requestDto) {
-        AdminSupportNoticeEntity entity = AdminSupportNoticeEntity.builder()
+        SupportNoticeEntity entity = SupportNoticeEntity.builder()
                 .noticeTitle(requestDto.getNoticeTitle())
                 .noticeContent(requestDto.getNoticeContent())
                 .noticeViewCount(0)
@@ -33,7 +33,7 @@ public class AdminSupportNoticeServiceImpl implements AdminSupportNoticeService 
 
     @Transactional
     public AdminSupportNoticeDto updateNotice(Long id, AdminSupportNoticeRequestDto requestDto) {
-        AdminSupportNoticeEntity entity = adminSupportNoticeRepository.findById(id)
+        SupportNoticeEntity entity = adminSupportNoticeRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminSupportNoticeErrorCode.NOT_FOUND));
 
         entity.setNoticeTitle(requestDto.getNoticeTitle());
@@ -44,7 +44,7 @@ public class AdminSupportNoticeServiceImpl implements AdminSupportNoticeService 
 
     @Transactional
     public void deleteNotice(Long id) {
-        AdminSupportNoticeEntity entity = adminSupportNoticeRepository.findById(id)
+        SupportNoticeEntity entity = adminSupportNoticeRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminSupportNoticeErrorCode.NOT_FOUND));
         entity.setDisplayYn("N");
         adminSupportNoticeRepository.save(entity);
@@ -57,7 +57,7 @@ public class AdminSupportNoticeServiceImpl implements AdminSupportNoticeService 
 
     @Transactional(readOnly = true)
     public AdminSupportNoticeDto getNoticeById(Long id) {
-        AdminSupportNoticeEntity entity = adminSupportNoticeRepository.findById(id)
+        SupportNoticeEntity entity = adminSupportNoticeRepository.findById(id)
                 .filter(n -> "Y".equals(n.getDisplayYn()))
                 .orElseThrow(() -> new CustomException(AdminSupportNoticeErrorCode.NOT_FOUND));
         return new AdminSupportNoticeDto(entity);

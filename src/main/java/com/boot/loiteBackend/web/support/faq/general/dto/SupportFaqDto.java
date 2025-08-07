@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.support.faq.general.dto;
 
-import com.boot.loiteBackend.web.support.faq.general.entity.SupportFaqEntity;
+import com.boot.loiteBackend.domain.support.faq.general.entity.SupportFaqEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

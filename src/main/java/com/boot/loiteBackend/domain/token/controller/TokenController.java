@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.domain.token.controller;
 
-import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.dto.TokenRequestDto;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;

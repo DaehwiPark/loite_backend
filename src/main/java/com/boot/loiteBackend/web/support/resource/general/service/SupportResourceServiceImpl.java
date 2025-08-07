@@ -6,7 +6,7 @@ import com.boot.loiteBackend.admin.product.product.enums.ImageType;
 import com.boot.loiteBackend.admin.product.product.repository.AdminProductImageRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.support.resource.general.dto.SupportResourceDto;
-import com.boot.loiteBackend.web.support.resource.general.entity.SupportResourceEntity;
+import com.boot.loiteBackend.domain.support.resource.general.entity.SupportResourceEntity;
 import com.boot.loiteBackend.web.support.resource.general.error.ResourceErrorCode;
 import com.boot.loiteBackend.web.support.resource.general.repository.SupportResourceRepository;
 import lombok.RequiredArgsConstructor;

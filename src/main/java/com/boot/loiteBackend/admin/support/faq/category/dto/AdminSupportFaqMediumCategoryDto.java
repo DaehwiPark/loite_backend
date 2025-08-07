@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.faq.category.dto;
 
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
+import com.boot.loiteBackend.domain.support.faq.category.entity.SupportFaqMediumCategoryEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +36,7 @@ public class AdminSupportFaqMediumCategoryDto {
     @Schema(description = "카테고리 이미지 저장 경로", example = "/var/www/loite/uploads/payment.png")
     private String faqImagePath;
 
-    public AdminSupportFaqMediumCategoryDto(AdminSupportFaqMediumCategoryEntity entity) {
+    public AdminSupportFaqMediumCategoryDto(SupportFaqMediumCategoryEntity entity) {
         this.faqMediumCategoryId = entity.getFaqMediumCategoryId();
         this.faqMediumCategoryName = entity.getFaqMediumCategoryName();
         this.faqMediumCategoryOrder = entity.getFaqMediumCategoryOrder();

@@ -3,7 +3,7 @@ package com.boot.loiteBackend.web.support.faq.general.service;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.support.faq.category.repository.SupportFaqMediumCategoryRepository;
 import com.boot.loiteBackend.web.support.faq.general.dto.SupportFaqDto;
-import com.boot.loiteBackend.web.support.faq.general.entity.SupportFaqEntity;
+import com.boot.loiteBackend.domain.support.faq.general.entity.SupportFaqEntity;
 import com.boot.loiteBackend.web.support.faq.general.repository.SupportFaqRepository;
 import com.boot.loiteBackend.web.support.faq.general.error.SupportFaqErrorCode;
 import lombok.RequiredArgsConstructor;

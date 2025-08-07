@@ -2,13 +2,13 @@ package com.boot.loiteBackend.admin.support.faq.category.service;
 
 import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryDto;
 import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMediumCategoryRequestDto;
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMajorCategoryEntity;
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
 import com.boot.loiteBackend.admin.support.faq.category.error.AdminFaqCategoryErrorCode;
 import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqMajorCategoryRepository;
 import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqMediumCategoryRepository;
 import com.boot.loiteBackend.common.file.FileService;
 import com.boot.loiteBackend.common.file.FileUploadResult;
+import com.boot.loiteBackend.domain.support.faq.category.entity.SupportFaqMajorCategoryEntity;
+import com.boot.loiteBackend.domain.support.faq.category.entity.SupportFaqMediumCategoryEntity;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,10 +41,10 @@ public class AdminSupportFaqMediumCategoryServiceImpl implements AdminSupportFaq
             throw new CustomException(AdminFaqCategoryErrorCode.THUMBNAIL_UPLOAD_FAILED);
         }
 
-        AdminSupportFaqMajorCategoryEntity majorCategory = majorCategoryRepository.findById(request.getFaqMajorCategoryId())
+        SupportFaqMajorCategoryEntity majorCategory = majorCategoryRepository.findById(request.getFaqMajorCategoryId())
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.MAJOR_CATEGORY_NOT_FOUND));
 
-        AdminSupportFaqMediumCategoryEntity entity = AdminSupportFaqMediumCategoryEntity.builder()
+        SupportFaqMediumCategoryEntity entity = SupportFaqMediumCategoryEntity.builder()
                 .faqMediumCategoryName(request.getFaqMediumCategoryName())
                 .faqMediumCategoryOrder(request.getFaqMediumCategoryOrder())
                 .faqMajorCategory(majorCategory)
@@ -68,7 +68,7 @@ public class AdminSupportFaqMediumCategoryServiceImpl implements AdminSupportFaq
     @Override
     @Transactional(readOnly = true)
     public AdminSupportFaqMediumCategoryDto getCategoryById(Long id) {
-        AdminSupportFaqMediumCategoryEntity entity = mediumCategoryRepository.findById(id)
+        SupportFaqMediumCategoryEntity entity = mediumCategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.NOT_FOUND));
         return new AdminSupportFaqMediumCategoryDto(entity);
     }
@@ -77,11 +77,11 @@ public class AdminSupportFaqMediumCategoryServiceImpl implements AdminSupportFaq
     @Transactional
     public AdminSupportFaqMediumCategoryDto updateCategory(Long id, AdminSupportFaqMediumCategoryRequestDto request, MultipartFile faqImage) {
         // 중분류 조회
-        AdminSupportFaqMediumCategoryEntity entity = mediumCategoryRepository.findById(id)
+        SupportFaqMediumCategoryEntity entity = mediumCategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.NOT_FOUND));
 
         // 대분류 존재 여부 확인
-        AdminSupportFaqMajorCategoryEntity majorCategory = majorCategoryRepository.findById(request.getFaqMajorCategoryId())
+        SupportFaqMajorCategoryEntity majorCategory = majorCategoryRepository.findById(request.getFaqMajorCategoryId())
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.MAJOR_CATEGORY_NOT_FOUND));
 
         // 이미지가 넘어온 경우 새로 업로드
@@ -118,7 +118,7 @@ public class AdminSupportFaqMediumCategoryServiceImpl implements AdminSupportFaq
 
     @Override
     public List<AdminSupportFaqMediumCategoryDto> getMediumsByMajorCategoryId(Long majorId) {
-        List<AdminSupportFaqMediumCategoryEntity> entities =
+        List<SupportFaqMediumCategoryEntity> entities =
                 mediumCategoryRepository.findByFaqMajorCategory_FaqMajorCategoryId(majorId);
 
         return entities.stream()

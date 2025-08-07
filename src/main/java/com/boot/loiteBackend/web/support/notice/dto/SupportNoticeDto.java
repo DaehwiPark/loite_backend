@@ -1,7 +1,6 @@
 package com.boot.loiteBackend.web.support.notice.dto;
 
-import com.boot.loiteBackend.admin.support.notice.entity.AdminSupportNoticeEntity;
-import com.boot.loiteBackend.web.support.notice.entity.SupportNoticeEntity;
+import com.boot.loiteBackend.domain.support.notice.entity.SupportNoticeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
