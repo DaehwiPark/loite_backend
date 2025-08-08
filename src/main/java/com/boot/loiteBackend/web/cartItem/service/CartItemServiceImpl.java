@@ -271,7 +271,29 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         cartItem.setProductOptionId(newOption.getOptionId());
-        cartItem.setQuantity(requestDto.getQuantity());
+        if (requestDto.getQuantity() != null && requestDto.getQuantity() > 0) {
+            cartItem.setQuantity(requestDto.getQuantity());
+
+            List<CartItemGiftEntity> gifts = cartItemGiftRepository.findByCartItemId(cartItemId);
+            int totalGiftQty = gifts.stream().mapToInt(CartItemGiftEntity::getQuantity).sum();
+
+            int newQuantity = requestDto.getQuantity();
+
+            if (totalGiftQty > newQuantity) {
+                int toRemove = totalGiftQty - newQuantity;
+                for (CartItemGiftEntity gift : gifts) {
+                    int q = gift.getQuantity();
+                    if (q <= toRemove) {
+                        toRemove -= q;
+                        cartItemGiftRepository.delete(gift); // 초과된 사은품 삭제
+                    } else {
+                        gift.setQuantity(q - toRemove); // 일부만 줄이기
+                        cartItemGiftRepository.save(gift);
+                        break;
+                    }
+                }
+            }
+        }
         cartItem.setUpdatedAt(LocalDateTime.now());
     }
 
