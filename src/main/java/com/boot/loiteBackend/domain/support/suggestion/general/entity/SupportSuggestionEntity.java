@@ -3,6 +3,8 @@ package com.boot.loiteBackend.domain.support.suggestion.general.entity;
 import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -24,11 +26,11 @@ public class SupportSuggestionEntity {
     private Long suggestionUserId;
 
     @Column(name = "SUGGESTION_TITLE", nullable = false, length = 255,
-            columnDefinition = "VARCHAR(255) COMMENT '제안 제목'")
+            columnDefinition = "VARCHAR(255) NOT NULL COMMENT '제안 제목'")
     private String suggestionTitle;
 
     @Column(name = "SUGGESTION_CONTENT", nullable = false, length = 255,
-            columnDefinition = "VARCHAR(255) COMMENT '제안 상세 내용'")
+            columnDefinition = "VARCHAR(255) NOT NULL COMMENT '제안 상세 내용'")
     private String suggestionContent;
 
     @Column(name = "SUGGESTION_EMAIL", length = 255,
@@ -47,10 +49,12 @@ public class SupportSuggestionEntity {
             columnDefinition = "DATETIME(6) DEFAULT NULL COMMENT '검토 완료 일시'")
     private LocalDateTime suggestionReviewedAt;
 
+    @CreatedDate
     @Column(name = "CREATED_AT",
             columnDefinition = "DATETIME(6) DEFAULT NULL COMMENT '제안 등록 일시'")
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "UPDATED_AT",
             columnDefinition = "DATETIME(6) DEFAULT NULL COMMENT '제안 수정 일시'")
     private LocalDateTime updatedAt;
