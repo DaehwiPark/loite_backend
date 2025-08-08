@@ -3,6 +3,7 @@ package com.boot.loiteBackend.domain.social.entity;
 import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -39,11 +40,8 @@ public class SocialUserEntity {
     @Column(name = "SOCIAL_USER_NAME", length = 50, columnDefinition = "varchar(50) DEFAULT NULL COMMENT '소셜 계정 이름'")
     private String socialUserName;
 
+    @CreatedDate
     @Column(name = "CONNECTED_AT", nullable = false, columnDefinition = "timestamp NOT NULL DEFAULT current_timestamp() COMMENT '소셜 계정 연동 시각'")
     private LocalDateTime connectedAt;
 
-    @PrePersist
-    public void prePersist() {
-        this.connectedAt = LocalDateTime.now();
-    }
 }

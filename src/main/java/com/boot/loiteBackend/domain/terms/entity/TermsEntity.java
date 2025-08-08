@@ -2,6 +2,8 @@ package com.boot.loiteBackend.domain.terms.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -28,20 +30,11 @@ public class TermsEntity {
     @Column(name = "DISPLAY_YN", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y' COMMENT '노출 여부 (Y:노출/N:비노출)'")
     private String displayYn;
 
+    @CreatedDate
     @Column(name = "CREATED_AT", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시'")
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "UPDATED_AT", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시'")
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
