@@ -1,6 +1,5 @@
 package com.boot.loiteBackend.web.cartItem.service;
 
-import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
 import com.boot.loiteBackend.admin.product.gift.repository.AdminGiftRepository;
 import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
@@ -12,9 +11,9 @@ import com.boot.loiteBackend.web.cartItem.error.CartItemErrorCode;
 import com.boot.loiteBackend.web.cartItem.projection.CartItemGiftProjection;
 import com.boot.loiteBackend.web.cartItem.projection.CartItemProjection;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemGiftRepository;
+import com.boot.loiteBackend.web.cartItem.repository.CartItemProductGiftRepository;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,13 +35,14 @@ public class CartItemServiceImpl implements CartItemService {
     private final CartItemGiftRepository cartItemGiftRepository;
     private final AdminProductOptionRepository productOptionRepository;
     private final AdminGiftRepository adminGiftRepository;
+    private final CartItemProductGiftRepository cartItemProductGiftRepository;
 
-    @Override
     @Transactional
-    public void addToCart(Long loginUserId, CartItemRequestDto requestDto) {
-        for (CartItemOptionGiftDto item : requestDto.getItems()) {
+    @Override
+    public void addToCart(Long loginUserId, List<CartItemRequestDto> requestList) {
+        for (CartItemRequestDto item : requestList) {
 
-            validateCartItem(item);
+            validateCartItem(item); // 기존 검증 메서드 유지
 
             AdminProductOptionEntity option = productOptionRepository.findById(item.getProductOptionId())
                     .orElseThrow(() -> new CustomException(CartItemErrorCode.OPTION_NOT_FOUND));
@@ -56,7 +56,7 @@ public class CartItemServiceImpl implements CartItemService {
             Optional<CartItemEntity> existingItem = cartItemRepository
                     .findByUserIdAndProductIdAndProductOptionId(
                             loginUserId,
-                            requestDto.getProductId(),
+                            item.getProductId(),
                             item.getProductOptionId()
                     );
 
@@ -68,7 +68,7 @@ public class CartItemServiceImpl implements CartItemService {
             } else {
                 entity = CartItemEntity.builder()
                         .userId(loginUserId)
-                        .productId(requestDto.getProductId())
+                        .productId(item.getProductId())
                         .productOptionId(item.getProductOptionId())
                         .quantity(item.getQuantity())
                         .checkedYn("1")
@@ -85,12 +85,10 @@ public class CartItemServiceImpl implements CartItemService {
                             cartItemGiftRepository.findByCartItemIdAndGiftId(entity.getId(), giftDto.getProductGiftId());
 
                     if (existingGift.isPresent()) {
-                        // 기존 사은품 수량 증가
                         CartItemGiftEntity giftEntity = existingGift.get();
                         giftEntity.setQuantity(giftEntity.getQuantity() + giftDto.getQuantity());
                         giftEntity.setUpdatedAt(LocalDateTime.now());
                     } else {
-                        // 신규 사은품 추가
                         CartItemGiftEntity giftEntity = CartItemGiftEntity.builder()
                                 .cartItemId(entity.getId())
                                 .giftId(giftDto.getProductGiftId())
@@ -104,8 +102,7 @@ public class CartItemServiceImpl implements CartItemService {
         }
     }
 
-
-    private void validateCartItem(CartItemOptionGiftDto item) {
+    private void validateCartItem(CartItemRequestDto item) {
         // 상품 수량 체크
         if (item.getQuantity() == null || item.getQuantity() <= 0) {
             throw new CustomException(CartItemErrorCode.INVALID_QUANTITY);
@@ -312,5 +309,47 @@ public class CartItemServiceImpl implements CartItemService {
 
         cartItem.setQuantity(requestDto.getQuantity());
         cartItem.setUpdatedAt(LocalDateTime.now());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AvailableGiftResponseDto> getAvailableGifts(Long cartItemId) {
+        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+
+        Long productId = cartItem.getProductId();
+
+        return cartItemProductGiftRepository.findAvailableGiftsByProductId(productId);
+    }
+
+    @Override
+    @Transactional
+    public void updateCartItemGifts(Long loginUserId, Long cartItemId, CartItemGiftUpdateRequestDto dto) {
+        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+
+        if (!cartItem.getUserId().equals(loginUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 장바구니에 대한 권한이 없습니다.");
+        }
+
+        int productQuantity = cartItem.getQuantity(); // 장바구니 상품 수량
+        int totalGiftQuantity = dto.getGifts().stream().mapToInt(g -> Optional.ofNullable(g.getQuantity()).orElse(0)).sum();
+
+        if (totalGiftQuantity > productQuantity) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "사은품 수량이 상품 수량을 초과할 수 없습니다.");
+        }
+
+        // 기존 사은품 전체 삭제
+        cartItemGiftRepository.deleteByCartItemId(cartItemId);
+
+        // 새 사은품 저장
+        for (CartItemGiftUpdateRequestDto.CartItemGiftUpdateDto gift : dto.getGifts()) {
+            CartItemGiftEntity newGift = CartItemGiftEntity.builder()
+                    .cartItemId(cartItemId)
+                    .giftId(gift.getProductGiftId())
+                    .quantity(gift.getQuantity())
+                    .build();
+            cartItemGiftRepository.save(newGift);
+        }
     }
 }

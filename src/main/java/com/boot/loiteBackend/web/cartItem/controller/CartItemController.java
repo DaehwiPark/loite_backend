@@ -22,11 +22,12 @@ public class CartItemController {
 
     @Operation(summary = "장바구니 추가", description = "상품을 장바구니에 추가 합니다.")
     @PostMapping
-    public ResponseEntity<Void> addCartItem(@RequestBody CartItemRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
-        cartItemService.addToCart(loginUser.getUserId(), requestDto);
-
+    public ResponseEntity<Void> addCartItems(@RequestBody List<CartItemRequestDto> requestList,
+                                             @AuthenticationPrincipal CustomUserDetails loginUser) {
+        cartItemService.addToCart(loginUser.getUserId(), requestList);
         return ResponseEntity.ok().build();
     }
+
 
     @Operation(summary = "장바구니 조회", description = "장바구니에 추가된 상품을 조회합니다.")
     @GetMapping
@@ -78,6 +79,20 @@ public class CartItemController {
     @PatchMapping("/{cartItemId}/updateProductQuantity")
     public ResponseEntity<Void> updateCartItemQuantity(@PathVariable Long cartItemId, @RequestBody CartItemQuantityUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
         cartItemService.updateCartItemQuantity(loginUser.getUserId(), cartItemId, requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "상품에 연결된 사은품 목록 조회", description = "장바구니에 추가된 상품과 연결된 사은품을 조회합니다.")
+    @GetMapping("/{cartItemId}/availableGifts")
+    public ResponseEntity<List<AvailableGiftResponseDto>> getAvailableGifts(@PathVariable Long cartItemId) {
+        List<AvailableGiftResponseDto> gifts = cartItemService.getAvailableGifts(cartItemId);
+        return ResponseEntity.ok(gifts);
+    }
+
+    @Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니 상품에 연결된 사은품 목록을 수정합니다.")
+    @PutMapping("/{cartItemId}/updateGifts")
+    public ResponseEntity<Void> updateCartItemGifts(@PathVariable Long cartItemId, @RequestBody CartItemGiftUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
+        cartItemService.updateCartItemGifts(loginUser.getUserId(), cartItemId, requestDto);
         return ResponseEntity.ok().build();
     }
 }

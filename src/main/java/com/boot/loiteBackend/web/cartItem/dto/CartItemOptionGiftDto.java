@@ -15,9 +15,6 @@ public class CartItemOptionGiftDto {
     @Schema(description = "옵션id", example = "1")
     private Long productOptionId;
 
-    /*@Schema(description = "사은품 id", example = "1")
-    private Long giftId;*/
-
     @Schema(description = "수량", example = "1")
     private Integer quantity;
 

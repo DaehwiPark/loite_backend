@@ -12,18 +12,13 @@ import java.util.List;
 @Builder
 public class CartItemGiftUpdateRequestDto {
 
-    @Schema(description = "카트아이템 ID", example = "10")
-    private Long cartItemId;
-
-    @Schema(description = "선택한 사은품 리스트")
-    private List<GiftItem> giftList;
-
+    private List<CartItemGiftUpdateDto> gifts;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GiftItem {
+    public static class CartItemGiftUpdateDto {
         @Schema(description = "사은품 ID", example = "5")
         private Long productGiftId;
 

@@ -1,12 +1,14 @@
 package com.boot.loiteBackend.web.cartItem.service;
 
 import com.boot.loiteBackend.web.cartItem.dto.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface CartItemService {
 
-    void addToCart(Long loginUserId, CartItemRequestDto requestDto);
+    @Transactional
+    void addToCart(Long loginUserId, List<CartItemRequestDto> requestList);
 
     List<CartItemResponseDto> getCartItemsByUser(Long loginUserId);
 
@@ -17,6 +19,10 @@ public interface CartItemService {
     void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto);
 
     void updateCartItemQuantity(Long loginUserId, Long cartItemId, CartItemQuantityUpdateRequestDto requestDto);
+
+    List<AvailableGiftResponseDto> getAvailableGifts(Long cartItemId);
+
+    void updateCartItemGifts(Long loginUserId, Long cartItemId, CartItemGiftUpdateRequestDto dto);
 
     //void updateCartItemGifts(Long loginUserId, Long cartItemId, List<CartItemGiftUpdateRequestDto.GiftItem> requestDto);
 

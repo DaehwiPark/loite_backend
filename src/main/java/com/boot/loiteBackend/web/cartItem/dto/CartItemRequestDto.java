@@ -14,18 +14,12 @@ public class CartItemRequestDto {
     @Schema(description = "추가할 상품 ID", example = "1001")
     private Long productId;
 
-    private List<CartItemOptionGiftDto> items;
-
-    /*@Schema(description = "추가할 상품 ID", example = "1001")
-    private Long productId;
-
-    @Schema(description = "선택한 상품 옵션 ID", example = "12")
+    @Schema(description = "옵션id", example = "1")
     private Long productOptionId;
 
-    @Schema(description = "선택한 사은품 ID 리스트", example = "[2,4]")
-    private List<Long> giftIdList;
+    @Schema(description = "수량", example = "1")
+    private Integer quantity;
 
-    @Schema(description = "주문 수량", example = "2")
-    private Integer quantity;*/
+    private List<CartItemGiftDto> gifts;
 }
 
