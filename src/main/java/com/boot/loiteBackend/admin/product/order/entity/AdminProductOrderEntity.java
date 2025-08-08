@@ -2,7 +2,7 @@ package com.boot.loiteBackend.admin.product.order.entity;
 
 
 import com.boot.loiteBackend.admin.product.order.enums.OrderStatusType;
-import com.boot.loiteBackend.admin.user.Entity.AdminUserEntity;
+import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,7 +28,7 @@ public class AdminProductOrderEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
-    private AdminUserEntity user;
+    private UserEntity user;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ORDER_STATUS", length = 20)

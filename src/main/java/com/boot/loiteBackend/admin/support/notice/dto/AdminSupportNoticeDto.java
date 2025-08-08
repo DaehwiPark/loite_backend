@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.notice.dto;
 
-import com.boot.loiteBackend.admin.support.notice.entity.AdminSupportNoticeEntity;
+import com.boot.loiteBackend.domain.support.notice.entity.SupportNoticeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -37,7 +37,7 @@ public class AdminSupportNoticeDto {
     @Schema(description = "수정일", example = "2025-05-29T10:00:00")
     private LocalDateTime updatedAt;
 
-    public AdminSupportNoticeDto(AdminSupportNoticeEntity entity) {
+    public AdminSupportNoticeDto(SupportNoticeEntity entity) {
         this.noticeId = entity.getNoticeId();
         this.noticeTitle = entity.getNoticeTitle();
         this.noticeContent = entity.getNoticeContent();

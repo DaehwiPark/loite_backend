@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface SupportFaqService {
 
-    Page<SupportFaqDto> getFaqsByMediumCategory(Long mediumCategoryId, Pageable pageable);
+    Page<SupportFaqDto> getFaqsByMediumCategory(Long mediumId, Pageable pageable);
 
+    Page<SupportFaqDto> getFaqsByMajorCategory(Long majorId, Pageable pageable, String keyword);
 }

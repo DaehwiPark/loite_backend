@@ -1,18 +1,17 @@
 package com.boot.loiteBackend.web.social.service;
 
-import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.handler.OAuthUnLinkHandlers;
 import com.boot.loiteBackend.web.social.model.OAuthUserInfo;
-import com.boot.loiteBackend.web.social.entity.SocialUserEntity;
+import com.boot.loiteBackend.domain.social.entity.SocialUserEntity;
 import com.boot.loiteBackend.web.social.error.SocialErrorCode;
 import com.boot.loiteBackend.web.social.handler.OAuthHandler;
 import com.boot.loiteBackend.web.social.repository.SocialUserRepository;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
-import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.user.general.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;

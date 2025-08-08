@@ -1,8 +1,8 @@
 package com.boot.loiteBackend.web.social.controller;
 
-import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
 import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.dto.SocialLinkingStatusResponseDto;
 import com.boot.loiteBackend.web.social.dto.SocialVerificationResultDto;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;

@@ -1,20 +1,18 @@
 package com.boot.loiteBackend.web.social.controller;
 
-import com.boot.loiteBackend.global.security.CustomUserDetails;
 import com.boot.loiteBackend.web.social.dto.SocialUserRegistrationDto;
 import com.boot.loiteBackend.web.social.resolver.OAuthHandlerResolver;
 import com.boot.loiteBackend.web.social.service.SocialLinkService;
 import com.boot.loiteBackend.web.social.service.SocialLoginService;
 import com.boot.loiteBackend.web.social.service.SocialRegisterService;
 import com.boot.loiteBackend.global.response.ApiResponse;
-import com.boot.loiteBackend.domain.login.dto.LoginResponseDto;
+import com.boot.loiteBackend.web.login.dto.LoginResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

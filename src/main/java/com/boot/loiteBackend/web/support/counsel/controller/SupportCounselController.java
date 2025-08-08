@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.support.counsel.controller;
 
-import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.web.support.counsel.dto.SupportCounselPasswordVerifyDto;
 import com.boot.loiteBackend.web.support.counsel.dto.SupportCounselRequestDto;
 import com.boot.loiteBackend.web.support.counsel.dto.SupportCounselResponseDto;

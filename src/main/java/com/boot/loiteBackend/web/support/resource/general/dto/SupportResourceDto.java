@@ -50,4 +50,7 @@ public class SupportResourceDto {
 
     @Schema(description = "Last updated date", example = "2025-05-27T15:00:00")
     private LocalDateTime updatedAt;
+
+    @Schema(description = "대표 상품 이미지 URL", example = "/uploads/product/image.jpg")
+    private String productImageUrl;
 }

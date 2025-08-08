@@ -2,7 +2,7 @@ package com.boot.loiteBackend.web.support.notice.service;
 
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.support.notice.dto.SupportNoticeDto;
-import com.boot.loiteBackend.web.support.notice.entity.SupportNoticeEntity;
+import com.boot.loiteBackend.domain.support.notice.entity.SupportNoticeEntity;
 import com.boot.loiteBackend.web.support.notice.error.SupportNoticeErrorCode;
 import com.boot.loiteBackend.web.support.notice.repository.SupportNoticeRepository;
 import lombok.RequiredArgsConstructor;

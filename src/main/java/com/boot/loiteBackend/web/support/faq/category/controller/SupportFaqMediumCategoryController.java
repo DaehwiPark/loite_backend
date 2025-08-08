@@ -17,12 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/public/support/faq/category/medium")
-@Tag(name = "고객센터 FAQ 중분류 카테고리 API", description = "FAQ 중분류 카테고리 조회 API")
+@Tag(name = "고객센터 FAQ 관련 API", description = "FAQ 대분류/중분류 카테고리 및 목록 조회 API")
 public class SupportFaqMediumCategoryController {
 
     private final SupportFaqMediumCategoryService supportFaqCategoryService;
 
-    @Operation(summary = "대분류 ID 기준 중분류 카테고리 조회", description = "대분류 ID에 해당하는 중분류 카테고리를 표시순서 기준으로 조회합니다.")
+    @Operation(summary = "중분류 카테고리 목록 조회", description = "대분류 ID에 해당하는 중분류 카테고리를 표시순서 기준으로 조회합니다.")
     @GetMapping
     public ResponseEntity<List<SupportFaqMediumCategoryDto>> getMediumsByMajorId(
             @Parameter(description = "대분류 ID", example = "1", required = true)

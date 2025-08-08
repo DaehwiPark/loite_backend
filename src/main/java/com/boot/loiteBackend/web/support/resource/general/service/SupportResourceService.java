@@ -10,6 +10,6 @@ public interface SupportResourceService {
 
     Page<SupportResourceDto> getManuals(String keyword, Long categoryId, Pageable pageable);
 
-    ResponseEntity<Resource> fileDownload(Long id);
+    ResponseEntity<Resource> fileDownload(Long resourceId);
 
 }

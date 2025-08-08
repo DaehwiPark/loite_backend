@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.mileage.total.entity;
 
-import com.boot.loiteBackend.web.user.general.entity.UserEntity;
+import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.support.resource.general.repository;
 
-import com.boot.loiteBackend.web.support.resource.general.entity.SupportResourceEntity;
+import com.boot.loiteBackend.domain.support.resource.general.entity.SupportResourceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

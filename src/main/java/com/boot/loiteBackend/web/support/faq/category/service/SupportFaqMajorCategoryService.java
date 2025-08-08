@@ -1,7 +1,7 @@
 package com.boot.loiteBackend.web.support.faq.category.service;
 
 import com.boot.loiteBackend.web.support.faq.category.dto.SupportFaqMajorCategoryDto;
-import com.boot.loiteBackend.web.support.faq.category.entity.SupportFaqMajorCategoryEntity;
+import com.boot.loiteBackend.domain.support.faq.category.entity.SupportFaqMajorCategoryEntity;
 import com.boot.loiteBackend.web.support.faq.category.repository.SupportFaqMajorCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

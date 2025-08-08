@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.cartItem.controller;
 
-import com.boot.loiteBackend.global.security.CustomUserDetails;
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.web.cartItem.dto.*;
 import com.boot.loiteBackend.web.cartItem.service.CartItemService;
 import io.swagger.v3.oas.annotations.Operation;

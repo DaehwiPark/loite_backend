@@ -4,7 +4,7 @@ import com.boot.loiteBackend.admin.support.counsel.enums.AdminCounselStatus;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.support.counsel.dto.SupportCounselRequestDto;
 import com.boot.loiteBackend.web.support.counsel.dto.SupportCounselResponseDto;
-import com.boot.loiteBackend.web.support.counsel.entity.SupportCounselEntity;
+import com.boot.loiteBackend.domain.support.counsel.entity.SupportCounselEntity;
 import com.boot.loiteBackend.web.support.counsel.error.SupportCounselErrorCode;
 import com.boot.loiteBackend.web.support.counsel.repository.SupportCounselRepository;
 import lombok.RequiredArgsConstructor;

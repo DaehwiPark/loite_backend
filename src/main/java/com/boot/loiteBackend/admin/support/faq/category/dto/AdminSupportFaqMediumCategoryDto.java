@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.admin.support.faq.category.dto;
 
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMediumCategoryEntity;
+import com.boot.loiteBackend.domain.support.faq.category.entity.SupportFaqMediumCategoryEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,12 +27,23 @@ public class AdminSupportFaqMediumCategoryDto {
     @Schema(description = "대분류 이름", example = "회원 서비스")
     private String faqMajorCategoryName;
 
-    public AdminSupportFaqMediumCategoryDto(AdminSupportFaqMediumCategoryEntity entity) {
+    @Schema(description = "카테고리 이미지 실제 파일명", example = "payment.png")
+    private String faqImageName;
+
+    @Schema(description = "카테고리 이미지 URL", example = "/files/faq-category/payment.png")
+    private String faqImageUrl;
+
+    @Schema(description = "카테고리 이미지 저장 경로", example = "/var/www/loite/uploads/payment.png")
+    private String faqImagePath;
+
+    public AdminSupportFaqMediumCategoryDto(SupportFaqMediumCategoryEntity entity) {
         this.faqMediumCategoryId = entity.getFaqMediumCategoryId();
         this.faqMediumCategoryName = entity.getFaqMediumCategoryName();
         this.faqMediumCategoryOrder = entity.getFaqMediumCategoryOrder();
         this.faqMajorCategoryId = entity.getFaqMajorCategory().getFaqMajorCategoryId();
         this.faqMajorCategoryName = entity.getFaqMajorCategory().getFaqMajorCategoryName();
+        this.faqImageName = entity.getFaqImageName();
+        this.faqImageUrl = entity.getFaqImageUrl();
+        this.faqImagePath = entity.getFaqImagePath();
     }
-
 }

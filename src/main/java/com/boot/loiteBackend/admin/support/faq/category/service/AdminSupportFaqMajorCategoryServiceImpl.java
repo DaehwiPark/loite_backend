@@ -2,9 +2,9 @@ package com.boot.loiteBackend.admin.support.faq.category.service;
 
 import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMajorCategoryDto;
 import com.boot.loiteBackend.admin.support.faq.category.dto.AdminSupportFaqMajorCategoryRequestDto;
-import com.boot.loiteBackend.admin.support.faq.category.entity.AdminSupportFaqMajorCategoryEntity;
 import com.boot.loiteBackend.admin.support.faq.category.error.AdminFaqCategoryErrorCode;
 import com.boot.loiteBackend.admin.support.faq.category.repository.AdminSupportFaqMajorCategoryRepository;
+import com.boot.loiteBackend.domain.support.faq.category.entity.SupportFaqMajorCategoryEntity;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class AdminSupportFaqMajorCategoryServiceImpl implements AdminSupportFaqM
     @Override
     @Transactional
     public AdminSupportFaqMajorCategoryDto createCategory(AdminSupportFaqMajorCategoryRequestDto request) {
-        AdminSupportFaqMajorCategoryEntity entity = AdminSupportFaqMajorCategoryEntity.builder()
+        SupportFaqMajorCategoryEntity entity = SupportFaqMajorCategoryEntity.builder()
                 .faqMajorCategoryName(request.getFaqMajorCategoryName())
                 .faqMajorCategoryOrder(request.getFaqMajorCategoryOrder())
                 .build();
@@ -41,7 +41,7 @@ public class AdminSupportFaqMajorCategoryServiceImpl implements AdminSupportFaqM
     @Override
     @Transactional(readOnly = true)
     public AdminSupportFaqMajorCategoryDto getCategoryById(Long id) {
-        AdminSupportFaqMajorCategoryEntity entity = majorCategoryRepository.findById(id)
+        SupportFaqMajorCategoryEntity entity = majorCategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.MAJOR_CATEGORY_NOT_FOUND));
         return new AdminSupportFaqMajorCategoryDto(entity);
     }
@@ -49,7 +49,7 @@ public class AdminSupportFaqMajorCategoryServiceImpl implements AdminSupportFaqM
     @Override
     @Transactional
     public AdminSupportFaqMajorCategoryDto updateCategory(Long id, AdminSupportFaqMajorCategoryRequestDto request) {
-        AdminSupportFaqMajorCategoryEntity entity = majorCategoryRepository.findById(id)
+        SupportFaqMajorCategoryEntity entity = majorCategoryRepository.findById(id)
                 .orElseThrow(() -> new CustomException(AdminFaqCategoryErrorCode.MAJOR_CATEGORY_NOT_FOUND));
 
         entity.setFaqMajorCategoryName(request.getFaqMajorCategoryName());
