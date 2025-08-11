@@ -123,6 +123,4 @@ public class AdminProductEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-
 }

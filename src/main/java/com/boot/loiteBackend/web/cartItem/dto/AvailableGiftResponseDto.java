@@ -20,4 +20,17 @@ public class AvailableGiftResponseDto {
 
     @Schema(description = "사은품 이미지 URL", example = "image")
     private String giftImageUrl;
+
+    @Schema(description = "사은품 재고", example = "50")
+    private Integer giftStock;
+
+    @Schema(description = "상품 이름", example = "주전자")
+    private String productName;
+
+    @Schema(description = "옵션 이름", example = "화이트")
+    private String optionValue;
+
+    @Schema(description = "컬러 코드", example = "#ffffff")
+    private String optionColorCode;
+
 }

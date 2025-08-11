@@ -312,15 +312,21 @@ public class CartItemServiceImpl implements CartItemService {
         cartItem.setUpdatedAt(LocalDateTime.now());
     }
 
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<AvailableGiftResponseDto> getAvailableGifts(Long cartItemId) {
+//        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
+//                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+//
+//        Long productId = cartItem.getProductId();
+//
+//        return cartItemProductGiftRepository.findAvailableGiftsByProductId(productId);
+//    }
+
     @Override
     @Transactional(readOnly = true)
     public List<AvailableGiftResponseDto> getAvailableGifts(Long cartItemId) {
-        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
-
-        Long productId = cartItem.getProductId();
-
-        return cartItemProductGiftRepository.findAvailableGiftsByProductId(productId);
+        return cartItemProductGiftRepository.findAvailableGiftsForReselect(cartItemId);
     }
 
     @Override

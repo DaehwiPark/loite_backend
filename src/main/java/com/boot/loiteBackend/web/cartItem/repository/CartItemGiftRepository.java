@@ -13,12 +13,12 @@ import java.util.Optional;
 public interface CartItemGiftRepository extends JpaRepository<CartItemGiftEntity, Long> {
     @Query(value = """
     SELECT
-        cig.CART_ITEM_ID AS cartItemId,
-        cig.PRODUCT_GIFT_ID AS productGiftId,
-        cig.GIFT_QUANTITY AS quantity,
-        g.GIFT_NAME AS giftName,
-        g.GIFT_IMAGE_URL AS giftImageUrl,
-        g.GIFT_STOCK AS giftStock
+        cig.CART_ITEM_ID        AS cartItemId,
+        cig.PRODUCT_GIFT_ID     AS productGiftId,
+        cig.GIFT_QUANTITY       AS quantity,
+        g.GIFT_NAME             AS giftName,
+        g.GIFT_IMAGE_URL        AS giftImageUrl,
+        g.GIFT_STOCK            AS giftStock
     FROM TB_PRODUCT_CART_ITEM_GIFT cig
     JOIN TB_PRODUCT_GIFT pg ON cig.PRODUCT_GIFT_ID = pg.PRODUCT_GIFT_ID
     JOIN TB_GIFT g ON pg.GIFT_ID = g.GIFT_ID

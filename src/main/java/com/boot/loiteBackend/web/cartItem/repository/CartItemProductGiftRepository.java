@@ -13,11 +13,21 @@ public interface CartItemProductGiftRepository extends JpaRepository<CartItemEnt
     SELECT new com.boot.loiteBackend.web.cartItem.dto.AvailableGiftResponseDto(
         pg.productGiftId,
         g.giftName,
-        g.giftImageUrl
+        g.giftImageUrl,
+        g.giftStock,
+        p.productName,
+        po.optionValue,
+        po.optionColorCode
     )
-    FROM AdminProductGiftEntity pg
+    FROM CartItemEntity ci
+    JOIN AdminProductEntity p
+        ON ci.productId = p.productId
+    LEFT JOIN AdminProductOptionEntity po
+        ON ci.productOptionId = po.optionId
+    JOIN AdminProductGiftEntity pg
+        ON pg.product = p
     JOIN pg.gift g
-    WHERE pg.product.productId = :productId
+    WHERE ci.id = :cartItemId
     """)
-    List<AvailableGiftResponseDto> findAvailableGiftsByProductId(@Param("productId") Long productId);
+    List<AvailableGiftResponseDto> findAvailableGiftsForReselect(@Param("cartItemId") Long cartItemId);
 }
