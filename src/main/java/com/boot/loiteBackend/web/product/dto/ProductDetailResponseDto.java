@@ -83,6 +83,9 @@ public class ProductDetailResponseDto {
     @Getter
     @Builder
     public static class ProductGiftDto {
+        @Schema(description = "상품과 사은품 고유 연결 ID", example = "11")
+        private Long productGiftId;
+
         @Schema(description = "사은품 ID", example = "11")
         private Long giftId;
 

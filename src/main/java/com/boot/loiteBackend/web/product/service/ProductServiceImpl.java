@@ -114,6 +114,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(pg -> {
                     AdminGiftEntity gift = pg.getGift();
                     return ProductDetailResponseDto.ProductGiftDto.builder()
+                            .productGiftId(pg.getProductGiftId())
                             .giftId(gift.getGiftId())
                             .giftName(gift.getGiftName())
                             .giftStock(gift.getGiftStock())
