@@ -12,7 +12,7 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService {
 
     private final FileStorageProperties fileProps;
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf");
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf",".svg");
 
     public FileServiceImpl(FileStorageProperties fileProps) {
         this.fileProps = fileProps;

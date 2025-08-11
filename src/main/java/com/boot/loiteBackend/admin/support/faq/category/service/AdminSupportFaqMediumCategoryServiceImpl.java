@@ -32,10 +32,9 @@ public class AdminSupportFaqMediumCategoryServiceImpl implements AdminSupportFaq
         if (faqImage == null || faqImage.isEmpty()) {
             throw new CustomException(AdminFaqCategoryErrorCode.INVALID_THUMBNAIL);
         }
-
         FileUploadResult uploadResult;
         try {
-            String uploadCategory = "faq-category";
+            String uploadCategory = "etc";
             uploadResult = fileService.save(faqImage, uploadCategory);
         } catch (Exception e) {
             throw new CustomException(AdminFaqCategoryErrorCode.THUMBNAIL_UPLOAD_FAILED);
