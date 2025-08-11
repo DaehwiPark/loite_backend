@@ -28,9 +28,6 @@ public class CartItemResponseDto {
     @Schema(description = "대표 썸네일 이미지 URL", example = "https://cdn.loite.com/images/product/thumb-wood-table.jpg")
     private String thumbnailUrl;
 
-    @Schema(description = "재고", example = "100")
-    private Integer productStock;
-
     @Schema(description = "선택한 옵션 타입 (예: 색상)", example = "색상")
     private String optionType;
 
@@ -39,6 +36,9 @@ public class CartItemResponseDto {
 
     @Schema(description = "옵션 추가 금액", example = "5000")
     private Integer optionAdditionalPrice;
+
+    @Schema(description = "재고", example = "100")
+    private Integer optionStock;
 
     @Schema(description = "주문 수량", example = "2")
     private int quantity;

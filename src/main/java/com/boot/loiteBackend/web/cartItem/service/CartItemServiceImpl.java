@@ -184,6 +184,7 @@ public class CartItemServiceImpl implements CartItemService {
                         .productGiftId(p.getProductGiftId())
                         .giftName(p.getGiftName())
                         .giftImageUrl(p.getGiftImageUrl())
+                        .giftStock(p.getGiftStock())
                         .quantity(p.getQuantity())
                         .build())
                 .collect(Collectors.groupingBy(CartItemGiftResponseDto::getCartItemId));
@@ -213,7 +214,7 @@ public class CartItemServiceImpl implements CartItemService {
                             .productName(p.getProductName())
                             .brandName(p.getBrandName())
                             .thumbnailUrl(p.getThumbnailUrl())
-                            .productStock(p.getProductStock())
+                            .optionStock(p.getOptionStock())
                             .optionType(p.getOptionType())
                             .optionValue(p.getOptionValue())
                             .optionAdditionalPrice(p.getOptionAdditionalPrice())

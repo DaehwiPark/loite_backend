@@ -5,5 +5,6 @@ public interface CartItemGiftProjection {
     Long getProductGiftId();
     String getGiftName();
     String getGiftImageUrl();
+    Integer getGiftStock();
     Integer getQuantity();
 }

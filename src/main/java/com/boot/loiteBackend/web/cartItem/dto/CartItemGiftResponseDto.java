@@ -22,6 +22,9 @@ public class CartItemGiftResponseDto {
     @Schema(description = "사은품 이미지 URL", example = "https://cdn.loite.com/images/gift/rug.jpg")
     private String giftImageUrl;
 
+    @Schema(description = "사은품 재고", example = "50")
+    private Integer giftStock;
+
     @Schema(description = "사은품 수량", example = "2")
     private Integer quantity;
 }
