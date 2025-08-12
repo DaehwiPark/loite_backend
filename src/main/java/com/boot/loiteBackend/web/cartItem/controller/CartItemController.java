@@ -89,6 +89,13 @@ public class CartItemController {
         return ResponseEntity.ok(gifts);
     }
 
+    @Operation(summary = "상품에 연결된 옵션 목록 조회", description = "장바구니에 추가된 상품의 옵션을 조회합니다.")
+    @GetMapping("/{cartItemId}/options")
+    public ResponseEntity<List<AvailableOptionResponseDto>> getAvailableOptions(@PathVariable Long cartItemId) {
+        List<AvailableOptionResponseDto> options = cartItemService.getAvailableOptions(cartItemId);
+        return ResponseEntity.ok(options);
+    }
+
     @Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니 상품에 연결된 사은품 목록을 수정합니다.")
     @PutMapping("/{cartItemId}/updateGifts")
     public ResponseEntity<Void> updateCartItemGifts(@PathVariable Long cartItemId, @RequestBody CartItemGiftUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {

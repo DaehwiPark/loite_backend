@@ -8,9 +8,12 @@ import com.boot.loiteBackend.web.cartItem.dto.*;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemEntity;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemGiftEntity;
 import com.boot.loiteBackend.web.cartItem.error.CartItemErrorCode;
+import com.boot.loiteBackend.web.cartItem.projection.AvailableGiftProjection;
+import com.boot.loiteBackend.web.cartItem.projection.AvailableOptionProjection;
 import com.boot.loiteBackend.web.cartItem.projection.CartItemGiftProjection;
 import com.boot.loiteBackend.web.cartItem.projection.CartItemProjection;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemGiftRepository;
+import com.boot.loiteBackend.web.cartItem.repository.CartItemOptionRepository;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemProductGiftRepository;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     private final CartItemRepository cartItemRepository;
     private final CartItemGiftRepository cartItemGiftRepository;
+    private final CartItemOptionRepository cartItemOptionRepository;
     private final AdminProductOptionRepository productOptionRepository;
     private final AdminGiftRepository adminGiftRepository;
     private final CartItemProductGiftRepository cartItemProductGiftRepository;
@@ -255,43 +259,99 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
 
+//    @Override
+//    @Transactional
+//    public void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto) {
+//        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
+//                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+//
+//        AdminProductOptionEntity newOption = productOptionRepository.findById(requestDto.getProductOptionId())
+//                .orElseThrow(() -> new IllegalArgumentException("해당 옵션이 존재하지 않습니다."));
+//
+//        if ("Y".equals(newOption.getSoldOutYn())) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 옵션으로 변경할 수 없습니다.");
+//        }
+//
+//        cartItem.setProductOptionId(newOption.getOptionId());
+//        if (requestDto.getQuantity() != null && requestDto.getQuantity() > 0) {
+//            cartItem.setQuantity(requestDto.getQuantity());
+//
+//            List<CartItemGiftEntity> gifts = cartItemGiftRepository.findByCartItemId(cartItemId);
+//            int totalGiftQty = gifts.stream().mapToInt(CartItemGiftEntity::getQuantity).sum();
+//
+//            int newQuantity = requestDto.getQuantity();
+//
+//            if (totalGiftQty > newQuantity) {
+//                int toRemove = totalGiftQty - newQuantity;
+//                for (CartItemGiftEntity gift : gifts) {
+//                    int q = gift.getQuantity();
+//                    if (q <= toRemove) {
+//                        toRemove -= q;
+//                        cartItemGiftRepository.delete(gift); // 초과된 사은품 삭제
+//                    } else {
+//                        gift.setQuantity(q - toRemove); // 일부만 줄이기
+//                        cartItemGiftRepository.save(gift);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//        cartItem.setUpdatedAt(LocalDateTime.now());
+//    }
+
     @Override
     @Transactional
     public void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto) {
+
         CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "장바구니 항목이 존재하지 않습니다."));
+
+        if (!cartItem.getUserId().equals(loginUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인 장바구니만 수정할 수 있습니다.");
+        }
 
         AdminProductOptionEntity newOption = productOptionRepository.findById(requestDto.getProductOptionId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 옵션이 존재하지 않습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 옵션이 존재하지 않습니다."));
 
-        if ("Y".equals(newOption.getSoldOutYn())) {
+        if (!newOption.getProduct().getProductId().equals(cartItem.getProductId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 상품의 옵션이 아닙니다.");
+        }
+
+        if ("Y".equalsIgnoreCase(newOption.getSoldOutYn())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 옵션으로 변경할 수 없습니다.");
         }
 
+        Integer reqQty = requestDto.getQuantity();
+        if (reqQty == null || reqQty <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수량은 1 이상이어야 합니다.");
+        }
+        if (newOption.getOptionStock() < reqQty) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "옵션 재고(" + newOption.getOptionStock() + ")를 초과했습니다.");
+        }
+
         cartItem.setProductOptionId(newOption.getOptionId());
-        if (requestDto.getQuantity() != null && requestDto.getQuantity() > 0) {
-            cartItem.setQuantity(requestDto.getQuantity());
 
-            List<CartItemGiftEntity> gifts = cartItemGiftRepository.findByCartItemId(cartItemId);
-            int totalGiftQty = gifts.stream().mapToInt(CartItemGiftEntity::getQuantity).sum();
+        cartItem.setQuantity(reqQty);
 
-            int newQuantity = requestDto.getQuantity();
+        List<CartItemGiftEntity> gifts = cartItemGiftRepository.findByCartItemId(cartItemId);
+        int totalGiftQty = gifts.stream().mapToInt(CartItemGiftEntity::getQuantity).sum();
 
-            if (totalGiftQty > newQuantity) {
-                int toRemove = totalGiftQty - newQuantity;
-                for (CartItemGiftEntity gift : gifts) {
-                    int q = gift.getQuantity();
-                    if (q <= toRemove) {
-                        toRemove -= q;
-                        cartItemGiftRepository.delete(gift); // 초과된 사은품 삭제
-                    } else {
-                        gift.setQuantity(q - toRemove); // 일부만 줄이기
-                        cartItemGiftRepository.save(gift);
-                        break;
-                    }
+        if (totalGiftQty > reqQty) {
+            int toRemove = totalGiftQty - reqQty;
+            for (CartItemGiftEntity gift : gifts) {
+                int q = gift.getQuantity();
+                if (q <= toRemove) {
+                    toRemove -= q;
+                    cartItemGiftRepository.delete(gift);
+                } else {
+                    gift.setQuantity(q - toRemove);
+                    cartItemGiftRepository.save(gift);
+                    break;
                 }
             }
         }
+
+        // 10. 업데이트 시간 변경
         cartItem.setUpdatedAt(LocalDateTime.now());
     }
 
@@ -312,21 +372,42 @@ public class CartItemServiceImpl implements CartItemService {
         cartItem.setUpdatedAt(LocalDateTime.now());
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<AvailableGiftResponseDto> getAvailableGifts(Long cartItemId) {
-//        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-//                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
-//
-//        Long productId = cartItem.getProductId();
-//
-//        return cartItemProductGiftRepository.findAvailableGiftsByProductId(productId);
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<AvailableOptionResponseDto> getAvailableOptions(Long cartItemId) {
+        // 1. 해당 cartItemId로 옵션 목록 + 현재 수량 조회
+        List<AvailableOptionProjection> projections =
+                cartItemOptionRepository.findOptionsForCartItem(cartItemId);
+
+        // 2. Projection → DTO 변환
+        return projections.stream()
+                .map(p -> new AvailableOptionResponseDto(
+                        p.getOptionId(),
+                        p.getOptionValue(),
+                        p.getColorCode(),
+                        p.getQuantity()
+                ))
+                .toList();
+    }
 
     @Override
     @Transactional(readOnly = true)
     public List<AvailableGiftResponseDto> getAvailableGifts(Long cartItemId) {
-        return cartItemProductGiftRepository.findAvailableGiftsForReselect(cartItemId);
+        List<AvailableGiftProjection> projectionList =
+                cartItemProductGiftRepository.findAvailableGiftsForReselect(cartItemId);
+
+        return projectionList.stream()
+                .map(p -> new AvailableGiftResponseDto(
+                        p.getProductGiftId(),
+                        p.getGiftName(),
+                        p.getGiftImageUrl(),
+                        p.getGiftStock(),
+                        p.getProductName(),
+                        p.getOptionValue(),
+                        p.getOptionColorCode(),
+                        p.getQuantity()
+                ))
+                .toList();
     }
 
     @Override

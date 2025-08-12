@@ -33,4 +33,6 @@ public class AvailableGiftResponseDto {
     @Schema(description = "컬러 코드", example = "#ffffff")
     private String optionColorCode;
 
+    @Schema(description = "기존 수량 표시", example = "2")
+    private Integer quantity;
 }

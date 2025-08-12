@@ -20,10 +20,11 @@ public interface CartItemService {
 
     void updateCartItemQuantity(Long loginUserId, Long cartItemId, CartItemQuantityUpdateRequestDto requestDto);
 
+    @Transactional(readOnly = true)
+    List<AvailableOptionResponseDto> getAvailableOptions(Long cartItemId);
+
     List<AvailableGiftResponseDto> getAvailableGifts(Long cartItemId);
 
     void updateCartItemGifts(Long loginUserId, Long cartItemId, CartItemGiftUpdateRequestDto dto);
-
-    //void updateCartItemGifts(Long loginUserId, Long cartItemId, List<CartItemGiftUpdateRequestDto.GiftItem> requestDto);
 
 }
