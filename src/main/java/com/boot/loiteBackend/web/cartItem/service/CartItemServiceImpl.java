@@ -113,9 +113,9 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         // 사은품 리스트 체크
-        if (item.getGifts() == null || item.getGifts().isEmpty()) {
+        /*if (item.getGifts() == null || item.getGifts().isEmpty()) {
             throw new CustomException(CartItemErrorCode.GIFT_REQUIRED);
-        }
+        }*/
 
         // 각 사은품 수량 체크
         int totalGiftQuantity = 0;
@@ -388,20 +388,16 @@ public class CartItemServiceImpl implements CartItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "사은품 수량이 상품 수량을 초과할 수 없습니다.");
         }
 
-        Map<Long, Integer> merged = dto.getGifts().stream()
-                .filter(g -> g.getProductGiftId() != null)
-                .filter(g -> g.getQuantity() != null && g.getQuantity() > 0) // 핵심: 0은 저장하지 않음
-                .collect(Collectors.toMap(
-                        CartItemGiftUpdateRequestDto.CartItemGiftUpdateDto::getProductGiftId,
-                        CartItemGiftUpdateRequestDto.CartItemGiftUpdateDto::getQuantity,
-                        Integer::sum
-                ));
-
         // 기존 사은품 전체 삭제
         cartItemGiftRepository.deleteByCartItemId(cartItemId);
 
         // 새 사은품 저장
         for (CartItemGiftUpdateRequestDto.CartItemGiftUpdateDto gift : dto.getGifts()) {
+            Integer qty = gift.getQuantity();
+            if (qty == null || qty <= 0) {
+                continue;
+            }
+            
             CartItemGiftEntity newGift = CartItemGiftEntity.builder()
                     .cartItemId(cartItemId)
                     .giftId(gift.getProductGiftId())
