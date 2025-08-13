@@ -26,6 +26,7 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
         o.OPTION_VALUE             AS optionValue,
         o.OPTION_ADDITIONAL_PRICE  AS optionAdditionalPrice,
         o.OPTION_STOCK             AS optionStock,
+        o.SOLD_OUT_YN              AS optionSoldOutYn,
         ci.CART_ITEM_QUANTITY      AS quantity,
         p.PRODUCT_PRICE            AS unitPrice,
         p.DISCOUNTED_PRICE         AS discountedPrice,

@@ -1,6 +1,7 @@
 package com.boot.loiteBackend.admin.product.gift.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class AdminGiftRequestDto {
     @Schema(description = "사은품 ID", example = "1, 2, 3 ...")
     private Long giftId;

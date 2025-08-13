@@ -2,6 +2,7 @@ package com.boot.loiteBackend.admin.product.gift.controller;
 
 import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftRequestDto;
 import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftResponseDto;
+import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftUpdateRequestDto;
 import com.boot.loiteBackend.admin.product.gift.service.AdminGiftService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +31,7 @@ public class AdminGiftController {
 
     @Operation(summary = "사은품 수정", description = "사은품을 수정합니다.")
     @PutMapping("/{giftId}")
-    public ResponseEntity<String> updateGift(@PathVariable Long giftId, @RequestBody AdminGiftRequestDto dto) {
+    public ResponseEntity<String> updateGift(@PathVariable Long giftId, @RequestBody AdminGiftUpdateRequestDto dto) {
         adminGiftService.updateGift(giftId, dto);
         return ResponseEntity.ok("사은품이 수정되었습니다.");
     }

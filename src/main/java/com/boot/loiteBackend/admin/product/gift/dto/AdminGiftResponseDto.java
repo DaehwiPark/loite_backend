@@ -1,13 +1,12 @@
 package com.boot.loiteBackend.admin.product.gift.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class AdminGiftResponseDto {
     @Schema(description = "사은품 ID", example = "1, 2, 3 ...")

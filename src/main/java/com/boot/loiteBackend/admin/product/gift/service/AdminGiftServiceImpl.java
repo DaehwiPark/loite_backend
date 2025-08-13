@@ -2,6 +2,7 @@ package com.boot.loiteBackend.admin.product.gift.service;
 
 import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftRequestDto;
 import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftResponseDto;
+import com.boot.loiteBackend.admin.product.gift.dto.AdminGiftUpdateRequestDto;
 import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
 import com.boot.loiteBackend.admin.product.gift.mapper.AdminGiftMapper;
 import com.boot.loiteBackend.admin.product.gift.repository.AdminGiftRepository;
@@ -47,12 +48,13 @@ public class AdminGiftServiceImpl implements AdminGiftService {
     }
 
     @Override
-    public void updateGift(Long giftId, AdminGiftRequestDto dto) {
+    public void updateGift(Long giftId, AdminGiftUpdateRequestDto dto) {
         AdminGiftEntity gift = adminGiftRepository.findById(giftId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 사은품이 존재하지 않습니다."));
 
         gift.setGiftName(dto.getGiftName());
         gift.setGiftStock(dto.getGiftStock());
+        gift.setGiftImageUrl(dto.getGiftImageUrl());
         gift.setSoldOutYn(dto.getGiftStock() <= 0 ? "Y" : "N");
         gift.setActiveYn(dto.getActiveYn() != null ? dto.getActiveYn() : gift.getActiveYn());
         gift.setUpdatedAt(LocalDateTime.now());

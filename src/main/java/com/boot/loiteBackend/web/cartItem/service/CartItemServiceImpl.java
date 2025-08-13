@@ -190,6 +190,7 @@ public class CartItemServiceImpl implements CartItemService {
                         .giftImageUrl(p.getGiftImageUrl())
                         .giftStock(p.getGiftStock())
                         .quantity(p.getQuantity())
+                        .giftSoldOutYn(Optional.ofNullable(p.getGiftStock()).orElse(0) <= 0)
                         .build())
                 .collect(Collectors.groupingBy(CartItemGiftResponseDto::getCartItemId));
 
@@ -222,6 +223,7 @@ public class CartItemServiceImpl implements CartItemService {
                             .optionType(p.getOptionType())
                             .optionValue(p.getOptionValue())
                             .optionAdditionalPrice(p.getOptionAdditionalPrice())
+                            .optionSoldOutYn(Optional.ofNullable(p.getOptionStock()).orElse(0) <= 0)
                             .quantity(quantity)
                             .unitPrice(p.getUnitPrice())
                             .discountedPrice(p.getDiscountedPrice())
@@ -257,47 +259,6 @@ public class CartItemServiceImpl implements CartItemService {
 
         cartItemRepository.deleteAll(cartItems);
     }
-
-
-//    @Override
-//    @Transactional
-//    public void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto) {
-//        CartItemEntity cartItem = cartItemRepository.findById(cartItemId)
-//                .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));
-//
-//        AdminProductOptionEntity newOption = productOptionRepository.findById(requestDto.getProductOptionId())
-//                .orElseThrow(() -> new IllegalArgumentException("해당 옵션이 존재하지 않습니다."));
-//
-//        if ("Y".equals(newOption.getSoldOutYn())) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "품절된 옵션으로 변경할 수 없습니다.");
-//        }
-//
-//        cartItem.setProductOptionId(newOption.getOptionId());
-//        if (requestDto.getQuantity() != null && requestDto.getQuantity() > 0) {
-//            cartItem.setQuantity(requestDto.getQuantity());
-//
-//            List<CartItemGiftEntity> gifts = cartItemGiftRepository.findByCartItemId(cartItemId);
-//            int totalGiftQty = gifts.stream().mapToInt(CartItemGiftEntity::getQuantity).sum();
-//
-//            int newQuantity = requestDto.getQuantity();
-//
-//            if (totalGiftQty > newQuantity) {
-//                int toRemove = totalGiftQty - newQuantity;
-//                for (CartItemGiftEntity gift : gifts) {
-//                    int q = gift.getQuantity();
-//                    if (q <= toRemove) {
-//                        toRemove -= q;
-//                        cartItemGiftRepository.delete(gift); // 초과된 사은품 삭제
-//                    } else {
-//                        gift.setQuantity(q - toRemove); // 일부만 줄이기
-//                        cartItemGiftRepository.save(gift);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        cartItem.setUpdatedAt(LocalDateTime.now());
-//    }
 
     @Override
     @Transactional
@@ -426,6 +387,15 @@ public class CartItemServiceImpl implements CartItemService {
         if (totalGiftQuantity > productQuantity) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "사은품 수량이 상품 수량을 초과할 수 없습니다.");
         }
+
+        Map<Long, Integer> merged = dto.getGifts().stream()
+                .filter(g -> g.getProductGiftId() != null)
+                .filter(g -> g.getQuantity() != null && g.getQuantity() > 0) // 핵심: 0은 저장하지 않음
+                .collect(Collectors.toMap(
+                        CartItemGiftUpdateRequestDto.CartItemGiftUpdateDto::getProductGiftId,
+                        CartItemGiftUpdateRequestDto.CartItemGiftUpdateDto::getQuantity,
+                        Integer::sum
+                ));
 
         // 기존 사은품 전체 삭제
         cartItemGiftRepository.deleteByCartItemId(cartItemId);

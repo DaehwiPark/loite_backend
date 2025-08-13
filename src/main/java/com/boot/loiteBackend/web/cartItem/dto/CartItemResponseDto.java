@@ -40,6 +40,9 @@ public class CartItemResponseDto {
     @Schema(description = "재고", example = "100")
     private Integer optionStock;
 
+    @Schema(description = "옵션 품절 여부", example = "true,false")
+    private boolean optionSoldOutYn;
+
     @Schema(description = "주문 수량", example = "2")
     private int quantity;
 

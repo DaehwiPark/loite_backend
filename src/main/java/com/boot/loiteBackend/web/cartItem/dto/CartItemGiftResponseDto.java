@@ -27,4 +27,7 @@ public class CartItemGiftResponseDto {
 
     @Schema(description = "사은품 수량", example = "2")
     private Integer quantity;
+
+    @Schema(description = "사은품 품절 여부", example = "true,false")
+    private boolean giftSoldOutYn;
 }
