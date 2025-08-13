@@ -63,7 +63,8 @@ public class CartItemResponseDto {
 
     public BigDecimal getTotalPrice() {
         BigDecimal basePrice = discountedPrice != null ? discountedPrice : unitPrice;
-        BigDecimal totalUnit = basePrice.add(BigDecimal.valueOf(optionAdditionalPrice));
+        int additionalPrice = optionAdditionalPrice != null ? optionAdditionalPrice : 0; // null 처리
+        BigDecimal totalUnit = basePrice.add(BigDecimal.valueOf(additionalPrice));
         return totalUnit.multiply(BigDecimal.valueOf(quantity));
     }
 }

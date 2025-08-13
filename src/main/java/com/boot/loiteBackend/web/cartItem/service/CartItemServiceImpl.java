@@ -16,6 +16,8 @@ import com.boot.loiteBackend.web.cartItem.repository.CartItemGiftRepository;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemOptionRepository;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemProductGiftRepository;
 import com.boot.loiteBackend.web.cartItem.repository.CartItemRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CartItemServiceImpl implements CartItemService {
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final CartItemRepository cartItemRepository;
     private final CartItemGiftRepository cartItemGiftRepository;
@@ -172,6 +176,7 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     @Transactional(readOnly = true)
     public List<CartItemResponseDto> getCartItemsByUser(Long loginUserId) {
+        entityManager.clear();
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         List<CartItemProjection> items = cartItemRepository.findCartItemsByUserId(loginUserId, oneMonthAgo);
 
