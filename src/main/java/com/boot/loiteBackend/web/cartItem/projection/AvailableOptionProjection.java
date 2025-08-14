@@ -6,4 +6,5 @@ public interface AvailableOptionProjection {
     String getOptionValue();
     String getColorCode();
     Integer getQuantity();
+    Integer getOptionStock();
 }

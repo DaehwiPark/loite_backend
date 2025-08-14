@@ -347,12 +347,15 @@ public class CartItemServiceImpl implements CartItemService {
 
         // 2. Projection → DTO 변환
         return projections.stream()
-                .map(p -> new AvailableOptionResponseDto(
-                        p.getOptionId(),
-                        p.getOptionValue(),
-                        p.getColorCode(),
-                        p.getQuantity()
-                ))
+                .map(p -> AvailableOptionResponseDto.builder()
+                        .optionId(p.getOptionId())
+                        .optionValue(p.getOptionValue())
+                        .colorCode(p.getColorCode())
+                        .quantity(p.getQuantity())
+                        .optionStock(p.getOptionStock())
+                        .optionSoldOutYn(Optional.ofNullable(p.getOptionStock()).orElse(0) <= 0)
+                        .build()
+                )
                 .toList();
     }
 
@@ -363,16 +366,18 @@ public class CartItemServiceImpl implements CartItemService {
                 cartItemProductGiftRepository.findAvailableGiftsForReselect(cartItemId);
 
         return projectionList.stream()
-                .map(p -> new AvailableGiftResponseDto(
-                        p.getProductGiftId(),
-                        p.getGiftName(),
-                        p.getGiftImageUrl(),
-                        p.getGiftStock(),
-                        p.getProductName(),
-                        p.getOptionValue(),
-                        p.getOptionColorCode(),
-                        p.getQuantity()
-                ))
+                .map(p -> AvailableGiftResponseDto.builder()
+                        .productGiftId(p.getProductGiftId())
+                        .giftName(p.getGiftName())
+                        .giftImageUrl(p.getGiftImageUrl())
+                        .giftStock(p.getGiftStock())
+                        .productName(p.getProductName())
+                        .optionValue(p.getOptionValue())
+                        .optionColorCode(p.getOptionColorCode())
+                        .quantity(p.getQuantity())
+                        .giftSoldOutYn(Optional.ofNullable(p.getGiftStock()).orElse(0) <= 0)
+                        .build()
+                )
                 .toList();
     }
 

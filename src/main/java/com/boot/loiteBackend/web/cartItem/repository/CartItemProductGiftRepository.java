@@ -19,7 +19,8 @@ public interface CartItemProductGiftRepository extends JpaRepository<CartItemEnt
         p.PRODUCT_NAME       AS productName,
         po.OPTION_VALUE      AS optionValue,
         po.OPTION_COLOR_CODE AS optionColorCode,
-        cig.GIFT_QUANTITY    AS quantity
+        COALESCE(cig.GIFT_QUANTITY, 0) AS quantity,
+        g.SOLD_OUT_YN      AS giftSoldOutYn
     FROM TB_PRODUCT_CART_ITEM ci
     JOIN TB_PRODUCT p
         ON ci.PRODUCT_ID = p.PRODUCT_ID

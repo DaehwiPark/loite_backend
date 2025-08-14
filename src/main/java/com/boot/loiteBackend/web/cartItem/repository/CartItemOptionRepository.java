@@ -14,6 +14,7 @@ public interface CartItemOptionRepository extends JpaRepository<CartItemEntity, 
                 po.OPTION_ID         AS optionId,
                 po.OPTION_VALUE      AS optionValue,
                 po.OPTION_COLOR_CODE AS colorCode,
+                po.OPTION_STOCK      AS optionStock,
                 CASE WHEN po.OPTION_ID = ci.PRODUCT_OPTION_ID
                      THEN ci.CART_ITEM_QUANTITY
                      ELSE 0

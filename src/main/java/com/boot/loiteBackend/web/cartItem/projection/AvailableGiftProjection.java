@@ -9,4 +9,6 @@ public interface AvailableGiftProjection {
     String getOptionValue();
     String getOptionColorCode();
     Integer getQuantity();
+
+    String getGiftSoldOutYn();
 }

@@ -1,15 +1,13 @@
 package com.boot.loiteBackend.web.cartItem.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AvailableGiftResponseDto {
 
     @Schema(description = "연결 상품의 사은품 ID", example = "1")
@@ -35,4 +33,7 @@ public class AvailableGiftResponseDto {
 
     @Schema(description = "기존 수량 표시", example = "2")
     private Integer quantity;
+
+    @Schema(description = "사은품 품절 여부", example = "true,false")
+    private boolean giftSoldOutYn;
 }
