@@ -4,7 +4,6 @@ import com.boot.loiteBackend.web.delivery.enums.DeliveryStatus;
 import com.boot.loiteBackend.web.order.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,6 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "tb_order")
 public class OrderEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ORDER_ID")
