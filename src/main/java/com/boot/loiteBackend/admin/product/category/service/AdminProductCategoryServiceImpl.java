@@ -5,11 +5,14 @@ import com.boot.loiteBackend.admin.product.category.dto.AdminProductCategoryResp
 import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
 import com.boot.loiteBackend.admin.product.category.mapper.AdminProductCategoryMapper;
 import com.boot.loiteBackend.admin.product.category.repository.AdminProductCategoryRepository;
+import com.boot.loiteBackend.common.file.FileService;
+import com.boot.loiteBackend.common.file.FileUploadResult;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,9 +26,10 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
     private final AdminProductCategoryRepository productCategoryRepository;
     private final AdminProductCategoryMapper adminProductCategoryMapper;
     private final ModelMapper modelMapper;
+    private final FileService fileService;
 
     @Override
-    public Long saveCategory(AdminProductCategoryRequestDto dto) {
+    public Long saveCategory(AdminProductCategoryRequestDto dto, MultipartFile imageFile) {
         if (dto.getCategoryId() == null) {
             // 신규 등록
             AdminProductCategoryEntity category = adminProductCategoryMapper.toEntity(dto);
@@ -40,6 +44,12 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
             if (category.getDeleteYn() == null) category.setDeleteYn("N");
             if (category.getCategoryDepth() == null) {
                 category.setCategoryDepth(dto.getCategoryParentId() == null ? 1 : calculateDepth(dto.getCategoryParentId()));
+            }
+            if (imageFile != null && !imageFile.isEmpty()) {
+                FileUploadResult result = fileService.save(imageFile, "category");
+                if (result != null) {
+                    category.setCategoryImageUrl(result.getUrlPath());
+                }
             }
 
             category.setCreatedAt(LocalDateTime.now());
@@ -67,6 +77,15 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
             } else {
                 category.setCategoryParentId(null);
                 category.setCategoryDepth(1);
+            }
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                FileUploadResult result = fileService.save(imageFile, "category");
+                if (result != null) {
+                    category.setCategoryImageUrl(result.getUrlPath());
+                }
+            } else {
+                category.setCategoryImageUrl(dto.getCategoryImageUrl());
             }
 
             return category.getCategoryId();
