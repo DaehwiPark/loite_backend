@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.user.address.service;
 
-import com.boot.loiteBackend.domain.useraddress.entity.UserAddressEntity;
+import com.boot.loiteBackend.domain.user.address.entity.UserAddressEntity;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.user.address.dto.UserAddressCreateDto;
 import com.boot.loiteBackend.web.user.address.dto.UserAddressDto;
@@ -30,11 +30,9 @@ public class UserAddressServiceImpl implements UserAddressService {
 
         // MapStruct로 변환
         UserAddressEntity entity = mapper.toEntity(req);
-        // 서비스 레이어에서 보완 세팅
         entity.setUserId(userId);
         entity.setDeleted(false);
 
-        // 저장 후 DTO 변환
         return mapper.toDto(repository.save(entity));
     }
 
@@ -108,14 +106,19 @@ public class UserAddressServiceImpl implements UserAddressService {
         // 1) 기존 기본 플래그 해제 (flush + clear)
         repository.resetDefaultForUser(userId);
 
-        // 2) 대상 재조회 (영속)
         UserAddressEntity target = repository.findByIdAndUserIdAndIsDeletedFalse(addressId, userId)
                 .orElseThrow(() -> new CustomException(UserAddressErrorCode.ADDRESS_NOT_FOUND));
 
-        // 3) 지정
         if (!target.isDefault()) {
-            target.setDefault(true); // 영속 상태라 커밋 시 반영
+            target.setDefault(true);
         }
     }
 
+    @Override
+    @Transactional
+    public void unDefault(Long userId) {
+        UserAddressEntity currentDefault = repository.findByUserIdAndIsDefaultTrueAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new CustomException(UserAddressErrorCode.DEFAULT_ADDRESS_NOT_FOUND));
+        currentDefault.setDefault(false);
+    }
 }

@@ -8,10 +8,18 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserAddressService {
     UserAddressDto create(Long userId, UserAddressCreateDto req);
+
     UserAddressDto update(Long userId, Long addressId, UserAddressUpdateDto req);
+
     void delete(Long userId, Long addressId); // soft delete
+
     Page<UserAddressDto> list(Long userId, String q, Pageable pageable);
+
     UserAddressDto detail(Long userId, Long addressId);
+
     UserAddressDto getDefault(Long userId);
+
     void setDefault(Long userId, Long addressId);
+
+    void unDefault(Long userId);
 }

@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.user.address.repository;
 
-import com.boot.loiteBackend.domain.useraddress.entity.UserAddressEntity;
+import com.boot.loiteBackend.domain.user.address.entity.UserAddressEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -22,7 +22,7 @@ public interface UserAddressRepository extends JpaRepository<UserAddressEntity, 
              AND (
                  :q IS NULL OR :q = '' OR
                  LOWER(COALESCE(a.alias, ''))         LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.recipientName, ''))  LIKE CONCAT('%', LOWER(:q), '%') OR
+                 LOWER(COALESCE(a.receiverName, ''))  LIKE CONCAT('%', LOWER(:q), '%') OR
                  LOWER(COALESCE(a.zipCode, ''))        LIKE CONCAT('%', LOWER(:q), '%') OR
                  LOWER(COALESCE(a.addressLine1, ''))   LIKE CONCAT('%', LOWER(:q), '%') OR
                  LOWER(COALESCE(a.addressLine2, ''))   LIKE CONCAT('%', LOWER(:q), '%')
@@ -35,7 +35,7 @@ public interface UserAddressRepository extends JpaRepository<UserAddressEntity, 
              AND (
                  :q IS NULL OR :q = '' OR
                  LOWER(COALESCE(a.alias, ''))         LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.recipientName, ''))  LIKE CONCAT('%', LOWER(:q), '%') OR
+                 LOWER(COALESCE(a.receiverName, ''))  LIKE CONCAT('%', LOWER(:q), '%') OR
                  LOWER(COALESCE(a.zipCode, ''))        LIKE CONCAT('%', LOWER(:q), '%') OR
                  LOWER(COALESCE(a.addressLine1, ''))   LIKE CONCAT('%', LOWER(:q), '%') OR
                  LOWER(COALESCE(a.addressLine2, ''))   LIKE CONCAT('%', LOWER(:q), '%')
@@ -49,7 +49,6 @@ public interface UserAddressRepository extends JpaRepository<UserAddressEntity, 
 
     Optional<UserAddressEntity> findByUserIdAndIsDefaultTrueAndIsDeletedFalse(Long userId);
 
-    boolean existsByUserIdAndIsDefaultTrueAndIsDeletedFalse(Long userId);
 
     /**
      * 유저의 기존 기본 배송지 플래그를 일괄 해제

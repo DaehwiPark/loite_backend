@@ -1,6 +1,6 @@
 package com.boot.loiteBackend.web.user.address.mapper;
 
-import com.boot.loiteBackend.domain.useraddress.entity.UserAddressEntity;
+import com.boot.loiteBackend.domain.user.address.entity.UserAddressEntity;
 import com.boot.loiteBackend.web.user.address.dto.UserAddressCreateDto;
 import com.boot.loiteBackend.web.user.address.dto.UserAddressDto;
 import com.boot.loiteBackend.web.user.address.dto.UserAddressUpdateDto;
@@ -40,11 +40,10 @@ public interface UserAddressMapper {
     default void after(@MappingTarget UserAddressEntity entity) {
         // 공통 후처리 필요 시 (예: alias/recipientName trim 등)
         if (entity.getAlias() != null) entity.setAlias(entity.getAlias().trim());
-        if (entity.getRecipientName() != null) entity.setRecipientName(entity.getRecipientName().trim());
-        if (entity.getRecipientPhone() != null) entity.setRecipientPhone(entity.getRecipientPhone().trim());
+        if (entity.getReceiverName() != null) entity.setReceiverName(entity.getReceiverName().trim());
+        if (entity.getReceiverPhone() != null) entity.setReceiverPhone(entity.getReceiverPhone().trim());
         if (entity.getZipCode() != null) entity.setZipCode(entity.getZipCode().trim());
         if (entity.getAddressLine1() != null) entity.setAddressLine1(entity.getAddressLine1().trim());
         if (entity.getAddressLine2() != null) entity.setAddressLine2(entity.getAddressLine2().trim());
-        if (entity.getDeliveryRequest() != null) entity.setDeliveryRequest(entity.getDeliveryRequest().trim());
     }
 }
