@@ -28,7 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://211.234.108.224:3000",
                         "https://www.loite.co.kr",
                         "https://loite.co.kr",
-                        "https://admin.loite.co.kr"
+                        "https://admin.loite.co.kr",
+                        "http://192.168.0.73:5173"
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

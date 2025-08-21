@@ -35,7 +35,7 @@ public class AdminProductOptionEntity {
     private String optionColorCode;
 
     @Column(name = "OPTION_ADDITIONAL_PRICE")
-    private int optionAdditionalPrice;
+    private Integer optionAdditionalPrice;
 
     @Column(name = "OPTION_STOCK")
     private int optionStock;
