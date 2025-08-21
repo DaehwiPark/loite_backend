@@ -22,7 +22,7 @@ public class SupportFaqController {
     private final SupportFaqService supportFaqService;
 
     @Operation(
-            summary = "중분류 ID 기준 FAQ 목록 조회",
+            summary = "FAQ 목록 전체 조회(중분류 ID 기준)",
             description = "FAQ 리스트를 조회합니다. 표시순서(faqOrder) 오름차순 정렬, 페이지네이션 포함"
     )
     @GetMapping
@@ -37,7 +37,7 @@ public class SupportFaqController {
     }
 
     @Operation(
-            summary = "대분류 ID 기준 FAQ 목록 전체 카테고리 조회",
+            summary = "FAQ 목록 전체 조회(대분류 ID 기준)",
             description = "중분류들의 FAQ를 모두 조회합니다. 표시순서 기준 정렬, 페이지네이션 포함"
     )
     @GetMapping("/all")
