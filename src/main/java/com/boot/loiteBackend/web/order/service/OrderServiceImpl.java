@@ -238,7 +238,7 @@ public class OrderServiceImpl implements OrderService {
                     .receiverName(order.getReceiverName())
                     .receiverPhone(order.getReceiverPhone())
                     .receiverAddress(order.getReceiverAddress())
-                    .receiverAddress(order.getReceiverAddress())
+                    .receiverMemo(order.getReceiverMemo())
                     .createdAt(order.getCreatedAt())
                     .items(responseItems)
                     .build();
