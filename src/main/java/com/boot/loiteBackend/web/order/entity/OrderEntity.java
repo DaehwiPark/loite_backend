@@ -56,6 +56,9 @@ public class OrderEntity {
     @Column(name = "RECEIVER_ADDRESS", nullable = false, length = 255)
     private String receiverAddress;
 
+    @Column(name = "RECEIVER_MEMO", nullable = false, length = 255)
+    private String receiverMemo;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "DELIVERY_STATUS", nullable = false, length = 20)
     private DeliveryStatus deliveryStatus;

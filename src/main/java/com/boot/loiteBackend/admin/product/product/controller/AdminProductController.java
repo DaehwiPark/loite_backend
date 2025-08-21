@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/product/product")
-@Tag(name = "Product Management", description = "상품 관리 API")
+@Tag(name = "상품 API", description = "상품 관리 API")
 public class AdminProductController {
 
     private final AdminProductService adminProductService;

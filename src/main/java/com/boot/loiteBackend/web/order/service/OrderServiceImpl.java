@@ -61,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
                 .receiverName(requestDto.getReceiverName())
                 .receiverPhone(requestDto.getReceiverPhone())
                 .receiverAddress(requestDto.getReceiverAddress())
+                .receiverMemo(requestDto.getReceiverMemo())
                 .deliveryStatus(DeliveryStatus.READY)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -201,6 +202,7 @@ public class OrderServiceImpl implements OrderService {
                 .receiverName(order.getReceiverName())
                 .receiverPhone(order.getReceiverPhone())
                 .receiverAddress(order.getReceiverAddress())
+                .receiverMemo(order.getReceiverMemo())
                 .createdAt(order.getCreatedAt())
                 .items(responseItems)
                 .build();
@@ -236,6 +238,7 @@ public class OrderServiceImpl implements OrderService {
                     .receiverName(order.getReceiverName())
                     .receiverPhone(order.getReceiverPhone())
                     .receiverAddress(order.getReceiverAddress())
+                    .receiverMemo(order.getReceiverMemo())
                     .createdAt(order.getCreatedAt())
                     .items(responseItems)
                     .build();

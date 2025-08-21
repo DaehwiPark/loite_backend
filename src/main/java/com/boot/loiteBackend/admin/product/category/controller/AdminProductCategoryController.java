@@ -7,22 +7,25 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/product/category")
-@Tag(name = "Category Management", description = "카테고리 관리 API")
+@Tag(name = "카테고리 API", description = "카테고리 관리 API")
 public class AdminProductCategoryController {
+
     private final AdminProductCategoryService adminProductCategoryService;
 
     @Operation(summary = "카테고리 등록", description = "카테고리를 등록합니다.")
-    @PostMapping
-    public ResponseEntity<Long> saveCategory(@RequestBody @Valid AdminProductCategoryRequestDto dto){
-        Long saveId = adminProductCategoryService.saveCategory(dto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Long> saveCategory(@ModelAttribute AdminProductCategoryRequestDto dto, @RequestParam("imageFile") MultipartFile imageFile){
+        Long saveId = adminProductCategoryService.saveCategory(dto, imageFile);
 
         return ResponseEntity.ok(saveId);
     }

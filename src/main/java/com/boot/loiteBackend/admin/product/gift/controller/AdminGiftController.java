@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/product/gift")
 @RequiredArgsConstructor
-@Tag(name = "Gift Management", description = "사은품 관리 API")
+@Tag(name = "사은품 API", description = "사은품 관리 API")
 public class AdminGiftController {
 
     private final AdminGiftService adminGiftService;

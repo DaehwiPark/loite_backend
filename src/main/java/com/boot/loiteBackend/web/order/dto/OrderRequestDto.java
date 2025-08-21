@@ -22,6 +22,9 @@ public class OrderRequestDto {
     @Schema(description = "수령인 주소", example = "서울 강남구 테헤란로 123")
     private String receiverAddress;
 
+    @Schema(description = "배송 요청 사항", example = "고생 많으십니다.")
+    private String receiverMemo;
+
     @Schema(description = "결제수단", example = "CARD")
     private String paymentMethod;
 

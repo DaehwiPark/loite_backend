@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/product/brand")
-@Tag(name = "Brand Management", description = "브랜드 관리 API")
+@Tag(name = "브랜드 API", description = "브랜드 관리 API")
 public class AdminProductBrandController {
     private final AdminProductBrandService adminProductBrandService;
 

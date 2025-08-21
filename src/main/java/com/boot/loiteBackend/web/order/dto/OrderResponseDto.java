@@ -47,6 +47,9 @@ public class OrderResponseDto {
     @Schema(description = "배송지 주소", example = "서울특별시 강남구 테헤란로 123")
     private String receiverAddress;
 
+    @Schema(description = "배송 요청 사항", example = "고생 많으십니다.")
+    private String receiverMemo;
+
     @Schema(description = "주문 생성 일시", example = "2025-08-19T13:45:00")
     private LocalDateTime createdAt;
 

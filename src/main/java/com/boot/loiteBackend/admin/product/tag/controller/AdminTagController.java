@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/admin/product/tag")
-@Tag(name = "Tag Management", description = "상품 태그 관리 API")
+@Tag(name = "태그 API", description = "상품 태그 관리 API")
 public class AdminTagController {
     private final AdminTagService adminTagService;
 
