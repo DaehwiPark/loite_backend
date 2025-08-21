@@ -36,12 +36,14 @@ public class MileageOutboxEntity {
     private MileageOutboxEventType eventType;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(name = "mileage_outbox_status", nullable = false, length = 20)
     @Schema(description = "처리 상태 (PENDING, SUCCESS, FAILED)")
     private MileageOutboxStatus status = MileageOutboxStatus.PENDING;
 
     @Column(name = "mileage_outbox_retry_count")
     @Schema(description = "재시도 횟수")
+    @Builder.Default
     private Integer retryCount = 0;
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false,
