@@ -27,18 +27,18 @@ public class MileageOutboxProcessor {
 
     private static final int MAX_RETRY = 3;
 
-    @Scheduled(fixedDelay = 60000)
-    public void processOutboxEvents() {
-        System.out.println("스케줄러 실행");
-        List<MileageOutboxEntity> events = mileageOutboxRepository
-                .findTop10ByStatusInAndRetryCountLessThanOrderByLastAttemptAtAsc(
-                        List.of(MileageOutboxStatus.PENDING, MileageOutboxStatus.FAILED), 3
-                );
-
-        for (MileageOutboxEntity event : events) {
-            processEvent(event);
-        }
-    }
+//    @Scheduled(fixedDelay = 60000)
+//    public void processOutboxEvents() {
+//        System.out.println("스케줄러 실행");
+//        List<MileageOutboxEntity> events = mileageOutboxRepository
+//                .findTop10ByStatusInAndRetryCountLessThanOrderByLastAttemptAtAsc(
+//                        List.of(MileageOutboxStatus.PENDING, MileageOutboxStatus.FAILED), 3
+//                );
+//
+//        for (MileageOutboxEntity event : events) {
+//            processEvent(event);
+//        }
+//    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processEvent(MileageOutboxEntity event) {

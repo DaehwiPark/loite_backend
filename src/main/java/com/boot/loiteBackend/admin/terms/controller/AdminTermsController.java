@@ -48,7 +48,6 @@ public class AdminTermsController {
             @Parameter(description = "검색 키워드")
             @RequestParam(required = false) String keyword,
             @ParameterObject Pageable pageable) {
-
         Page<AdminTermsDto> result = adminTermsService.getPagedTerms(keyword, pageable);
         return ResponseEntity.ok(result);
     }
