@@ -117,6 +117,7 @@ public class ProductServiceImpl implements ProductService {
                             .productGiftId(pg.getProductGiftId())
                             .giftId(gift.getGiftId())
                             .giftName(gift.getGiftName())
+                            .giftImageUrl(gift.getGiftImageUrl())
                             .giftStock(gift.getGiftStock())
                             .soldOutYn("Y".equalsIgnoreCase(gift.getSoldOutYn()))
                             .build();

@@ -14,12 +14,15 @@ import com.boot.loiteBackend.web.order.enums.OrderStatus;
 import com.boot.loiteBackend.web.delivery.enums.DeliveryStatus;
 import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
 import com.boot.loiteBackend.web.order.repository.OrderRepository;
+import com.boot.loiteBackend.web.order.repository.OrderSequenceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,25 +34,30 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final AdminProductRepository productRepository;
     private final AdminProductOptionRepository optionRepository;
+    private final OrderSequenceRepository orderSequenceRepository;
 
     @Override
     @Transactional
     public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
-        // 1. 주문번호 생성 (실무에선 시퀀스 or UUID 사용)
-        String orderNumber = "ORD-" + System.currentTimeMillis();
+        // 1. 주문번호 생성
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        orderSequenceRepository.insertSeq(date);
+        Long seq = orderSequenceRepository.getLastSeq();
+        String orderNumber = "ORD-" + date + "-" + String.format("%06d", seq);
 
         // 2. 총액 계산을 위한 변수
-        BigDecimal calculatedTotal = BigDecimal.ZERO;
-        BigDecimal calculatedDiscount = BigDecimal.ZERO;
+        BigDecimal originalTotal = BigDecimal.ZERO;
+        BigDecimal discountedTotal = BigDecimal.ZERO;
 
         // 3. 주문 엔티티 생성 (상품 계산 전에 기본값 세팅)
         OrderEntity order = OrderEntity.builder()
                 .userId(userId)
                 .orderNumber(orderNumber)
                 .orderStatus(OrderStatus.CREATED)
-                .totalAmount(BigDecimal.ZERO)
+                .originalAmount(BigDecimal.ZERO)
                 .discountAmount(BigDecimal.ZERO)
-                .deliveryFee(requestDto.getDeliveryFee())
+                .deliveryFee(BigDecimal.ZERO)
+                .totalAmount(BigDecimal.ZERO)
                 .receiverName(requestDto.getReceiverName())
                 .receiverPhone(requestDto.getReceiverPhone())
                 .receiverAddress(requestDto.getReceiverAddress())
@@ -81,12 +89,14 @@ public class OrderServiceImpl implements OrderService {
             }
 
             // 4-4. 할인 적용가 (RequestDto에 들어온 할인 금액이 있으면 반영)
-            BigDecimal discountedPrice = itemDto.getDiscountedPrice() != null
-                    ? itemDto.getDiscountedPrice()
-                    : unitPrice;
+            BigDecimal discountedPrice = product.getDiscountedPrice();
+            if (option != null && option.getOptionAdditionalPrice() != null) {
+                discountedPrice = discountedPrice.add(BigDecimal.valueOf(option.getOptionAdditionalPrice()));
+            }
 
             // 4-5. 총액 = 수량 × 할인단가
-            BigDecimal totalPrice = discountedPrice.multiply(BigDecimal.valueOf(itemDto.getQuantity()));
+            BigDecimal itemOriginalTotal = unitPrice.multiply(BigDecimal.valueOf(itemDto.getQuantity()));
+            BigDecimal itemDiscountedTotal = discountedPrice.multiply(BigDecimal.valueOf(itemDto.getQuantity()));
 
             // 4-6. 주문 아이템 엔티티 생성
             OrderItemEntity orderItem = OrderItemEntity.builder()
@@ -96,24 +106,35 @@ public class OrderServiceImpl implements OrderService {
                     .quantity(itemDto.getQuantity())
                     .unitPrice(unitPrice)
                     .discountedPrice(discountedPrice)
-                    .totalPrice(totalPrice)
+                    .totalPrice(itemDiscountedTotal)
                     .createdAt(LocalDateTime.now())
                     .build();
 
             orderItems.add(orderItem);
 
             // 4-7. 누적 합산
-            calculatedTotal = calculatedTotal.add(totalPrice);
-            calculatedDiscount = calculatedDiscount.add(unitPrice.subtract(discountedPrice));
+            originalTotal = originalTotal.add(itemOriginalTotal);
+            discountedTotal = discountedTotal.add(itemDiscountedTotal);
         }
 
         // 5. 아이템들 저장
         orderItemRepository.saveAll(orderItems);
 
+        BigDecimal deliveryFee = BigDecimal.ZERO;
+        if (discountedTotal.compareTo(new BigDecimal("50000")) < 0) {
+            deliveryFee = new BigDecimal("3000"); // 기본 배송비
+        }
+
         // 6. 주문 총액/할인액 갱신 후 다시 저장
-        order.setTotalAmount(calculatedTotal.add(requestDto.getDeliveryFee()));
-        order.setDiscountAmount(calculatedDiscount);
+        BigDecimal discountAmount = originalTotal.subtract(discountedTotal);
+        BigDecimal finalPayAmount = discountedTotal.add(deliveryFee);
+
+        order.setOriginalAmount(originalTotal);
+        order.setDiscountAmount(discountAmount);
+        order.setTotalAmount(discountedTotal.add(deliveryFee));
+        order.setDeliveryFee(deliveryFee);
         order.setUpdatedAt(LocalDateTime.now());
+
         orderRepository.save(order);
 
         // 7. Response DTO 변환
@@ -133,8 +154,48 @@ public class OrderServiceImpl implements OrderService {
                 .orderId(order.getOrderId())
                 .orderNumber(order.getOrderNumber())
                 .orderStatus(order.getOrderStatus().name())
+                .originalAmount(originalTotal)
+                .discountAmount(discountAmount)
                 .totalAmount(order.getTotalAmount())
+                .deliveryFee(order.getDeliveryFee())
+                .payAmount(finalPayAmount)
+                .receiverName(order.getReceiverName())
+                .receiverPhone(order.getReceiverPhone())
+                .receiverAddress(order.getReceiverAddress())
+                .createdAt(order.getCreatedAt())
+                .items(responseItems)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public OrderResponseDto getOrder(Long userId, Long orderId) {
+        OrderEntity order = orderRepository.findByOrderIdAndUserId(orderId, userId)
+                .orElseThrow(() ->
+                    new IllegalArgumentException("주문을 찾을 수 없습니다.")
+                );
+
+        List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
+
+        List<OrderItemResponseDto> responseItems = items.stream()
+                .map(item -> OrderItemResponseDto.builder()
+                        .productId(item.getProduct().getProductId())
+                        .productName(item.getProduct().getProductName())
+                        .optionId(item.getOption() != null ? item.getOption().getOptionId() : null)
+                        .optionValue(item.getOption() != null ? item.getOption().getOptionValue() : null)
+                        .quantity(item.getQuantity())
+                        .unitPrice(item.getUnitPrice())
+                        .totalPrice(item.getTotalPrice())
+                        .build())
+                .toList();
+
+        return OrderResponseDto.builder()
+                .orderId(order.getOrderId())
+                .orderNumber(order.getOrderNumber())
+                .orderStatus(order.getOrderStatus().name())
+                .originalAmount(order.getOriginalAmount())
                 .discountAmount(order.getDiscountAmount())
+                .totalAmount(order.getTotalAmount())
                 .deliveryFee(order.getDeliveryFee())
                 .payAmount(order.getTotalAmount())
                 .receiverName(order.getReceiverName())
@@ -143,5 +204,41 @@ public class OrderServiceImpl implements OrderService {
                 .createdAt(order.getCreatedAt())
                 .items(responseItems)
                 .build();
+    }
+
+    public List<OrderResponseDto> getOrders(Long userId) {
+        List<OrderEntity> orders = orderRepository.findByUserId(userId);
+
+        return orders.stream().map(order -> {
+            List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
+
+            List<OrderItemResponseDto> responseItems = items.stream()
+                    .map(item -> OrderItemResponseDto.builder()
+                            .productId(item.getProduct().getProductId())
+                            .productName(item.getProduct().getProductName())
+                            .optionId(item.getOption() != null ? item.getOption().getOptionId() : null)
+                            .optionValue(item.getOption() != null ? item.getOption().getOptionValue() : null)
+                            .quantity(item.getQuantity())
+                            .unitPrice(item.getUnitPrice())
+                            .totalPrice(item.getTotalPrice())
+                            .build())
+                    .toList();
+
+            return OrderResponseDto.builder()
+                    .orderId(order.getOrderId())
+                    .orderNumber(order.getOrderNumber())
+                    .orderStatus(order.getOrderStatus().name())
+                    .originalAmount(order.getOriginalAmount())
+                    .discountAmount(order.getDiscountAmount())
+                    .totalAmount(order.getTotalAmount())
+                    .deliveryFee(order.getDeliveryFee())
+                    .payAmount(order.getTotalAmount())
+                    .receiverName(order.getReceiverName())
+                    .receiverPhone(order.getReceiverPhone())
+                    .receiverAddress(order.getReceiverAddress())
+                    .createdAt(order.getCreatedAt())
+                    .items(responseItems)
+                    .build();
+        }).toList();
     }
 }
