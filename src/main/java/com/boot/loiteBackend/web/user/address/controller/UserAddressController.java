@@ -64,8 +64,8 @@ public class UserAddressController {
             @Parameter(description = "검색 키워드")
             @RequestParam(required = false) String keyword,
             @ParameterObject
-            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable,
+            @Parameter(description = "페이징 정보 (기본값: size=10, sort=faqOrder ASC)")
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails loginUser
     ) {
         Long userId = loginUser.getUserId();

@@ -22,12 +22,16 @@ public class SupportFaqMediumCategoryDto {
     @Schema(description = "연결된 대분류 카테고리 ID", example = "1")
     private Long faqMajorCategoryId;
 
+    @Schema(description = "FAQ 중분류 카테고리 이미지 URL", example = "/files/faq-category/payment.png")
+    private String faqImageUrl;
+
     public static SupportFaqMediumCategoryDto from(SupportFaqMediumCategoryEntity entity) {
         return SupportFaqMediumCategoryDto.builder()
                 .faqMediumCategoryId(entity.getFaqMediumCategoryId())
                 .faqMediumCategoryName(entity.getFaqMediumCategoryName())
                 .faqMediumCategoryOrder(entity.getFaqMediumCategoryOrder())
                 .faqMajorCategoryId(entity.getFaqMajorCategory().getFaqMajorCategoryId())
+                .faqImageUrl(entity.getFaqImageUrl())
                 .build();
     }
 }
