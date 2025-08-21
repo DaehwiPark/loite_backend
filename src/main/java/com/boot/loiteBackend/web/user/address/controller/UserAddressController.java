@@ -98,4 +98,12 @@ public class UserAddressController {
         userAddressService.setDefault(userId, addressId);
         return ResponseEntity.ok(ApiResponse.ok(null, "기본 배송지가 설정되었습니다."));
     }
+
+    @Operation(summary = "기본 배송지 해제", description = "기본 배송지로 해제 합니다.")
+    @PostMapping("/unDefault")
+    public ResponseEntity<ApiResponse<Void>> unDefault(@AuthenticationPrincipal CustomUserDetails loginUser) {
+        Long userId = loginUser.getUserId();
+        userAddressService.unDefault(userId);
+        return ResponseEntity.ok(ApiResponse.ok(null, "기본 배송지가 해되었습니다."));
+    }
 }

@@ -38,9 +38,6 @@ public class UserAddressDto {
     @Schema(description = "주소 2 (상세 주소)", example = "101동 1001호")
     private String addressLine2;
 
-    @Schema(description = "배송 요청사항", example = "부재시 문앞에")
-    private String deliveryRequest;
-
     @JsonProperty("isDefault")
     @Schema(description = "기본 배송지 여부", example = "true")
     private boolean isDefault;
@@ -49,9 +46,9 @@ public class UserAddressDto {
     @Schema(description = "삭제 여부 (소프트 삭제 처리 여부)", example = "false")
     private boolean isDeleted;
 
-    @Schema(description = "배송지 등록일시 (ISO 8601)", example = "2025-08-20T09:00:00Z")
+    @Schema(description = "배송지 등록일시", example = "2025-08-20T09:00:00Z")
     private Instant createdAt;
 
-    @Schema(description = "배송지 수정일시 (ISO 8601)", example = "2025-08-20T09:10:00Z")
+    @Schema(description = "배송지 수정일시 ", example = "2025-08-20T09:10:00Z")
     private Instant updatedAt;
 }
