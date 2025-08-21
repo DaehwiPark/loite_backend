@@ -12,22 +12,13 @@ import java.math.BigDecimal;
 @Builder
 public class OrderItemRequestDto {
 
-    @Schema(description = "상품 ID", example = "101")
+    @Schema(description = "상품 ID", example = "2")
     private Long productId;
 
-    @Schema(description = "상품 옵션 ID (옵션 없는 상품이면 null)", example = "202")
+    @Schema(description = "상품 옵션 ID (없으면 null)", example = "3")
     private Long optionId;
 
-    @Schema(description = "주문 수량", example = "2")
+    @Schema(description = "주문 수량", example = "1")
     private int quantity;
-
-    @Schema(description = "상품 단가", example = "30000")
-    private BigDecimal unitPrice;
-
-    @Schema(description = "할인 적용 단가", example = "29000")
-    private BigDecimal discountedPrice;
-
-    @Schema(description = "총 금액 (수량 × 단가 - 할인)", example = "58000")
-    private BigDecimal totalPrice;
 }
 

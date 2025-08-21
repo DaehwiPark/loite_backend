@@ -19,25 +19,16 @@ public class OrderRequestDto {
     @Schema(description = "수령인 연락처", example = "010-1234-5678")
     private String receiverPhone;
 
-    @Schema(description = "수령인 주소", example = "서울특별시 강남구 테헤란로 123")
+    @Schema(description = "수령인 주소", example = "서울 강남구 테헤란로 123")
     private String receiverAddress;
 
-    @Schema(description = "결제 수단", example = "CARD") // CARD, KAKAOPAY, VIRTUAL_ACCOUNT 등
+    @Schema(description = "결제수단", example = "CARD")
     private String paymentMethod;
 
-    @Schema(description = "사용 마일리지", example = "1000") // 0이면 미사용
-    private int usedMileage;
+    @Schema(description = "사용 마일리지 (없으면 0)", example = "0")
+    private Integer usedMileage;
 
-    @Schema(description = "최종 결제 금액", example = "59000")
-    private BigDecimal totalAmount;
-
-    @Schema(description = "할인 금액", example = "1000")
-    private BigDecimal discountAmount;
-
-    @Schema(description = "배송비", example = "3000")
-    private BigDecimal deliveryFee;
-
-    @Schema(description = "주문 상품 목록")
+    @Schema(description = "주문 상품 리스트")
     private List<OrderItemRequestDto> orderItems;
 }
 

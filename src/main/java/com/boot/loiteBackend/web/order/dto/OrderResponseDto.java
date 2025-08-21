@@ -23,11 +23,14 @@ public class OrderResponseDto {
     @Schema(description = "주문 상태", example = "PENDING")
     private String orderStatus;
 
-    @Schema(description = "총 결제 금액", example = "120000")
-    private BigDecimal totalAmount;
+    @Schema(description = "원가 결제 금액", example = "120000")
+    private BigDecimal originalAmount;
 
     @Schema(description = "할인 금액", example = "5000")
     private BigDecimal discountAmount;
+
+    @Schema(description = "총 결제 금액", example = "120000")
+    private BigDecimal totalAmount;
 
     @Schema(description = "배송비", example = "3000")
     private BigDecimal deliveryFee;

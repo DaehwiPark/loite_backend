@@ -92,6 +92,9 @@ public class ProductDetailResponseDto {
         @Schema(description = "사은품명", example = "코튼 러그")
         private String giftName;
 
+        @Schema(description = "사은품 이미지", example = "example")
+        private String giftImageUrl;
+
         @Schema(description = "사은품 재고 수량", example = "5")
         private int giftStock;
 

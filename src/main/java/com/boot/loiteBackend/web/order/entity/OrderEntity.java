@@ -32,11 +32,14 @@ public class OrderEntity {
     @Column(name = "ORDER_STATUS", nullable = false, length = 20)
     private OrderStatus orderStatus;
 
-    @Column(name = "TOTAL_AMOUNT", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalAmount;
+    @Column(name = "ORIGINAL_AMOUNT", nullable = false, precision = 15, scale = 2)
+    private BigDecimal originalAmount;
 
     @Column(name = "DISCOUNT_AMOUNT", precision = 15, scale = 2)
     private BigDecimal discountAmount;
+
+    @Column(name = "TOTAL_AMOUNT", precision = 15, scale = 2)
+    private BigDecimal totalAmount;
 
     @Column(name = "DELIVERY_FEE", precision = 15, scale = 2)
     private BigDecimal deliveryFee;
