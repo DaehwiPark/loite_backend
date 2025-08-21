@@ -1,0 +1,147 @@
+package com.boot.loiteBackend.web.order.service;
+
+import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
+import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.product.repository.AdminProductRepository;
+import com.boot.loiteBackend.web.order.dto.OrderItemRequestDto;
+import com.boot.loiteBackend.web.order.dto.OrderItemResponseDto;
+import com.boot.loiteBackend.web.order.dto.OrderRequestDto;
+import com.boot.loiteBackend.web.order.dto.OrderResponseDto;
+import com.boot.loiteBackend.web.order.entity.OrderEntity;
+import com.boot.loiteBackend.web.order.entity.OrderItemEntity;
+import com.boot.loiteBackend.web.order.enums.OrderStatus;
+import com.boot.loiteBackend.web.delivery.enums.DeliveryStatus;
+import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
+import com.boot.loiteBackend.web.order.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService {
+
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final AdminProductRepository productRepository;
+    private final AdminProductOptionRepository optionRepository;
+
+    @Override
+    @Transactional
+    public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
+        // 1. 주문번호 생성 (실무에선 시퀀스 or UUID 사용)
+        String orderNumber = "ORD-" + System.currentTimeMillis();
+
+        // 2. 총액 계산을 위한 변수
+        BigDecimal calculatedTotal = BigDecimal.ZERO;
+        BigDecimal calculatedDiscount = BigDecimal.ZERO;
+
+        // 3. 주문 엔티티 생성 (상품 계산 전에 기본값 세팅)
+        OrderEntity order = OrderEntity.builder()
+                .userId(userId)
+                .orderNumber(orderNumber)
+                .orderStatus(OrderStatus.CREATED)
+                .totalAmount(BigDecimal.ZERO)
+                .discountAmount(BigDecimal.ZERO)
+                .deliveryFee(requestDto.getDeliveryFee())
+                .receiverName(requestDto.getReceiverName())
+                .receiverPhone(requestDto.getReceiverPhone())
+                .receiverAddress(requestDto.getReceiverAddress())
+                .deliveryStatus(DeliveryStatus.READY)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        orderRepository.save(order);
+
+        // 4. 주문 상품 리스트 처리
+        List<OrderItemEntity> orderItems = new ArrayList<>();
+
+        for (OrderItemRequestDto itemDto : requestDto.getOrderItems()) {
+            // 4-1. 상품 조회
+            AdminProductEntity product = productRepository.findById(itemDto.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+            // 4-2. 옵션 조회 (있으면)
+            AdminProductOptionEntity option = null;
+            if (itemDto.getOptionId() != null) {
+                option = optionRepository.findById(itemDto.getOptionId())
+                        .orElseThrow(() -> new IllegalArgumentException("옵션을 찾을 수 없습니다."));
+            }
+
+            // 4-3. 단가 계산 (상품가격 + 옵션 추가금액)
+            BigDecimal unitPrice = product.getProductPrice();
+            if (option != null && option.getOptionAdditionalPrice() != null) {
+                unitPrice = unitPrice.add(BigDecimal.valueOf(option.getOptionAdditionalPrice()));
+            }
+
+            // 4-4. 할인 적용가 (RequestDto에 들어온 할인 금액이 있으면 반영)
+            BigDecimal discountedPrice = itemDto.getDiscountedPrice() != null
+                    ? itemDto.getDiscountedPrice()
+                    : unitPrice;
+
+            // 4-5. 총액 = 수량 × 할인단가
+            BigDecimal totalPrice = discountedPrice.multiply(BigDecimal.valueOf(itemDto.getQuantity()));
+
+            // 4-6. 주문 아이템 엔티티 생성
+            OrderItemEntity orderItem = OrderItemEntity.builder()
+                    .order(order)
+                    .product(product)
+                    .option(option)
+                    .quantity(itemDto.getQuantity())
+                    .unitPrice(unitPrice)
+                    .discountedPrice(discountedPrice)
+                    .totalPrice(totalPrice)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            orderItems.add(orderItem);
+
+            // 4-7. 누적 합산
+            calculatedTotal = calculatedTotal.add(totalPrice);
+            calculatedDiscount = calculatedDiscount.add(unitPrice.subtract(discountedPrice));
+        }
+
+        // 5. 아이템들 저장
+        orderItemRepository.saveAll(orderItems);
+
+        // 6. 주문 총액/할인액 갱신 후 다시 저장
+        order.setTotalAmount(calculatedTotal.add(requestDto.getDeliveryFee()));
+        order.setDiscountAmount(calculatedDiscount);
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
+
+        // 7. Response DTO 변환
+        List<OrderItemResponseDto> responseItems = orderItems.stream()
+                .map(oi -> OrderItemResponseDto.builder()
+                        .productId(oi.getProduct().getProductId())
+                        .productName(oi.getProduct().getProductName())
+                        .optionId(oi.getOption() != null ? oi.getOption().getOptionId() : null)
+                        .optionValue(oi.getOption() != null ? oi.getOption().getOptionValue() : null)
+                        .quantity(oi.getQuantity())
+                        .unitPrice(oi.getUnitPrice())
+                        .totalPrice(oi.getTotalPrice())
+                        .build())
+                .toList();
+
+        return OrderResponseDto.builder()
+                .orderId(order.getOrderId())
+                .orderNumber(order.getOrderNumber())
+                .orderStatus(order.getOrderStatus().name())
+                .totalAmount(order.getTotalAmount())
+                .discountAmount(order.getDiscountAmount())
+                .deliveryFee(order.getDeliveryFee())
+                .payAmount(order.getTotalAmount())
+                .receiverName(order.getReceiverName())
+                .receiverPhone(order.getReceiverPhone())
+                .receiverAddress(order.getReceiverAddress())
+                .createdAt(order.getCreatedAt())
+                .items(responseItems)
+                .build();
+    }
+}

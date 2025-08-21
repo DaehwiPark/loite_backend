@@ -1,0 +1,35 @@
+package com.boot.loiteBackend.web.order.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderItemResponseDto {
+
+    @Schema(description = "상품 ID", example = "2001")
+    private Long productId;
+
+    @Schema(description = "상품명", example = "삼성 냉장고 500L")
+    private String productName;
+
+    @Schema(description = "옵션 ID", example = "301")
+    private Long optionId;
+
+    @Schema(description = "옵션 값", example = "화이트 / 500L")
+    private String optionValue;
+
+    @Schema(description = "수량", example = "2")
+    private Integer quantity;
+
+    @Schema(description = "단가", example = "60000")
+    private BigDecimal unitPrice;
+
+    @Schema(description = "총 금액", example = "120000")
+    private BigDecimal totalPrice;
+}
