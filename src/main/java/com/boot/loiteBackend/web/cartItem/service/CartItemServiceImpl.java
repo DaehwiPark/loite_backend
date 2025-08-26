@@ -224,6 +224,7 @@ public class CartItemServiceImpl implements CartItemService {
                             .productName(p.getProductName())
                             .brandName(p.getBrandName())
                             .thumbnailUrl(p.getThumbnailUrl())
+                            .optionId(p.getOptionId())
                             .optionStock(p.getOptionStock())
                             .optionType(p.getOptionType())
                             .optionValue(p.getOptionValue())

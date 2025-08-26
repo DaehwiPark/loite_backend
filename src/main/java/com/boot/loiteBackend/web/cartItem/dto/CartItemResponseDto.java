@@ -28,6 +28,9 @@ public class CartItemResponseDto {
     @Schema(description = "대표 썸네일 이미지 URL", example = "https://cdn.loite.com/images/product/thumb-wood-table.jpg")
     private String thumbnailUrl;
 
+    @Schema(description = "옵션 ID", example = "3")
+    private Long optionId;
+
     @Schema(description = "선택한 옵션 타입 (예: 색상)", example = "색상")
     private String optionType;
 

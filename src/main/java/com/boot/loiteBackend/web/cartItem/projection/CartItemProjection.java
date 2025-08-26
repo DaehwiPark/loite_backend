@@ -11,6 +11,7 @@ public interface CartItemProjection {
     String getThumbnailUrl();
     Integer getProductStock();
 
+    Long getOptionId();
     String getOptionType();
     String getOptionValue();
     Integer getOptionAdditionalPrice();
@@ -25,5 +26,5 @@ public interface CartItemProjection {
     BigDecimal getDiscountedPrice();
     Integer getDiscountRate();
 
-    Integer getChecked();      // 체크 여부
+    Integer getChecked();
 }
