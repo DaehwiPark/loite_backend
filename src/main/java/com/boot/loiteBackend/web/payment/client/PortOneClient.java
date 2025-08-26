@@ -37,9 +37,9 @@ public class PortOneClient {
     }
 
     /** 결제 단건 조회 */
-    public Map<String, Object> getPaymentByImpUid(String impUid) {
+    public Map<String, Object> getPaymentByTxId(String txId) {
         String token = getAccessToken();
-        String url = portOneConfig.getUrl() + "/payments/" + impUid;
+        String url = portOneConfig.getUrl() + "/transactions/" + txId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);

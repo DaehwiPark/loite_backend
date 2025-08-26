@@ -31,9 +31,9 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/test/{impUid}")
-    public ResponseEntity<Map<String, Object>> testPayment(@PathVariable String impUid) {
-        Map<String, Object> paymentInfo = portOneClient.getPaymentByImpUid(impUid);
+    @GetMapping("/{txId}")
+    public ResponseEntity<Map<String, Object>> testPayment(@PathVariable String txId) {
+        Map<String, Object> paymentInfo = portOneClient.getPaymentByTxId(txId);
 
         return ResponseEntity.ok(paymentInfo);
     }
