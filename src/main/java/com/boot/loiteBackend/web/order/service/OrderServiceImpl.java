@@ -4,6 +4,7 @@ import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntit
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import com.boot.loiteBackend.admin.product.product.repository.AdminProductRepository;
+import com.boot.loiteBackend.domain.user.address.entity.UserAddressEntity;
 import com.boot.loiteBackend.web.order.dto.OrderItemRequestDto;
 import com.boot.loiteBackend.web.order.dto.OrderItemResponseDto;
 import com.boot.loiteBackend.web.order.dto.OrderRequestDto;
@@ -15,6 +16,9 @@ import com.boot.loiteBackend.web.delivery.enums.DeliveryStatus;
 import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
 import com.boot.loiteBackend.web.order.repository.OrderRepository;
 import com.boot.loiteBackend.web.order.repository.OrderSequenceRepository;
+import com.boot.loiteBackend.web.user.address.dto.UserAddressCreateDto;
+import com.boot.loiteBackend.web.user.address.repository.UserAddressRepository;
+import com.boot.loiteBackend.web.user.address.service.UserAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,10 +39,33 @@ public class OrderServiceImpl implements OrderService {
     private final AdminProductRepository productRepository;
     private final AdminProductOptionRepository optionRepository;
     private final OrderSequenceRepository orderSequenceRepository;
+    private final UserAddressRepository userAddressRepository;
+    private final UserAddressService userAddressService;
 
     @Override
     @Transactional
     public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
+
+        if(requestDto.getAddressId() == null){
+            if ("Y".equals(requestDto.getDefaultYn())) {
+                userAddressRepository.resetDefaultForUser(userId);
+            }
+
+            UserAddressEntity userAddressData = UserAddressEntity.builder()
+                    .userId(userId)
+                    .alias(requestDto.getAlias())
+                    .receiverName(requestDto.getReceiverName())
+                    .receiverPhone(requestDto.getReceiverPhone())
+                    .zipCode(requestDto.getZipCode())
+                    .addressLine1(requestDto.getAddressLine1())
+                    .addressLine2(requestDto.getAddressLine2())
+                    .defaultYn(requestDto.getDefaultYn())
+                    .deleteYn("N")
+                    .build();
+
+            userAddressRepository.save(userAddressData);
+        }
+
         // 1. 주문번호 생성
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         orderSequenceRepository.insertSeq(date);
@@ -173,7 +200,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto getOrder(Long userId, Long orderId) {
         OrderEntity order = orderRepository.findByOrderIdAndUserId(orderId, userId)
                 .orElseThrow(() ->
-                    new IllegalArgumentException("주문을 찾을 수 없습니다.")
+                        new IllegalArgumentException("주문을 찾을 수 없습니다.")
                 );
 
         List<OrderItemEntity> items = orderItemRepository.findByOrder(order);

@@ -39,7 +39,7 @@ public class UserAddressController {
         return ResponseEntity.ok(ApiResponse.ok(created, "배송지 생성이 완료되었습니다."));
     }
 
-    @Operation(summary = "배송지 수정", description = "기존 배송지를 수정합니다. `isDefault=true`로 수정하면 해당 주소가 기본 배송지로 지정되고, 기존 기본 배송지는 해제됩니다.")
+    @Operation(summary = "배송지 수정", description = "기존 배송지를 수정합니다. `isDefault=Y`로 수정하면 해당 주소가 기본 배송지로 지정되고, 기존 기본 배송지는 해제됩니다.")
     @PutMapping("/{addressId}")
     public ResponseEntity<ApiResponse<UserAddressDto>> update(@PathVariable Long addressId,
                                                               @Valid @RequestBody UserAddressUpdateDto req,
@@ -97,5 +97,13 @@ public class UserAddressController {
         Long userId = loginUser.getUserId();
         userAddressService.setDefault(userId, addressId);
         return ResponseEntity.ok(ApiResponse.ok(null, "기본 배송지가 설정되었습니다."));
+    }
+
+    @Operation(summary = "기본 배송지 해제", description = "기본 배송지로 해제 합니다.")
+    @PostMapping("/unDefault")
+    public ResponseEntity<ApiResponse<Void>> unDefault(@AuthenticationPrincipal CustomUserDetails loginUser) {
+        Long userId = loginUser.getUserId();
+        userAddressService.unDefault(userId);
+        return ResponseEntity.ok(ApiResponse.ok(null, "기본 배송지가 해되었습니다."));
     }
 }
