@@ -46,24 +46,25 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
 
-        if ("Y".equals(requestDto.getDefaultYn())) {
-            userAddressRepository.resetDefaultForUser(userId);
+        if(requestDto.getAddressId() == null){
+            if ("Y".equals(requestDto.getDefaultYn())) {
+                userAddressRepository.resetDefaultForUser(userId);
+            }
+
+            UserAddressEntity userAddressData = UserAddressEntity.builder()
+                    .userId(userId)
+                    .alias(requestDto.getAlias())
+                    .receiverName(requestDto.getReceiverName())
+                    .receiverPhone(requestDto.getReceiverPhone())
+                    .zipCode(requestDto.getZipCode())
+                    .addressLine1(requestDto.getAddressLine1())
+                    .addressLine2(requestDto.getAddressLine2())
+                    .defaultYn(requestDto.getDefaultYn())
+                    .deleteYn("N")
+                    .build();
+
+            userAddressRepository.save(userAddressData);
         }
-
-        UserAddressEntity userAddressData = UserAddressEntity.builder()
-                .userId(userId)
-                .alias(requestDto.getAlias())
-                .receiverName(requestDto.getReceiverName())
-                .receiverPhone(requestDto.getReceiverPhone())
-                .zipCode(requestDto.getZipCode())
-                .addressLine1(requestDto.getAddressLine1())
-                .addressLine2(requestDto.getAddressLine2())
-                .defaultYn(requestDto.getDefaultYn())
-                .deleteYn("N")
-                .build();
-
-        userAddressRepository.save(userAddressData);
-
 
         // 1. 주문번호 생성
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
