@@ -24,10 +24,10 @@ public class UserAddressDto {
     private String alias;
 
     @Schema(description = "수령인 이름", example = "홍길동")
-    private String recipientName;
+    private String receiverName;
 
     @Schema(description = "수령인 연락처", example = "010-1234-5678")
-    private String recipientPhone;
+    private String receiverPhone;
 
     @Schema(description = "우편번호", example = "06236")
     private String zipCode;
@@ -38,13 +38,13 @@ public class UserAddressDto {
     @Schema(description = "주소 2 (상세 주소)", example = "101동 1001호")
     private String addressLine2;
 
-    @JsonProperty("isDefault")
-    @Schema(description = "기본 배송지 여부", example = "true")
-    private boolean isDefault;
+    @JsonProperty("defaultYn")
+    @Schema(description = "기본 배송지 여부", example = "N")
+    private String defaultYn;
 
-    @JsonProperty("isDeleted")
-    @Schema(description = "삭제 여부 (소프트 삭제 처리 여부)", example = "false")
-    private boolean isDeleted;
+    @JsonProperty("deleteYn")
+    @Schema(description = "삭제 여부 (소프트 삭제 처리 여부)", example = "N")
+    private String deleteYn;
 
     @Schema(description = "배송지 등록일시", example = "2025-08-20T09:00:00Z")
     private Instant createdAt;

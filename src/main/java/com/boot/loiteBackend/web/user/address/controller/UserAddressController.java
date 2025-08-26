@@ -39,7 +39,7 @@ public class UserAddressController {
         return ResponseEntity.ok(ApiResponse.ok(created, "배송지 생성이 완료되었습니다."));
     }
 
-    @Operation(summary = "배송지 수정", description = "기존 배송지를 수정합니다. `isDefault=true`로 수정하면 해당 주소가 기본 배송지로 지정되고, 기존 기본 배송지는 해제됩니다.")
+    @Operation(summary = "배송지 수정", description = "기존 배송지를 수정합니다. `isDefault=Y`로 수정하면 해당 주소가 기본 배송지로 지정되고, 기존 기본 배송지는 해제됩니다.")
     @PutMapping("/{addressId}")
     public ResponseEntity<ApiResponse<UserAddressDto>> update(@PathVariable Long addressId,
                                                               @Valid @RequestBody UserAddressUpdateDto req,

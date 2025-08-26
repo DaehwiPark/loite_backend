@@ -48,17 +48,24 @@ public class UserAddressEntity {
     @Column(name = "USER_ADDRESS_LINE2", length = 200, columnDefinition = "VARCHAR(200) COMMENT '상세 주소'")
     private String addressLine2;
 
-    @Column(name = "IS_DEFAULT", nullable = false, columnDefinition = "TINYINT(1) NOT NULL DEFAULT 0 COMMENT '기본 배송지 여부'")
-    private boolean isDefault;
+    /** Y/N 플래그 컬럼들 */
+    @Builder.Default
+    @Column(name = "DEFAULT_YN", nullable = false, length = 1,
+            columnDefinition = "CHAR(1) NOT NULL DEFAULT 'N' COMMENT '기본 배송지 여부(Y/N)'")
+    private String defaultYn = "N";
 
-    @Column(name = "IS_DELETED", nullable = false, columnDefinition = "TINYINT(1) NOT NULL DEFAULT 0 COMMENT '삭제 여부'")
-    private boolean isDeleted;
+    @Builder.Default
+    @Column(name = "DELETE_YN", nullable = false, length = 1,
+            columnDefinition = "CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제 여부(Y/N)'")
+    private String deleteYn = "N";
 
     @CreatedDate
-    @Column(name = "CREATED_AT", nullable = false, updatable = false, columnDefinition = "DATETIME(6) NOT NULL COMMENT '생성일시'")
+    @Column(name = "CREATED_AT", nullable = false, updatable = false,
+            columnDefinition = "TIMESTAMP NOT NULL COMMENT '생성일시'")
     private Instant createdAt;
 
     @LastModifiedDate
-    @Column(name = "UPDATED_AT", nullable = false, columnDefinition = "DATETIME(6) NOT NULL COMMENT '수정일시'")
+    @Column(name = "UPDATED_AT", nullable = false,
+            columnDefinition = "TIMESTAMP NOT NULL COMMENT '수정일시'")
     private Instant updatedAt;
 }

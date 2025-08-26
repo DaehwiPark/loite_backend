@@ -12,68 +12,103 @@ import java.util.Optional;
 public interface UserAddressRepository extends JpaRepository<UserAddressEntity, Long> {
 
     /**
-     * 검색/페이징: q가 비어있으면 전체, 있으면 alias/수신인/우편번호/주소1/주소2에 부분일치(대소문자 무시)
-     * countQuery를 별도 지정하여 페이징 성능/정확도 개선
+     * 검색/페이징: q가 비어있으면 전체, 있으면 alias/수신인/우편번호/주소1/주소2 부분일치(대소문자 무시)
+     * 삭제되지 않은 건만 조회(DELETE_YN = 'N')
      */
     @Query(value = """
-           SELECT a FROM UserAddressEntity a
-           WHERE a.userId = :userId
-             AND a.isDeleted = false
-             AND (
-                 :q IS NULL OR :q = '' OR
-                 LOWER(COALESCE(a.alias, ''))         LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.receiverName, ''))  LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.zipCode, ''))        LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.addressLine1, ''))   LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.addressLine2, ''))   LIKE CONCAT('%', LOWER(:q), '%')
-             )
+           SELECT a
+             FROM UserAddressEntity a
+            WHERE a.userId = :userId
+              AND a.deleteYn = 'N'
+              AND (
+                    :q IS NULL OR :q = '' OR
+                    LOWER(COALESCE(a.alias, ''))        LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.receiverName, '')) LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.zipCode, ''))      LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.addressLine1, '')) LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.addressLine2, '')) LIKE CONCAT('%', LOWER(:q), '%')
+                  )
            """,
             countQuery = """
-           SELECT COUNT(a) FROM UserAddressEntity a
-           WHERE a.userId = :userId
-             AND a.isDeleted = false
-             AND (
-                 :q IS NULL OR :q = '' OR
-                 LOWER(COALESCE(a.alias, ''))         LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.receiverName, ''))  LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.zipCode, ''))        LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.addressLine1, ''))   LIKE CONCAT('%', LOWER(:q), '%') OR
-                 LOWER(COALESCE(a.addressLine2, ''))   LIKE CONCAT('%', LOWER(:q), '%')
-             )
+           SELECT COUNT(a)
+             FROM UserAddressEntity a
+            WHERE a.userId = :userId
+              AND a.deleteYn = 'N'
+              AND (
+                    :q IS NULL OR :q = '' OR
+                    LOWER(COALESCE(a.alias, ''))        LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.receiverName, '')) LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.zipCode, ''))      LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.addressLine1, '')) LIKE CONCAT('%', LOWER(:q), '%') OR
+                    LOWER(COALESCE(a.addressLine2, '')) LIKE CONCAT('%', LOWER(:q), '%')
+                  )
            """)
     Page<UserAddressEntity> search(@Param("userId") Long userId,
                                    @Param("q") String q,
                                    Pageable pageable);
 
-    Optional<UserAddressEntity> findByIdAndUserIdAndIsDeletedFalse(Long id, Long userId);
+    /* 단건 조회(삭제되지 않은 건만) */
+    Optional<UserAddressEntity> findByIdAndUserIdAndDeleteYn(Long id, Long userId, String deleteYn);
 
-    Optional<UserAddressEntity> findByUserIdAndIsDefaultTrueAndIsDeletedFalse(Long userId);
-
+    /* 기본 배송지 조회(삭제되지 않은 건만) */
+    Optional<UserAddressEntity> findByUserIdAndDefaultYnAndDeleteYn(Long userId, String defaultYn, String deleteYn);
 
     /**
-     * 유저의 기존 기본 배송지 플래그를 일괄 해제
+     * 유저의 기존 기본 배송지 플래그 일괄 해제 (현재 주소 제외)
+     * - 삭제되지 않은 건만 대상으로 DEFAULT_YN = 'N'
+     * - clearAutomatically=false 로 영속성 컨텍스트를 유지하여 더티체킹이 이어지도록 함
      */
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE UserAddressEntity a " +
-            "SET a.isDefault = false " +
-            "WHERE a.userId = :userId AND a.isDefault = true AND a.isDeleted = false")
+    @Modifying(clearAutomatically = false, flushAutomatically = true)
+    @Query("""
+           UPDATE UserAddressEntity a
+              SET a.defaultYn = 'N'
+            WHERE a.userId = :userId
+              AND a.deleteYn = 'N'
+              AND a.defaultYn = 'Y'
+              AND a.id <> :addressId
+           """)
+    int resetDefaultForUserExcept(@Param("userId") Long userId, @Param("addressId") Long addressId);
+
+    /**
+     * (선택) 모든 기본 플래그 해제 - 필요 시 사용
+     * 주의: 이 메서드는 현재 주소까지 N으로 만들 수 있으므로 일반 업데이트 흐름에서는 사용하지 않는 것을 권장
+     */
+    @Modifying(clearAutomatically = false, flushAutomatically = true)
+    @Query("""
+           UPDATE UserAddressEntity a
+              SET a.defaultYn = 'N'
+            WHERE a.userId = :userId
+              AND a.deleteYn = 'N'
+              AND a.defaultYn = 'Y'
+           """)
     int resetDefaultForUser(@Param("userId") Long userId);
 
     /**
-     * 소프트 삭제: isDeleted=true, 기본 플래그도 함께 해제
+     * 소프트 삭제: DELETE_YN='Y', 기본 플래그도 함께 해제(DEFAULT_YN='N')
+     * - clearAutomatically=false: 현재 트랜잭션의 영속성 컨텍스트를 유지
      */
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE UserAddressEntity a " +
-            "SET a.isDeleted = true, a.isDefault = false " +
-            "WHERE a.id = :id AND a.userId = :userId AND a.isDeleted = false")
+    @Modifying(clearAutomatically = false, flushAutomatically = true)
+    @Query("""
+           UPDATE UserAddressEntity a
+              SET a.deleteYn = 'Y',
+                  a.defaultYn = 'N'
+            WHERE a.id = :id
+              AND a.userId = :userId
+              AND a.deleteYn = 'N'
+           """)
     int softDelete(@Param("id") Long id, @Param("userId") Long userId);
 
     /**
-     * (선택) 동시성 제어용: 기본 배송지를 갱신하기 직전에 현재 기본건을 잠금
-     * setDefault 로직에서 사용하려면 트랜잭션 범위 내에서 호출하세요.
+     * 동시성 제어: 현재 기본 배송지 레코드를 잠금(PESSIMISTIC_WRITE)
+     * - 트랜잭션 내 동시 기본지정 경쟁을 줄이고 싶을 때 사용 가능
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT a FROM UserAddressEntity a " +
-            "WHERE a.userId = :userId AND a.isDefault = true AND a.isDeleted = false")
+    @Query("""
+           SELECT a
+             FROM UserAddressEntity a
+            WHERE a.userId = :userId
+              AND a.defaultYn = 'Y'
+              AND a.deleteYn = 'N'
+           """)
     Optional<UserAddressEntity> lockDefaultForUpdate(@Param("userId") Long userId);
 }

@@ -46,9 +46,10 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
 
-        if (requestDto.isDefault()) {
-            userAddressService.unDefault(userId);
+        if ("Y".equals(requestDto.getDefaultYn())) {
+            userAddressRepository.resetDefaultForUser(userId);
         }
+
         UserAddressEntity userAddressData = UserAddressEntity.builder()
                 .userId(userId)
                 .alias(requestDto.getAlias())
@@ -57,7 +58,10 @@ public class OrderServiceImpl implements OrderService {
                 .zipCode(requestDto.getZipCode())
                 .addressLine1(requestDto.getAddressLine1())
                 .addressLine2(requestDto.getAddressLine2())
-                .isDefault(requestDto.isDefault()).build();
+                .defaultYn(requestDto.getDefaultYn())
+                .deleteYn("N")
+                .build();
+
         userAddressRepository.save(userAddressData);
 
 

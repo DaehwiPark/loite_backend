@@ -42,9 +42,9 @@ public class UserAddressCreateDto {
     @Size(max = 200)
     private String addressLine2;
 
-    @JsonProperty("isDefault")
-    @Schema(description = "기본 배송지 여부. true로 설정하면 기존 기본 배송지를 해제하고 이 주소를 기본으로 등록",
-            example = "true")
-    private boolean isDefault;
+    @JsonProperty("defaultYn")
+    @Schema(description = "기본 배송지 여부. Y로 설정하면 기존 기본 배송지를 해제하고 이 주소를 기본으로 등록",
+            example = "N")
+    private String defaultYn;
 
 }

@@ -41,9 +41,9 @@ public class UserAddressUpdateDto {
     @Size(max = 200)
     private String addressLine2;
 
-    @JsonProperty("isDefault")
-    @Schema(description = "기본 배송지 여부. true면 이 주소를 기본으로 지정, false면 기본 해제. " +
+    @JsonProperty("defaultYn")
+    @Schema(description = "기본 배송지 여부. Y면 이 주소를 기본으로 지정, N면 기본 해제. " +
             "null일 경우 변경하지 않음",
-            example = "true")
-    private Boolean isDefault; // 부분 업데이트를 위해 박싱(Boolean)
+            example = "N")
+    private String defaultYn;
 }
