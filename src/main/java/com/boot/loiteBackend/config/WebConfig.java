@@ -2,11 +2,15 @@ package com.boot.loiteBackend.config;
 
 import com.boot.loiteBackend.common.file.FileStorageProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -17,31 +21,43 @@ public class WebConfig implements WebMvcConfigurer {
         this.fileProps = fileProps;
     }
 
-    // CORS 허용 설정
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(
+                .allowedOriginPatterns(
                         "http://localhost:5173",
                         "http://localhost:3000",
-                        "https://www.loite.co.kr",
+                        "http://192.168.0.73:5173",
                         "https://loite.co.kr",
+                        "https://www.loite.co.kr",
                         "https://admin.loite.co.kr",
-                        "http://192.168.0.73:5173"
+                        "https://api.loite.co.kr"
                 )
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS","HEAD")
                 .allowedHeaders("*")
-                .allowCredentials(true); // 필요 시 쿠키 전달 허용
+                .allowCredentials(true);
     }
 
-    // 정적 리소스 핸들링 (ex: 업로드 이미지 경로)
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String projectRoot = System.getProperty("user.dir");
-        File uploadsDir = new File(projectRoot, fileProps.getUploadDir());
-        String absolutePath = uploadsDir.getAbsolutePath().replace("\\", "/");
+        String raw = fileProps.getUploadDir();
+        if (raw == null || raw.isBlank()) {
+            throw new IllegalStateException("file.upload-dir is not set");
+        }
+        // 눈에 안 보이는 공백/제어문자 제거
+        String cleaned = raw.trim();
 
-        registry.addResourceHandler(fileProps.getUploadUrlPrefix() + "/**")
-                .addResourceLocations("file:" + absolutePath + "/");
+        Path configured = Paths.get(cleaned);
+        Path uploadRoot = configured.isAbsolute()
+                ? configured.normalize()
+                : Paths.get(System.getProperty("user.dir")).resolve(configured).normalize();
+
+        String pattern  = fileProps.getUploadUrlPrefix() + "/**";  // "/uploads/**"
+        String location = uploadRoot.toUri().toString();           // "file:/home/.../uploads/"
+
+        registry.addResourceHandler(pattern)
+                .addResourceLocations(location);
+
+        System.out.println("[Static] " + pattern + " -> " + location + " (raw='" + raw + "')");
     }
 }
