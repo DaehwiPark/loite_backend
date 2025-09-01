@@ -29,7 +29,7 @@ public class PaymentEntity {
     private String merchantUid;
 
     @Column(name = "IMP_UID", unique = true, length = 100)
-    private String impUid;
+    private String txId;
 
     @Column(name = "PG_TID", length = 100)
     private String pgTid;

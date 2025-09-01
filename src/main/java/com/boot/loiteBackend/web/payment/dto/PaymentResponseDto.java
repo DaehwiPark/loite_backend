@@ -20,7 +20,7 @@ public class PaymentResponseDto {
     private String merchantUid;
 
     @Schema(description = "포트원 결제 고유번호", example = "1")
-    private String impUid;
+    private String txId;
 
     @Schema(description = "PG사 종류", example = "TOSS, KAKAO, INICIS")
     private String pgProvider;

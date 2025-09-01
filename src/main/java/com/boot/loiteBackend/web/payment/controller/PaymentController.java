@@ -31,10 +31,15 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/token")
+    public ResponseEntity<String> getToken() {
+        String token = portOneClient.getAccessToken();
+        return ResponseEntity.ok(token);
+    }
+
     @GetMapping("/{txId}")
     public ResponseEntity<Map<String, Object>> testPayment(@PathVariable String txId) {
         Map<String, Object> paymentInfo = portOneClient.getPaymentByTxId(txId);
-
         return ResponseEntity.ok(paymentInfo);
     }
 }
