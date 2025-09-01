@@ -1,6 +1,7 @@
 package com.boot.loiteBackend.web.payment.entity;
 
 import com.boot.loiteBackend.web.order.entity.OrderEntity;
+import com.boot.loiteBackend.web.payment.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ public class PaymentEntity {
     private String merchantUid;
 
     @Column(name = "IMP_UID", unique = true, length = 100)
-    private String impUid;
+    private String txId;
 
     @Column(name = "PG_TID", length = 100)
     private String pgTid;
@@ -49,8 +50,9 @@ public class PaymentEntity {
     @Column(name = "PAYMENT_CURRENCY", nullable = false, length = 3)
     private String paymentCurrency = "KRW";
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "PAYMENT_STATUS", nullable = false, length = 24)
-    private String status;
+    private PaymentStatus paymentStatus;
 
     @Column(name = "RECEIPT_URL", length = 255)
     private String receiptUrl;

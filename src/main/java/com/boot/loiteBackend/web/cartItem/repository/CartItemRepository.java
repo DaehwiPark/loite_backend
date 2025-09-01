@@ -22,6 +22,7 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
         b.BRAND_NAME               AS brandName,
         i.IMAGE_URL                AS thumbnailUrl,
         P.PRODUCT_STOCK            AS productStock,
+        o.OPTION_ID                AS optionId,
         o.OPTION_TYPE              AS optionType,
         o.OPTION_VALUE             AS optionValue,
         o.OPTION_ADDITIONAL_PRICE  AS optionAdditionalPrice,

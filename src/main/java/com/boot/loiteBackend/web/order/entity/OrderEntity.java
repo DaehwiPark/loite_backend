@@ -68,4 +68,5 @@ public class OrderEntity {
 
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
+
 }
