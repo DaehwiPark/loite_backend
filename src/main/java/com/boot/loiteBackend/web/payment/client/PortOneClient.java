@@ -39,19 +39,27 @@ public class PortOneClient {
         return (String) res.get("accessToken");
     }
 
-    public Map<String, Object> getPaymentByTxId(String txId) {
+    public Map<String, Object> getPaymentByPaymentId(String paymentId) {
+        // 1. 먼저 토큰 발급
         String token = getAccessToken();
-        String url = portOneConfig.getUrl() + "/payments/" + txId;
 
+        // 2. PortOne API 엔드포인트
+        String url = portOneConfig.getUrl() + "/payments/" + paymentId;
+
+        // 3. Authorization 헤더 설정 (Bearer 방식)
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "PortOne " + token);
+        headers.set("Authorization", "Bearer " + token);
 
+        // 4. API 호출
         ResponseEntity<Map> response =
                 restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
 
+        // 5. 응답 로깅
         Map<String, Object> body = response.getBody();
         System.out.println(">>> PortOne 결제 단건조회 응답 = " + body);
+
         return body;
     }
+
 
 }

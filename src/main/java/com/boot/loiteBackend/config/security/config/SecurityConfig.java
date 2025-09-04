@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/private/**").authenticated()
 
                         // 관리자 전용 API
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").permitAll() //.hasRole("ADMIN")
 
                         // 그 외 전부 인증 필요
                         .anyRequest().authenticated()

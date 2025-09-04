@@ -43,6 +43,9 @@ public class AdminProductCategoryEntity {
     @Column(name = "CATEGORY_PATH", nullable = false, length = 255)
     private String categoryPath;
 
+    @Column(name = "CATEGORY_ICON_URL", nullable = false, length = 255)
+    private String categoryIconUrl;
+
     @Column(name = "CATEGORY_IMAGE_URL", nullable = false, length = 255)
     private String categoryImageUrl;
 

@@ -6,6 +6,8 @@ import com.boot.loiteBackend.web.order.repository.OrderRepository;
 import com.boot.loiteBackend.web.payment.client.PortOneClient;
 import com.boot.loiteBackend.web.payment.dto.PaymentRequestDto;
 import com.boot.loiteBackend.web.payment.dto.PaymentResponseDto;
+import com.boot.loiteBackend.web.payment.dto.PaymentVerifyRequestDto;
+import com.boot.loiteBackend.web.payment.dto.PaymentVerifyResponseDto;
 import com.boot.loiteBackend.web.payment.entity.PaymentEntity;
 import com.boot.loiteBackend.web.payment.enums.PaymentStatus;
 import com.boot.loiteBackend.web.payment.repository.PaymentRepository;
@@ -15,103 +17,108 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
     private final PortOneClient portOneClient;
 
     @Override
-    @Transactional
-    public PaymentResponseDto verifyAndSavePayment(Long userId, PaymentRequestDto requestDto) {
-        // 1. 주문 찾기
-        OrderEntity order = orderRepository.findByOrderNumber(requestDto.getMerchantUid())
-                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+    public PaymentVerifyResponseDto verifyPayment(PaymentVerifyRequestDto requestDto) {
+        String paymentId = requestDto.getPaymentId(); // 주문번호 = PortOne paymentId
 
-        if (!order.getUserId().equals(userId)) {
-            throw new SecurityException("본인 주문만 결제할 수 있습니다.");
+        // 1. 주문 조회
+        OrderEntity order = orderRepository.findByOrderNumber(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없음: " + paymentId));
+
+        // 2. 포트원 결제 단건 조회
+        Map<String, Object> portOneRes = portOneClient.getPaymentByPaymentId(paymentId);
+
+        // 3. 결제 금액 검증
+        Map<String, Object> amount = (Map<String, Object>) portOneRes.get("amount");
+        BigDecimal paidAmount = new BigDecimal(((Number) amount.get("total")).toString());
+
+        if (order.getTotalAmount().compareTo(paidAmount) != 0) {
+            // 금액 불일치 → 결제 실패 처리
+            order.setOrderStatus(OrderStatus.PAYMENT_FAILED);
+            orderRepository.save(order);
+
+            return PaymentVerifyResponseDto.builder()
+                    .orderId(order.getOrderId())
+                    .orderNumber(order.getOrderNumber())
+                    .paymentId(null)
+                    .paymentStatus(PaymentStatus.FAILED)
+                    .build();
         }
 
-        // 2. PortOne V2 API 호출
-        Map<String, Object> result = portOneClient.getPaymentByTxId(requestDto.getTxId());
-        Map<String, Object> paymentInfo = (Map<String, Object>) result.get("data");
-        if (paymentInfo == null) {
-            throw new IllegalStateException("PortOne 결제 응답이 올바르지 않습니다.");
+        // 4. 기존 결제 정보 확인 (주문번호 기준)
+        Optional<PaymentEntity> existingOpt = paymentRepository.findByMerchantUid(order.getOrderNumber());
+
+        PaymentEntity payment;
+
+        String statusStr = (String) portOneRes.get("status");
+        PaymentStatus status = PaymentStatus.valueOf(statusStr);
+
+        if (existingOpt.isPresent()) {
+            // 기존 결제 row 업데이트
+            payment = existingOpt.get();
+            payment.setTxId((String) portOneRes.get("transactionId"));
+            payment.setPgProvider(((Map<String, Object>) portOneRes.get("channel")).get("pgProvider").toString());
+            payment.setPaymentMethod(((Map<String, Object>) portOneRes.get("method")).get("type").toString());
+            payment.setPaymentAmountApproved(paidAmount);
+            payment.setPaymentStatus(status);
+            payment.setReceiptUrl((String) portOneRes.get("receiptUrl"));
+            payment.setRequestedAt(parseDateTime((String) portOneRes.get("requestedAt")));
+            payment.setPaidAt(parseDateTime((String) portOneRes.get("paidAt")));
+            payment.setRawPayload(portOneRes.toString());
+        } else {
+            // 새 결제 row insert
+            payment = PaymentEntity.builder()
+                    .order(order)
+                    .merchantUid(order.getOrderNumber())
+                    .txId((String) portOneRes.get("transactionId"))
+                    .pgProvider(((Map<String, Object>) portOneRes.get("channel")).get("pgProvider").toString())
+                    .paymentMethod(((Map<String, Object>) portOneRes.get("method")).get("type").toString())
+                    .paymentTotalAmount(order.getTotalAmount())
+                    .paymentAmountApproved(paidAmount)
+                    .paymentCurrency((String) portOneRes.getOrDefault("currency", "KRW"))
+                    .paymentStatus(status)
+                    .receiptUrl((String) portOneRes.get("receiptUrl"))
+                    .requestedAt(parseDateTime((String) portOneRes.get("requestedAt")))
+                    .paidAt(parseDateTime((String) portOneRes.get("paidAt")))
+                    .rawPayload(portOneRes.toString())
+                    .build();
+
+            paymentRepository.save(payment);
         }
 
-        // 3. PortOne 응답 파싱
-        String txId = (String) paymentInfo.get("id"); // PortOne 트랜잭션 ID
-        String pgProvider = (String) paymentInfo.get("pgProvider");
-        String pgTid = (String) paymentInfo.get("pgTxId");
-        String status = (String) paymentInfo.get("status"); // PAID, FAILED 등
-        String receiptUrl = (String) paymentInfo.get("receiptUrl");
+        // 5. 주문 상태 업데이트
+        order.setOrderStatus(status == PaymentStatus.PAID ? OrderStatus.PAID : OrderStatus.PAYMENT_FAILED);
+        orderRepository.save(order);
 
-        // 금액
-        Map<String, Object> amountMap = (Map<String, Object>) paymentInfo.get("amount");
-        Integer paidAmount = (Integer) amountMap.get("total");
 
-        // 결제수단
-        Map<String, Object> methodMap = (Map<String, Object>) paymentInfo.get("method");
-        String payMethod = (String) methodMap.get("type");
-
-        // 4. 상태 매핑
-        PaymentStatus paymentStatus = mapPortOneStatus(status);
-
-        // 5. 금액 검증
-        if (!order.getTotalAmount().equals(BigDecimal.valueOf(paidAmount))) {
-            throw new IllegalStateException("결제 금액 불일치");
-        }
-
-        // 6. 결제 저장
-        PaymentEntity payment = PaymentEntity.builder()
-                .order(order)
-                .merchantUid(order.getOrderNumber())
-                .txId(txId) // ✅ V2 트랜잭션 ID
-                .pgTid(pgTid)
-                .pgProvider(pgProvider)
-                .paymentMethod(payMethod)
-                .paymentTotalAmount(BigDecimal.valueOf(paidAmount))
-                .paymentAmountApproved(BigDecimal.valueOf(paidAmount))
-                .paymentStatus(paymentStatus)
-                .receiptUrl(receiptUrl)
-                .rawPayload(paymentInfo.toString())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        paymentRepository.save(payment);
-
-        // 주문 상태 업데이트
+        // 5. 주문 상태 업데이트
         order.setOrderStatus(OrderStatus.PAID);
         orderRepository.save(order);
 
-        // 7. 응답 반환
-        return PaymentResponseDto.builder()
+        return PaymentVerifyResponseDto.builder()
+                .orderId(order.getOrderId())
+                .orderNumber(order.getOrderNumber())
                 .paymentId(payment.getPaymentId())
-                .merchantUid(payment.getMerchantUid())
-                .txId(payment.getTxId())
-                .paymentStatus(payment.getPaymentStatus())
-                .paymentTotalAmount(payment.getPaymentTotalAmount())
-                .createdAt(payment.getCreatedAt())
+                .paymentStatus(PaymentStatus.PAID)
                 .build();
     }
 
-    private PaymentStatus mapPortOneStatus(String status) {
-        if (status == null) return PaymentStatus.FAILED;
-
-        return switch (status.toUpperCase()) {
-            case "READY" -> PaymentStatus.READY;
-            case "PAID" -> PaymentStatus.PAID;
-            case "CANCELED" -> PaymentStatus.CANCELED;
-            case "PARTIAL_CANCELED" -> PaymentStatus.PARTIAL_CANCELED;
-            case "FAILED" -> PaymentStatus.FAILED;
-            case "PENDING" -> PaymentStatus.PENDING;
-            default -> PaymentStatus.FAILED;
-        };
+    private LocalDateTime parseDateTime(String isoTime) {
+        if (isoTime == null) return null;
+        return LocalDateTime.parse(isoTime, DateTimeFormatter.ISO_DATE_TIME);
     }
 }
 

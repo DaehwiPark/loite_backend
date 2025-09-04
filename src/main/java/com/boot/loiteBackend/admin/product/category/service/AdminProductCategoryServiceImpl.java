@@ -31,7 +31,6 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
     @Override
     public Long saveCategory(AdminProductCategoryRequestDto dto, MultipartFile imageFile) {
         if (dto.getCategoryId() == null) {
-            // 신규 등록
             AdminProductCategoryEntity category = adminProductCategoryMapper.toEntity(dto);
 
             if (dto.getCategoryParentId() != null) {
@@ -48,6 +47,7 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
             if (imageFile != null && !imageFile.isEmpty()) {
                 FileUploadResult result = fileService.save(imageFile, "category");
                 if (result != null) {
+                    category.setCategoryIconUrl(result.getUrlPath());
                     category.setCategoryImageUrl(result.getUrlPath());
                 }
             }
@@ -82,10 +82,13 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
             if (imageFile != null && !imageFile.isEmpty()) {
                 FileUploadResult result = fileService.save(imageFile, "category");
                 if (result != null) {
+                    category.setCategoryIconUrl(result.getUrlPath());
                     category.setCategoryImageUrl(result.getUrlPath());
                 }
             } else {
-                category.setCategoryImageUrl(dto.getCategoryImageUrl());
+                category.setCategoryIconUrl(dto.getCategoryIconUrl());
+                category.setCategoryImageUrl(dto.getCategoryIconUrl());
+
             }
 
             return category.getCategoryId();
@@ -106,7 +109,7 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
 
     @Override
     public List<AdminProductCategoryResponseDto> getAllCategory() {
-        List<AdminProductCategoryEntity> categories = productCategoryRepository.findAllByDeleteYn("N"); // ✅ 변경됨
+        List<AdminProductCategoryEntity> categories = productCategoryRepository.findAllByDeleteYn("N");
 
         List<AdminProductCategoryEntity> topLevel = categories.stream()
                 .filter(category -> category.getCategoryParentId() == null)

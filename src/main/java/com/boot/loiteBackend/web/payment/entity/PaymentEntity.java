@@ -28,7 +28,7 @@ public class PaymentEntity {
     @Column(name = "MERCHANT_UID", nullable = false, unique = true, length = 100)
     private String merchantUid;
 
-    @Column(name = "IMP_UID", unique = true, length = 100)
+    @Column(name = "TX_ID", unique = true, length = 100)
     private String txId;
 
     @Column(name = "PG_TID", length = 100)
@@ -70,9 +70,9 @@ public class PaymentEntity {
     @Column(name = "RAW_PAYLOAD")
     private String rawPayload;
 
-    @Column(name = "CREATED_AT", updatable = false)
+    @Column(name = "CREATED_AT", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "UPDATED_AT")
+    @Column(name = "UPDATED_AT", insertable = false)
     private LocalDateTime updatedAt;
 }

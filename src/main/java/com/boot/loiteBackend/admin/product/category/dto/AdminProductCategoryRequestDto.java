@@ -21,6 +21,9 @@ public class AdminProductCategoryRequestDto {
     @Schema(description = "카테고리 경로", example = "electronics")
     private String categoryPath;
 
+    @Schema(description = "카테고리 아이콘", example = "example")
+    private String categoryIconUrl;
+
     @Schema(description = "카테고리 이미지", example = "example")
     private String categoryImageUrl;
 
