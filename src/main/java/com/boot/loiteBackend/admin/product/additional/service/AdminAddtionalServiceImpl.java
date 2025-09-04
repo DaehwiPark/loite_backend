@@ -28,32 +28,24 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
 
     @Override
     public AdminAdditionalResponseDto createAdditional(AdminAdditionalRequestDto requestDto, MultipartFile imageFile) {
-        AdminProductEntity product = adminProductRepository.findById(requestDto.getProductId())
-                .orElseThrow(()-> new RuntimeException("상품을 찾을 수 없습니다 ID=" + requestDto.getProductId()));
-
-        String imageUrl = requestDto.getAdditionalImageUrl();
+        AdminAdditionalEntity additional = new AdminAdditionalEntity();
 
         if (imageFile != null && !imageFile.isEmpty()) {
             FileUploadResult result = fileService.save(imageFile, "additional");
             if (result != null) {
-                imageUrl = result.getUrlPath();
+                additional.setAdditionalImageUrl(result.getUrlPath());
             }
         }
 
-        AdminAdditionalEntity entity = AdminAdditionalEntity.builder()
-                .product(product)
-                .additionalName(requestDto.getAdditionalName())
-                .additionalStock(requestDto.getAdditionalStock())
-                .additionalPrice(requestDto.getAdditionalPrice())
-                .additionalImageUrl(imageUrl)
-                .activeYn(requestDto.getActiveYn() ? "Y" : "N")
-                .build();
+        additional.setAdditionalName(requestDto.getAdditionalName());
+        additional.setAdditionalStock(requestDto.getAdditionalStock());
+        additional.setAdditionalPrice(requestDto.getAdditionalPrice());
+        additional.setActiveYn(requestDto.getActiveYn() ? "Y" : "N");
 
-        AdminAdditionalEntity saved = adminAdditionalRepository.save(entity);
+        AdminAdditionalEntity saved = adminAdditionalRepository.save(additional);
 
         return AdminAdditionalResponseDto.builder()
                 .additionalId(saved.getAdditionalId())
-                .productId(saved.getProduct().getProductId())
                 .additionalName(saved.getAdditionalName())
                 .additionalStock(saved.getAdditionalStock())
                 .additionalPrice(saved.getAdditionalPrice())
@@ -64,13 +56,11 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
                 .build();
     }
 
+
     @Override
     public AdminAdditionalResponseDto updateAdditional(Long additionalId, AdminAdditionalRequestDto requestDto, MultipartFile imageFile) {
         AdminAdditionalEntity additional = adminAdditionalRepository.findById(additionalId)
                 .orElseThrow(() -> new RuntimeException("추가구성품을 찾을 수 없습니다. ID=" + additionalId));
-
-        AdminProductEntity product = adminProductRepository.findById(requestDto.getProductId())
-                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다. ID=" + requestDto.getProductId()));
 
         if (imageFile != null && !imageFile.isEmpty()) {
             FileUploadResult result = fileService.save(imageFile, "additional");
@@ -79,7 +69,6 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
             }
         }
 
-        additional.setProduct(product);
         additional.setAdditionalName(requestDto.getAdditionalName());
         additional.setAdditionalStock(requestDto.getAdditionalStock());
         additional.setAdditionalPrice(requestDto.getAdditionalPrice());
@@ -89,7 +78,6 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
 
         return AdminAdditionalResponseDto.builder()
                 .additionalId(saved.getAdditionalId())
-                .productId(saved.getProduct().getProductId())
                 .additionalName(saved.getAdditionalName())
                 .additionalStock(saved.getAdditionalStock())
                 .additionalPrice(saved.getAdditionalPrice())
@@ -117,7 +105,6 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
 
         return AdminAdditionalResponseDto.builder()
                 .additionalId(entity.getAdditionalId())
-                .productId(entity.getProduct().getProductId())
                 .additionalName(entity.getAdditionalName())
                 .additionalStock(entity.getAdditionalStock())
                 .additionalPrice(entity.getAdditionalPrice())
@@ -134,7 +121,6 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
 
         return page.map(entity -> AdminAdditionalResponseDto.builder()
                 .additionalId(entity.getAdditionalId())
-                .productId(entity.getProduct().getProductId())
                 .additionalName(entity.getAdditionalName())
                 .additionalStock(entity.getAdditionalStock())
                 .additionalPrice(entity.getAdditionalPrice())

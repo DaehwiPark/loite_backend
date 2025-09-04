@@ -36,6 +36,9 @@ public class AdminProductOptionRequestDto {
     @Schema(description = "사용 여부", example = "Y, N")
     private String activeYn;
 
+    @Schema(description = "삭제 여부", example = "Y, N")
+    private String deleteYn;
+
     @Schema(description = "옵션 정렬 순서", example = "index값으로 1, 2, 3 ...")
     private int optionSortOrder;
 }

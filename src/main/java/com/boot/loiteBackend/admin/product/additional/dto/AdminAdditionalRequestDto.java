@@ -12,9 +12,6 @@ import java.math.BigDecimal;
 @Builder
 public class AdminAdditionalRequestDto {
 
-    @Schema(description = "본상품 ID", example = "1")
-    private Long productId;
-
     @Schema(description = "추가구성품 이름", example = "녹차")
     private String additionalName;
 

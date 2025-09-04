@@ -1,5 +1,9 @@
 package com.boot.loiteBackend.admin.product.product.service;
 
+import com.boot.loiteBackend.admin.product.additional.entity.AdminAdditionalEntity;
+import com.boot.loiteBackend.admin.product.additional.entity.AdminProductAdditionalEntity;
+import com.boot.loiteBackend.admin.product.additional.repository.AdminAdditionalRepository;
+import com.boot.loiteBackend.admin.product.additional.repository.AdminProductAdditionalRepository;
 import com.boot.loiteBackend.admin.product.brand.entity.AdminProductBrandEntity;
 import com.boot.loiteBackend.admin.product.brand.repository.AdminProductBrandRepository;
 import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
@@ -68,6 +72,8 @@ public class AdminProductServiceImpl implements AdminProductService {
     private final AdminProductSectionMapper adminProductSectionMapper;
     private final FileService fileService;
     private final AdminProductSectionService adminProductSectionService;
+    private final AdminAdditionalRepository adminAdditionalRepository;
+    private final AdminProductAdditionalRepository adminProductAdditionalRepository;
 
     @Override
     public Long saveProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages) {
@@ -110,6 +116,20 @@ public class AdminProductServiceImpl implements AdminProductService {
                     .toList();
 
             adminProductGiftRepository.saveAll(giftMaps);
+        }
+
+        // 추가구성품 연결
+        if (dto.getAdditionalIdList() != null && !dto.getAdditionalIdList().isEmpty()) {
+            List<AdminAdditionalEntity> additionalEntities = adminAdditionalRepository.findAllById(dto.getAdditionalIdList());
+
+            List<AdminProductAdditionalEntity> additionalMaps = additionalEntities.stream()
+                    .map(additional -> AdminProductAdditionalEntity.builder()
+                            .product(savedProduct)
+                            .additional(additional)
+                            .build())
+                    .toList();
+
+            adminProductAdditionalRepository.saveAll(additionalMaps);
         }
 
         // 이미지 등록
@@ -278,6 +298,22 @@ public class AdminProductServiceImpl implements AdminProductService {
             adminProductGiftRepository.saveAll(giftMaps);
         }
 
+        // 기존 추가구성품 삭제 후 재삽입
+        adminProductAdditionalRepository.deleteByProduct(product);
+
+        if (dto.getAdditionalIdList() != null && !dto.getAdditionalIdList().isEmpty()) {
+            List<AdminAdditionalEntity> additionalEntities = adminAdditionalRepository.findAllById(dto.getAdditionalIdList());
+
+            List<AdminProductAdditionalEntity> additionalMaps = additionalEntities.stream()
+                    .map(additional -> AdminProductAdditionalEntity.builder()
+                            .product(product)
+                            .additional(additional)
+                            .build())
+                    .toList();
+
+            adminProductAdditionalRepository.saveAll(additionalMaps);
+        }
+
         // 기존 이미지 삭제 후 재삽입
         adminProductImageRepository.deleteByProduct(product);
 
@@ -433,6 +469,37 @@ public class AdminProductServiceImpl implements AdminProductService {
                     return tagDto;
                 }).toList();
         dto.setTags(tagDtos);
+
+        // 사은품
+        List<AdminProductDetailResponseDto.GiftDto> giftDtos = product.getProductGifts().stream()
+                .map(pg -> {
+                    AdminGiftEntity gift = pg.getGift();
+                    AdminProductDetailResponseDto.GiftDto giftDto = new AdminProductDetailResponseDto.GiftDto();
+                    giftDto.setGiftId(gift.getGiftId());
+                    giftDto.setGiftName(gift.getGiftName());
+                    giftDto.setGiftStock(gift.getGiftStock());
+                    giftDto.setGiftImageUrl(gift.getGiftImageUrl());
+                    giftDto.setActiveYn("Y".equals(gift.getActiveYn()));
+                    return giftDto;
+                })
+                .toList();
+        dto.setGifts(giftDtos);
+
+        // 추가구성품
+        List<AdminProductDetailResponseDto.AdditionalDto> additionalDtos = product.getProductAdditionals().stream()
+                .map(pa -> {
+                    AdminAdditionalEntity additional = pa.getAdditional();
+                    AdminProductDetailResponseDto.AdditionalDto addDto = new AdminProductDetailResponseDto.AdditionalDto();
+                    addDto.setAdditionalId(additional.getAdditionalId());
+                    addDto.setAdditionalName(additional.getAdditionalName());
+                    addDto.setAdditionalStock(additional.getAdditionalStock());
+                    addDto.setAdditionalPrice(additional.getAdditionalPrice());
+                    addDto.setAdditionalImageUrl(additional.getAdditionalImageUrl());
+                    addDto.setActiveYn("Y".equals(additional.getActiveYn()));
+                    return addDto;
+                })
+                .toList();
+        dto.setAdditionals(additionalDtos);
 
         return dto;
     }

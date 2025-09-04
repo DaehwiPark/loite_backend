@@ -51,6 +51,9 @@ public class AdminProductOptionEntity {
     @Column(name = "ACTIVE_YN", length = 100)
     private String activeYn;
 
+    @Column(name = "DELETE_YN")
+    private String deleteYn;
+
     @Column(name = "OPTION_SORT_ORDER")
     private int optionSortOrder;
 

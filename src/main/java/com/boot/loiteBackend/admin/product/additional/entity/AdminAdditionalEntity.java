@@ -15,17 +15,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "tb_product_additional")
+@Table(name = "tb_additional")
 public class AdminAdditionalEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ADDITIONAL_ID")
     private Long additionalId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRODUCT_ID", nullable = false)
-    private AdminProductEntity product; // 본상품 참조
 
     @Column(name = "ADDITIONAL_NAME", nullable = false, length = 100)
     private String additionalName;
