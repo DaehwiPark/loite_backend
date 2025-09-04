@@ -3,6 +3,7 @@ package com.boot.loiteBackend.web.order.service;
 import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductImageEntity;
 import com.boot.loiteBackend.admin.product.product.repository.AdminProductRepository;
 import com.boot.loiteBackend.domain.user.address.entity.UserAddressEntity;
 import com.boot.loiteBackend.web.order.dto.OrderItemRequestDto;
@@ -28,7 +29,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,26 +48,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
-
-       /* if(requestDto.getAddressId() == null){
-            if ("Y".equals(requestDto.getDefaultYn())) {
-                userAddressRepository.resetDefaultForUser(userId);
-            }
-
-            UserAddressEntity userAddressData = UserAddressEntity.builder()
-                    .userId(userId)
-                    .alias(requestDto.getAlias())
-                    .receiverName(requestDto.getReceiverName())
-                    .receiverPhone(requestDto.getReceiverPhone())
-                    .zipCode(requestDto.getZipCode())
-                    .addressLine1(requestDto.getAddressLine1())
-                    .addressLine2(requestDto.getAddressLine2())
-                    .defaultYn(requestDto.getDefaultYn())
-                    .deleteYn("N")
-                    .build();
-
-            userAddressRepository.save(userAddressData);
-        }*/
 
         // 1. 주문번호 생성
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -206,15 +189,24 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
 
         List<OrderItemResponseDto> responseItems = items.stream()
-                .map(item -> OrderItemResponseDto.builder()
-                        .productId(item.getProduct().getProductId())
-                        .productName(item.getProduct().getProductName())
-                        .optionId(item.getOption() != null ? item.getOption().getOptionId() : null)
-                        .optionValue(item.getOption() != null ? item.getOption().getOptionValue() : null)
-                        .quantity(item.getQuantity())
-                        .unitPrice(item.getUnitPrice())
-                        .totalPrice(item.getTotalPrice())
-                        .build())
+                .map(item -> {
+                    String imageUrl = item.getProduct().getProductImages().stream()
+                            .sorted(Comparator.comparingInt(img -> Optional.ofNullable(img.getImageSortOrder()).orElse(9999)))
+                            .map(AdminProductImageEntity::getImageUrl)
+                            .findFirst()
+                            .orElse(null);
+
+                    return OrderItemResponseDto.builder()
+                            .productId(item.getProduct().getProductId())
+                            .productName(item.getProduct().getProductName())
+                            .productImageUrl(imageUrl)
+                            .optionId(item.getOption() != null ? item.getOption().getOptionId() : null)
+                            .optionValue(item.getOption() != null ? item.getOption().getOptionValue() : null)
+                            .quantity(item.getQuantity())
+                            .unitPrice(item.getUnitPrice())
+                            .totalPrice(item.getTotalPrice())
+                            .build();
+                })
                 .toList();
 
         return OrderResponseDto.builder()

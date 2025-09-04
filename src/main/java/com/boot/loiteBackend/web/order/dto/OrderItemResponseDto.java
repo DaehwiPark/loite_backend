@@ -18,6 +18,9 @@ public class OrderItemResponseDto {
     @Schema(description = "상품명", example = "삼성 냉장고 500L")
     private String productName;
 
+    @Schema(description = "상품 이미지", example = "url 어쩌구 저쩌구")
+    private String productImageUrl;
+
     @Schema(description = "옵션 ID", example = "301")
     private Long optionId;
 
