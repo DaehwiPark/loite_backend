@@ -34,14 +34,14 @@ public interface UserAddressMapper {
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mappings({
-            @Mapping(target = "alias",         source = "alias",         conditionQualifiedByName = "hasText"),
-            @Mapping(target = "receiverName",  source = "receiverName",  conditionQualifiedByName = "hasText"),
+            @Mapping(target = "alias", source = "alias", conditionQualifiedByName = "hasText"),
+            @Mapping(target = "receiverName", source = "receiverName", conditionQualifiedByName = "hasText"),
             @Mapping(target = "receiverPhone", source = "receiverPhone", conditionQualifiedByName = "hasText"),
-            @Mapping(target = "zipCode",       source = "zipCode",       conditionQualifiedByName = "hasText"),
-            @Mapping(target = "addressLine1",  source = "addressLine1",  conditionQualifiedByName = "hasText"),
-            @Mapping(target = "addressLine2",  source = "addressLine2",  conditionQualifiedByName = "hasText"),
+            @Mapping(target = "zipCode", source = "zipCode", conditionQualifiedByName = "hasText"),
+            @Mapping(target = "addressLine1", source = "addressLine1", conditionQualifiedByName = "hasText"),
+            @Mapping(target = "addressLine2", source = "addressLine2", conditionQualifiedByName = "hasText"),
             @Mapping(target = "defaultYn", ignore = true),
-            @Mapping(target = "deleteYn",  ignore = true)
+            @Mapping(target = "deleteYn", ignore = true)
     })
     void updateEntityFromDto(UserAddressUpdateDto dto, @MappingTarget UserAddressEntity entity);
 
@@ -55,11 +55,11 @@ public interface UserAddressMapper {
     /* 문자열 공통 trim: 생성/수정 모두 적용 */
     @AfterMapping
     default void after(@MappingTarget UserAddressEntity entity) {
-        if (entity.getAlias() != null)         entity.setAlias(entity.getAlias().trim());
-        if (entity.getReceiverName() != null)  entity.setReceiverName(entity.getReceiverName().trim());
+        if (entity.getAlias() != null) entity.setAlias(entity.getAlias().trim());
+        if (entity.getReceiverName() != null) entity.setReceiverName(entity.getReceiverName().trim());
         if (entity.getReceiverPhone() != null) entity.setReceiverPhone(entity.getReceiverPhone().trim());
-        if (entity.getZipCode() != null)       entity.setZipCode(entity.getZipCode().trim());
-        if (entity.getAddressLine1() != null)  entity.setAddressLine1(entity.getAddressLine1().trim());
-        if (entity.getAddressLine2() != null)  entity.setAddressLine2(entity.getAddressLine2().trim());
+        if (entity.getZipCode() != null) entity.setZipCode(entity.getZipCode().trim());
+        if (entity.getAddressLine1() != null) entity.setAddressLine1(entity.getAddressLine1().trim());
+        if (entity.getAddressLine2() != null) entity.setAddressLine2(entity.getAddressLine2().trim());
     }
 }
