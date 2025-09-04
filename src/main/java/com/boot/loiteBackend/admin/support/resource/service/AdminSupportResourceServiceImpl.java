@@ -42,7 +42,6 @@ public class AdminSupportResourceServiceImpl implements AdminSupportResourceServ
     private final AdminSupportResourceRepository resourceRepository;
     private final AdminProductRepository productRepository;
     private final FileService fileService;
-    private final FileStorageProperties fileProps;
     private final AdminSupportResourceMapper adminSupportResourceMapper;
 
     private final String uploadCategory = "etc";
