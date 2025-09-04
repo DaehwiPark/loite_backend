@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.admin.product.product.entity;
 
+import com.boot.loiteBackend.admin.product.additional.entity.AdminProductAdditionalEntity;
 import com.boot.loiteBackend.admin.product.brand.entity.AdminProductBrandEntity;
 import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
 import com.boot.loiteBackend.admin.product.gift.entity.AdminProductGiftEntity;
@@ -57,6 +58,11 @@ public class AdminProductEntity {
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdminProductGiftEntity> productGifts = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AdminProductAdditionalEntity> productAdditionals = new ArrayList<>();
+
 
     @Column(name = "PRODUCT_NAME", nullable = false, length = 100)
     private String productName;

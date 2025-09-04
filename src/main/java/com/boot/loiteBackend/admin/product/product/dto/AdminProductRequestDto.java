@@ -75,6 +75,9 @@ public class AdminProductRequestDto {
     @Schema(description = "사은품 ID 목록", example = "[1, 3, 5]")
     private List<Long> giftIdList;
 
+    @Schema(description = "사은품 ID 목록", example = "[1, 3, 5]")
+    private List<Long> additionalIdList;
+
     @Schema(description = "태그 ID 목록", example = "[2, 4, 6]")
     private List<Long> tagIdList;
 

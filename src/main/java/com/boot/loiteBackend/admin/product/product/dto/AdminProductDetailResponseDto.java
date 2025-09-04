@@ -74,6 +74,8 @@ public class AdminProductDetailResponseDto {
     private List<ImageDto> productImages;
     private List<ProductOptionDto> productOptions;
     private List<AdminProductSectionResponseDto> productSections;
+    private List<GiftDto> gifts;
+    private List<AdditionalDto> additionals;
 
     @Getter
     @Setter
@@ -127,6 +129,48 @@ public class AdminProductDetailResponseDto {
 
         @Schema(description = "옵션 정렬 순서", example = "1")
         private int optionSortOrder;
+    }
+    
+    @Getter
+    @Setter
+    public static class GiftDto {
+        @Schema(description = "사은품 ID", example = "1")
+        private Long giftId;
+        
+        @Schema(description = "사은품명", example = "포켓몬빵")
+        private String giftName;
+
+        @Schema(description = "사은품 재고", example = "50")
+        private Integer giftStock;
+
+        @Schema(description = "사은품 이미지 URL", example = "example")
+        private String giftImageUrl;
+
+        @Schema(description = "사용 여부 Y/N", example = "Y")
+        private boolean activeYn;
+    }
+
+    @Getter
+    @Setter
+    public static class AdditionalDto {
+
+        @Schema(description = "추가구성품 ID", example = "1")
+        private Long additionalId;
+
+        @Schema(description = "추가구성품명", example = "녹차 티백")
+        private String additionalName;
+
+        @Schema(description = "추가구성품 재고", example = "50")
+        private Integer additionalStock;
+
+        @Schema(description = "추가구성품 가격", example = "15000")
+        private BigDecimal additionalPrice;
+
+        @Schema(description = "추가구성품 이미지 URL", example = "example")
+        private String additionalImageUrl;
+
+        @Schema(description = "사용 여부 Y/N", example = "Y")
+        private boolean activeYn;
     }
 }
 
