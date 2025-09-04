@@ -14,7 +14,7 @@ public interface AdminGiftService {
 
     AdminGiftResponseDto getGift(Long giftId);
 
-    void updateGift(Long giftId, AdminGiftUpdateRequestDto dto);
+    void updateGift(Long giftId, AdminGiftUpdateRequestDto dto, MultipartFile imageFile);
 
     void deleteGift(Long giftId);
 }

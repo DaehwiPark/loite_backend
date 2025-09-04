@@ -48,7 +48,7 @@ public class AdminGiftServiceImpl implements AdminGiftService {
     }
 
     @Override
-    public void updateGift(Long giftId, AdminGiftUpdateRequestDto dto) {
+    public void updateGift(Long giftId, AdminGiftUpdateRequestDto dto, MultipartFile imageFile) {
         AdminGiftEntity gift = adminGiftRepository.findById(giftId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 사은품이 존재하지 않습니다."));
 
@@ -58,6 +58,13 @@ public class AdminGiftServiceImpl implements AdminGiftService {
         gift.setSoldOutYn(dto.getGiftStock() <= 0 ? "Y" : "N");
         gift.setActiveYn(dto.getActiveYn() != null ? dto.getActiveYn() : gift.getActiveYn());
         gift.setUpdatedAt(LocalDateTime.now());
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            FileUploadResult result = fileService.save(imageFile, "gift");
+            if (result != null) {
+                gift.setGiftImageUrl(result.getUrlPath());
+            }
+        }
     }
 
     @Override

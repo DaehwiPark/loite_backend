@@ -30,9 +30,9 @@ public class AdminGiftController {
     }
 
     @Operation(summary = "사은품 수정", description = "사은품을 수정합니다.")
-    @PutMapping("/{giftId}")
-    public ResponseEntity<String> updateGift(@PathVariable Long giftId, @RequestBody AdminGiftUpdateRequestDto dto) {
-        adminGiftService.updateGift(giftId, dto);
+    @PutMapping(path = "/{giftId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateGift(@PathVariable Long giftId, @RequestBody AdminGiftUpdateRequestDto dto, @RequestParam("imageFile") MultipartFile imageFile) {
+        adminGiftService.updateGift(giftId, dto, imageFile);
         return ResponseEntity.ok("사은품이 수정되었습니다.");
     }
 
