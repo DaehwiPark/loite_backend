@@ -32,8 +32,7 @@ public class AdminProductCategoryController {
 
     @Operation(summary = "카테고리 조회", description = "카테고리를 트리구조로 조회합니다.")
     @GetMapping("/tree")
-    public List<AdminProductCategoryResponseDto> getCategory()
-    {
+    public List<AdminProductCategoryResponseDto> getCategory() {
         return adminProductCategoryService.getAllCategory();
     }
 

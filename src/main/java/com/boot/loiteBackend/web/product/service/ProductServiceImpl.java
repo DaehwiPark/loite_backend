@@ -1,5 +1,7 @@
 package com.boot.loiteBackend.web.product.service;
 
+import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
+import com.boot.loiteBackend.admin.product.category.repository.AdminProductCategoryRepository;
 import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductImageEntity;
@@ -8,6 +10,7 @@ import com.boot.loiteBackend.admin.product.section.entity.AdminProductSectionEnt
 import com.boot.loiteBackend.web.product.dto.ProductDetailResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductListResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductMainResponseDto;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final AdminProductRepository productRepository;
+    private final AdminProductCategoryRepository adminProductCategoryRepository;
 
     @Override
     public List<ProductMainResponseDto> getMainProducts() {
@@ -55,8 +60,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductListResponseDto> getListProducts(String categoryPath, Pageable pageable) {
-        Page<AdminProductEntity> productPage = productRepository.findListByCategoryId(categoryPath, pageable);
+        // 1. 부모 카테고리 찾기
+        AdminProductCategoryEntity parent = adminProductCategoryRepository.findByCategoryPathAndDeleteYn(categoryPath, "N")
+                .orElseThrow(() -> new EntityNotFoundException("카테고리 없음: " + categoryPath));
 
+        // 2. 부모 + 자식 카테고리 path 리스트 만들기
+        List<String> paths = new ArrayList<>();
+        paths.add(parent.getCategoryPath());
+
+        List<AdminProductCategoryEntity> children = adminProductCategoryRepository.findByCategoryParentIdAndDeleteYn(parent, "N");
+        paths.addAll(children.stream().map(AdminProductCategoryEntity::getCategoryPath).toList());
+
+        // 3. 상품 조회 (IN 조건)
+        Page<AdminProductEntity> productPage = productRepository.findListByCategoryPaths(paths, pageable);
+
+        // 4. DTO 변환
         List<ProductListResponseDto> dtoList = productPage.getContent().stream()
                 .map(entity -> {
                     String imageUrl = entity.getProductImages().stream()

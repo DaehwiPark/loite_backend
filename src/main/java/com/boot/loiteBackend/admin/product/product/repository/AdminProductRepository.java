@@ -33,14 +33,12 @@ public interface AdminProductRepository extends JpaRepository<AdminProductEntity
     """)
     List<AdminProductEntity> findTop20MainExposedProducts(Pageable pageable);
 
-    @EntityGraph(attributePaths = "productImages")
     @Query("""
-    SELECT p FROM AdminProductEntity p
-    WHERE p.mainExposureYn = 'Y'
-      AND p.activeYn = 'Y'
-      AND p.deleteYn = 'N'
-      AND p.productCategory.categoryPath = :categoryPath
-""")
-    Page<AdminProductEntity> findListByCategoryId(@Param("categoryPath") String categoryPath, Pageable pageable);
-
+        SELECT p FROM AdminProductEntity p
+        WHERE p.mainExposureYn = 'Y'
+          AND p.activeYn = 'Y'
+          AND p.deleteYn = 'N'
+          AND p.productCategory.categoryPath IN :paths
+    """)
+    Page<AdminProductEntity> findListByCategoryPaths(@Param("paths") List<String> paths, Pageable pageable);
 }
