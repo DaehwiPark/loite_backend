@@ -4,7 +4,10 @@ import com.boot.loiteBackend.admin.product.additional.entity.AdminProductAdditio
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface AdminProductAdditionalRepository extends JpaRepository<AdminProductAdditionalEntity, Long> {
-    void deleteByProduct(AdminProductEntity product);
+
+    List<AdminProductAdditionalEntity> findByProduct(AdminProductEntity product);
 }
 

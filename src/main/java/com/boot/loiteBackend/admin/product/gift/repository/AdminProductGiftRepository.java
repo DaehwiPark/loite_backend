@@ -4,6 +4,9 @@ import com.boot.loiteBackend.admin.product.gift.entity.AdminProductGiftEntity;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface AdminProductGiftRepository extends JpaRepository<AdminProductGiftEntity, Long> {
-    void deleteByProduct(AdminProductEntity product);
+
+    List<AdminProductGiftEntity> findByProduct(AdminProductEntity product);
 }

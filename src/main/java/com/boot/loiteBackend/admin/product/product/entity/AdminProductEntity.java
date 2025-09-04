@@ -59,6 +59,7 @@ public class AdminProductEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdminProductGiftEntity> productGifts = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdminProductAdditionalEntity> productAdditionals = new ArrayList<>();
 

@@ -41,6 +41,8 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
         additional.setAdditionalStock(requestDto.getAdditionalStock());
         additional.setAdditionalPrice(requestDto.getAdditionalPrice());
         additional.setActiveYn(requestDto.getActiveYn() ? "Y" : "N");
+        additional.setSoldOutYn(requestDto.getAdditionalStock() <= 0 ? "Y" : "N");
+
 
         AdminAdditionalEntity saved = adminAdditionalRepository.save(additional);
 
@@ -51,6 +53,7 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
                 .additionalPrice(saved.getAdditionalPrice())
                 .additionalImageUrl(saved.getAdditionalImageUrl())
                 .activeYn("Y".equals(saved.getActiveYn()))
+                .soldOutYn("Y".equals(saved.getSoldOutYn()))
                 .createdAt(saved.getCreatedAt())
                 .updatedAt(saved.getUpdatedAt())
                 .build();
@@ -73,6 +76,7 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
         additional.setAdditionalStock(requestDto.getAdditionalStock());
         additional.setAdditionalPrice(requestDto.getAdditionalPrice());
         additional.setActiveYn(requestDto.getActiveYn() ? "Y" : "N");
+        additional.setSoldOutYn(requestDto.getAdditionalStock() <= 0 ? "Y" : "N");
 
         AdminAdditionalEntity saved = adminAdditionalRepository.save(additional);
 
@@ -83,6 +87,7 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
                 .additionalPrice(saved.getAdditionalPrice())
                 .additionalImageUrl(saved.getAdditionalImageUrl())
                 .activeYn("Y".equals(saved.getActiveYn()))
+                .soldOutYn("Y".equals(saved.getSoldOutYn()))
                 .createdAt(saved.getCreatedAt())
                 .updatedAt(saved.getUpdatedAt())
                 .build();
@@ -110,6 +115,7 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
                 .additionalPrice(entity.getAdditionalPrice())
                 .additionalImageUrl(entity.getAdditionalImageUrl())
                 .activeYn("Y".equals(entity.getActiveYn()))
+                .soldOutYn("Y".equals(entity.getSoldOutYn()))
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -126,6 +132,7 @@ public class AdminAddtionalServiceImpl implements AdminAdditionalService {
                 .additionalPrice(entity.getAdditionalPrice())
                 .additionalImageUrl(entity.getAdditionalImageUrl())
                 .activeYn("Y".equals(entity.getActiveYn()))
+                .soldOutYn("Y".equals(entity.getSoldOutYn()))
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build()

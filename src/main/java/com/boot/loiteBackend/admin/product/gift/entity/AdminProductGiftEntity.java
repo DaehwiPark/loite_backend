@@ -27,6 +27,9 @@ public class AdminProductGiftEntity {
     @JoinColumn(name = "GIFT_ID", nullable = false)
     private AdminGiftEntity gift;
 
+    @Column(name = "DELETE_YN")
+    private String deleteYn;
+
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 
@@ -43,4 +46,5 @@ public class AdminProductGiftEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
 }

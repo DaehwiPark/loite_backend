@@ -16,9 +16,6 @@ public class AdminAdditionalResponseDto {
     @Schema(description = "추가구성품 ID", example = "1")
     private Long additionalId;
 
-    @Schema(description = "본상품 ID", example = "101")
-    private Long productId;
-
     @Schema(description = "추가구성품 이름", example = "전용 거치대")
     private String additionalName;
 
@@ -33,6 +30,9 @@ public class AdminAdditionalResponseDto {
 
     @Schema(description = "사용 여부 (Y/N)", example = "Y")
     private Boolean activeYn;
+
+    @Schema(description = "품절 여부 (Y/N)", example = "N")
+    private Boolean soldOutYn;
 
     @Schema(description = "생성 일시", example = "2025-09-01T12:00:00")
     private LocalDateTime createdAt;

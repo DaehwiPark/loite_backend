@@ -43,6 +43,9 @@ public class AdminAdditionalEntity {
     @Column(name = "DELETE_YN", nullable = false, length = 1)
     private String deleteYn = "N";
 
+    @Column(name = "SOLD_OUT_YN", length = 255)
+    private String soldOutYn;
+
     @Column(name = "CREATED_AT", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 

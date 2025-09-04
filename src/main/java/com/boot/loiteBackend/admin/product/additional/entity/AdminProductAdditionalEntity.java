@@ -28,7 +28,9 @@ public class AdminProductAdditionalEntity {
     @JoinColumn(name = "ADDITIONAL_ID", nullable = false)
     private AdminAdditionalEntity additional;
 
+    @Column(name = "DELETE_YN")
+    private String deleteYn;
+
     @Column(name = "CREATED_AT", updatable = false, insertable = false)
     private LocalDateTime createdAt;
-
 }

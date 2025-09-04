@@ -14,6 +14,7 @@ import com.boot.loiteBackend.admin.product.gift.entity.AdminProductGiftEntity;
 import com.boot.loiteBackend.admin.product.gift.mapper.AdminProductGiftMapper;
 import com.boot.loiteBackend.admin.product.gift.repository.AdminGiftRepository;
 import com.boot.loiteBackend.admin.product.gift.repository.AdminProductGiftRepository;
+import com.boot.loiteBackend.admin.product.option.dto.AdminProductOptionRequestDto;
 import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.admin.product.option.mapper.AdminProductOptionMapper;
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
@@ -47,8 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -204,39 +204,35 @@ public class AdminProductServiceImpl implements AdminProductService {
     }
 
     @Override
+    @Transactional
     public void updateProduct(AdminProductRequestDto dto, List<MultipartFile> thumbnailImages) {
-        //상품 연결
+        // 상품 조회
         AdminProductEntity product = adminProductRepository.findById(dto.getProductId())
-                .orElseThrow(()-> new IllegalArgumentException("상품이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
 
-        //카테고리 연결
+        // 브랜드, 카테고리 조회 및 연결
         AdminProductCategoryEntity category = productCategoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(()-> new IllegalArgumentException("해당 카테고리가 존재하지 않습니다."));
-
-        //브랜드 연결
+                .orElseThrow(() -> new IllegalArgumentException("카테고리 없음"));
         AdminProductBrandEntity brand = adminProductBrandRepository.findById(dto.getProductBrandId())
-                .orElseThrow(()-> new IllegalArgumentException("해당 브랜드가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("브랜드 없음"));
 
-        //브랜드 id 수정
         product.setProductBrand(brand);
-
-        //카테고리 id 수정
         product.setProductCategory(category);
 
-        //상품 필드 수정
+        // 상품 필드 수정
         product.setProductName(dto.getProductName());
         product.setProductModelName(dto.getProductModelName());
         product.setProductSummary(dto.getProductSummary());
         product.setProductPrice(dto.getProductPrice());
         product.setProductSupplyPrice(dto.getProductSupplyPrice());
         product.setDiscountRate(dto.getDiscountRate());
-        product.setProductStock(dto.getProductStock());
         product.setProductDeliveryCharge(dto.getProductDeliveryCharge());
         product.setProductFreeDelivery(dto.getProductFreeDelivery());
         product.setActiveYn(dto.getActiveYn());
         product.setDeleteYn(dto.getDeleteYn());
         product.setMainExposureYn(dto.getMainExposureYn());
 
+        // 할인가 재계산
         BigDecimal price = dto.getProductPrice();
         Integer rate = dto.getDiscountRate();
         if (price != null && rate != null) {
@@ -246,27 +242,47 @@ public class AdminProductServiceImpl implements AdminProductService {
             product.setDiscountedPrice(discounted);
         }
 
-        adminProductRepository.save(product);
+        /** ========================= 옵션 처리 ========================= */
+        List<AdminProductOptionEntity> existingOptions = adminProductOptionRepository.findByProduct(product);
 
-        //기존 옵션 삭제 후 재삽입
-        adminProductOptionRepository.deleteByProduct(product);
-        List<AdminProductOptionEntity> optionEntities = dto.getProductOptions().stream()
-                .map(optionDto -> {
-                    AdminProductOptionEntity option = adminProductOptionMapper.toEntity(optionDto);
-                    option.setProduct(product);
-                    option.setSoldOutYn(option.getOptionStock() <= 0 ? "Y" : "N");
-                    return option;
+        Map<Long, AdminProductOptionRequestDto> dtoMap = dto.getProductOptions().stream()
+                .filter(opt -> opt.getOptionId() != null)
+                .collect(Collectors.toMap(AdminProductOptionRequestDto::getOptionId, opt -> opt));
+
+        for (AdminProductOptionEntity option : existingOptions) {
+            AdminProductOptionRequestDto match = dtoMap.get(option.getOptionId());
+            if (match != null) {
+                // 업데이트
+                option.setOptionValue(match.getOptionValue());
+                option.setOptionStock(match.getOptionStock());
+                option.setDeleteYn("N");
+                option.setSoldOutYn(match.getOptionStock() <= 0 ? "Y" : "N");
+            } else {
+                // DTO에 없는 경우 → soft delete
+                option.setDeleteYn("Y");
+            }
+        }
+
+        List<AdminProductOptionEntity> newOptions = dto.getProductOptions().stream()
+                .filter(opt -> opt.getOptionId() == null)
+                .map(optDto -> {
+                    AdminProductOptionEntity newOpt = adminProductOptionMapper.toEntity(optDto);
+                    newOpt.setProduct(product);
+                    newOpt.setDeleteYn("N");
+                    newOpt.setSoldOutYn(newOpt.getOptionStock() <= 0 ? "Y" : "N");
+                    return newOpt;
                 }).toList();
-        adminProductOptionRepository.saveAll(optionEntities);
+        adminProductOptionRepository.saveAll(newOptions);
 
-        // 옵션 재고 총합 계산
-        int totalStock = optionEntities.stream()
-                .mapToInt(AdminProductOptionEntity::getOptionStock)
-                .sum();
+        // 재고 합산
+        int totalStock = existingOptions.stream()
+                .filter(opt -> "N".equals(opt.getDeleteYn()))
+                .mapToInt(AdminProductOptionEntity::getOptionStock).sum()
+                + newOptions.stream().mapToInt(AdminProductOptionEntity::getOptionStock).sum();
         product.setProductStock(totalStock);
 
-        //기존 태그 삭제 후 재삽입
-        adminProductTagRepository.deleteByProduct(product);
+        /** ========================= 태그 처리 ========================= */
+        adminProductTagRepository.deleteByProduct(product); // 태그는 주문 종속 X → 그냥 삭제/재삽입
         if (dto.getTagIdList() != null && !dto.getTagIdList().isEmpty()) {
             List<AdminTagEntity> tagEntities = adminTagRepository.findAllById(dto.getTagIdList());
             List<AdminProductTagEntity> tagMaps = tagEntities.stream()
@@ -280,45 +296,88 @@ public class AdminProductServiceImpl implements AdminProductService {
             adminProductTagRepository.saveAll(tagMaps);
         }
 
-        // 기존 섹션 삭제 후 재삽입
+        /** ========================= 섹션 처리 ========================= */
         if (dto.getSections() != null && !dto.getSections().isEmpty()) {
             adminProductSectionService.updateSections(product, dto.getSections());
         }
 
-        // 기존 사은품 삭제 후 재삽입
-        adminProductGiftRepository.deleteByProduct(product);
+        /** ========================= 사은품 처리 ========================= */
+        // 1. 기존 사은품들
+        List<AdminProductGiftEntity> existingGifts = adminProductGiftRepository.findByProduct(product);
 
-        if (dto.getGiftIdList() != null && !dto.getGiftIdList().isEmpty()) {
-            List<AdminGiftEntity> giftEntities = adminGiftRepository.findAllById(dto.getGiftIdList());
+        // DTO에서 넘어온 giftIdList
+        Set<Long> dtoGiftIds = new HashSet<>(Optional.ofNullable(dto.getGiftIdList()).orElse(List.of()));
 
-            List<AdminProductGiftEntity> giftMaps = giftEntities.stream()
-                    .map(gift -> adminProductGiftMapper.toEntity(gift, product))
-                    .toList();
-
-            adminProductGiftRepository.saveAll(giftMaps);
+        // 2. 기존 사은품 처리
+        for (AdminProductGiftEntity giftMap : existingGifts) {
+            Long giftId = giftMap.getGift().getGiftId();
+            if (dtoGiftIds.contains(giftId)) {
+                giftMap.setDeleteYn("N");
+            } else {
+                giftMap.setDeleteYn("Y");
+            }
         }
 
-        // 기존 추가구성품 삭제 후 재삽입
-        adminProductAdditionalRepository.deleteByProduct(product);
+        // 3. 신규 사은품 추가
+        List<Long> existingGiftIds = existingGifts.stream()
+                .map(g -> g.getGift().getGiftId())
+                .toList();
 
-        if (dto.getAdditionalIdList() != null && !dto.getAdditionalIdList().isEmpty()) {
-            List<AdminAdditionalEntity> additionalEntities = adminAdditionalRepository.findAllById(dto.getAdditionalIdList());
+        List<Long> newGiftIds = dtoGiftIds.stream()
+                .filter(id -> !existingGiftIds.contains(id))
+                .toList();
 
-            List<AdminProductAdditionalEntity> additionalMaps = additionalEntities.stream()
+        if (!newGiftIds.isEmpty()) {
+            List<AdminGiftEntity> newGifts = adminGiftRepository.findAllById(newGiftIds);
+            List<AdminProductGiftEntity> newGiftMaps = newGifts.stream()
+                    .map(gift -> adminProductGiftMapper.toEntity(gift, product))
+                    .toList();
+            adminProductGiftRepository.saveAll(newGiftMaps);
+        }
+
+
+        /** ========================= 추가구성품 처리 ========================= */
+        // 1. 기존 추가구성품들
+        List<AdminProductAdditionalEntity> existingAdditionals = adminProductAdditionalRepository.findByProduct(product);
+
+        // DTO에서 넘어온 additionalIdList
+        Set<Long> dtoAdditionalIds = new HashSet<>(Optional.ofNullable(dto.getAdditionalIdList()).orElse(List.of()));
+
+        // 2. 기존 추가구성품 처리
+        for (AdminProductAdditionalEntity addMap : existingAdditionals) {
+            Long additionalId = addMap.getAdditional().getAdditionalId();
+            if (dtoAdditionalIds.contains(additionalId)) {
+                addMap.setDeleteYn("N");
+            } else {
+                addMap.setDeleteYn("Y");
+            }
+        }
+
+        // 3. 신규 추가구성품 추가
+        List<Long> existingAdditionalIds = existingAdditionals.stream()
+                .map(a -> a.getAdditional().getAdditionalId())
+                .toList();
+
+        List<Long> newAdditionalIds = dtoAdditionalIds.stream()
+                .filter(id -> !existingAdditionalIds.contains(id))
+                .toList();
+
+        if (!newAdditionalIds.isEmpty()) {
+            List<AdminAdditionalEntity> newAdditionals = adminAdditionalRepository.findAllById(newAdditionalIds);
+            List<AdminProductAdditionalEntity> newAdditionalMaps = newAdditionals.stream()
                     .map(additional -> AdminProductAdditionalEntity.builder()
                             .product(product)
                             .additional(additional)
+                            .deleteYn("N")
                             .build())
                     .toList();
-
-            adminProductAdditionalRepository.saveAll(additionalMaps);
+            adminProductAdditionalRepository.saveAll(newAdditionalMaps);
         }
 
-        // 기존 이미지 삭제 후 재삽입
+
+        /** ========================= 이미지 처리 ========================= */
         adminProductImageRepository.deleteByProduct(product);
-
         List<AdminProductImageEntity> imageEntities = new ArrayList<>();
-
         if (thumbnailImages != null && !thumbnailImages.isEmpty()) {
             for (int i = 0; i < thumbnailImages.size(); i++) {
                 MultipartFile file = thumbnailImages.get(i);
@@ -339,12 +398,11 @@ public class AdminProductServiceImpl implements AdminProductService {
                 imageEntities.add(imageEntity);
             }
         }
-
         if (!imageEntities.isEmpty()) {
             adminProductImageRepository.saveAll(imageEntities);
         }
-
     }
+
 
     @Override
     public void deleteProduct(Long productId) {
