@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/public/banner")
-@Tag(name = "메인 배너 API", description = "쇼핑몰 홈 배너 조회")
+@Tag(name = "이벤트 배너 API", description = "쇼핑몰 홈 이벤트 배너 조회")
 public class HomeEventBannerController {
 
     private final HomeEventBannerService service;
