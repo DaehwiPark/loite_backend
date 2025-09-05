@@ -168,6 +168,7 @@ public class ProductServiceImpl implements ProductService {
                             .additionalName(additional.getAdditionalName())
                             .additionalImageUrl(additional.getAdditionalImageUrl())
                             .additionalStock(additional.getAdditionalStock())
+                            .additionalPrice(additional.getAdditionalPrice())
                             .soldOutYn("Y".equalsIgnoreCase(additional.getSoldOutYn()))
                             .build();
                 })
