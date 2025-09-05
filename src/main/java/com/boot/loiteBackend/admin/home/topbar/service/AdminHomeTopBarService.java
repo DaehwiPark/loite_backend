@@ -1,6 +1,9 @@
 package com.boot.loiteBackend.admin.home.topbar.service;
 
 import com.boot.loiteBackend.admin.home.topbar.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface AdminHomeTopBarService {
@@ -13,5 +16,5 @@ public interface AdminHomeTopBarService {
 
     AdminHomeTopBarResponseDto detail(Long id);
 
-    List<AdminHomeTopBarResponseDto> listAll();
+    Page<AdminHomeTopBarResponseDto> list(Pageable pageable, String keyword);
 }

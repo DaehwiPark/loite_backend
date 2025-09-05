@@ -8,11 +8,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -60,9 +63,15 @@ public class AdminHomeTopBarController {
         return ResponseEntity.ok(service.detail(id));
     }
 
-    @Operation(summary = "목록(전체)", description = "전체 리스트 조회")
+    @Operation(summary = "홈 탑바 목록 (페이지네이션/정렬/검색", description = "페이지당 10건 기본. sort_order ASC, start_at DESC, id DESC")
     @GetMapping
-    public ResponseEntity<List<AdminHomeTopBarResponseDto>> listAll() {
-        return ResponseEntity.ok(service.listAll());
+    public ResponseEntity<Page<AdminHomeTopBarResponseDto>> list(
+            @ParameterObject
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable,
+            @RequestParam(required = false) String keyword
+    ) {
+        return ResponseEntity.ok(service.list(pageable, keyword));
     }
+
 }
