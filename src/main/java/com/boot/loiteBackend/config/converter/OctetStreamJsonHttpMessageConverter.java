@@ -1,4 +1,4 @@
-package com.boot.loiteBackend.config;
+package com.boot.loiteBackend.config.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
