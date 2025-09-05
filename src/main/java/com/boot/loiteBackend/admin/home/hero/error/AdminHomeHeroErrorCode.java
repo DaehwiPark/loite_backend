@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum AdminHomeHeroErrorCode implements ErrorCode {
 
+    INVALID_REQUEST("HERO_000", "잘못된 요청입니다.", HttpStatus.BAD_REQUEST),
+    UNAUTHORIZED("HERO_999", "인증 정보가 없습니다.", HttpStatus.UNAUTHORIZED),
     INVALID_FILE("HERO_001", "잘못된 파일입니다.", HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_FAILED("HERO_002", "파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     SAVE_FAILED("HERO_003", "히어로 섹션 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
