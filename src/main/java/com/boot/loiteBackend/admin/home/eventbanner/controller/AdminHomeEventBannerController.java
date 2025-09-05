@@ -76,7 +76,7 @@ public class AdminHomeEventBannerController {
         return ResponseEntity.ok(adminHomeEventBannerService.detail(id));
     }
 
-    @Operation(  summary = "목록(페이지)",description = "페이지당 10건 기본. sort_order ASC, start_at DESC, id DESC")
+    @Operation(summary = "목록(페이지)", description = "페이지당 10건 기본. sort_order ASC, start_at DESC, id DESC")
     @GetMapping
     public ResponseEntity<Page<AdminHomeEventBannerResponseDto>> list(
             @ParameterObject
