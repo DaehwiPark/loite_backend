@@ -112,17 +112,20 @@ public class ProductDetailResponseDto {
         @Schema(description = "상품과 추가구성품 고유 연결 ID", example = "11")
         private Long productAdditionalId;
 
-        @Schema(description = "사은품 ID", example = "11")
+        @Schema(description = "추가구성품 ID", example = "11")
         private Long additionalId;
 
-        @Schema(description = "사은품명", example = "코튼 러그")
+        @Schema(description = "추가구성품명", example = "녹차")
         private String additionalName;
 
-        @Schema(description = "사은품 이미지", example = "example")
+        @Schema(description = "추가구성품 이미지", example = "example")
         private String additionalImageUrl;
 
-        @Schema(description = "사은품 재고 수량", example = "5")
+        @Schema(description = "추가구성품 재고 수량", example = "100")
         private int additionalStock;
+
+        @Schema(description = "추가구성품 금액", example = "5000")
+        private BigDecimal additionalPrice;
 
         @Schema(description = "품절 여부", example = "false")
         private Boolean soldOutYn;
