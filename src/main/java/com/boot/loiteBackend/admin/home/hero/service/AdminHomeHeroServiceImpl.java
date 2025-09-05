@@ -46,9 +46,12 @@ public class AdminHomeHeroServiceImpl implements AdminHomeHeroService {
 
     @Override
     public AdminHomeHeroResponseDto create(AdminHomeHeroCreateRequestDto req, MultipartFile image, Long loginUserId) {
-        if (loginUserId == null) throw new CustomException(AdminHomeHeroErrorCode.UNAUTHORIZED);
-        if (req == null) throw new CustomException(AdminHomeHeroErrorCode.INVALID_REQUEST);
-        if (image == null || image.isEmpty()) throw new CustomException(AdminHomeHeroErrorCode.INVALID_FILE);
+        if (loginUserId == null)
+            throw new CustomException(AdminHomeHeroErrorCode.UNAUTHORIZED);
+        if (req == null)
+            throw new CustomException(AdminHomeHeroErrorCode.INVALID_REQUEST);
+        if (image == null || image.isEmpty())
+            throw new CustomException(AdminHomeHeroErrorCode.INVALID_FILE);
 
         final FileUploadResult uploadResult;
         try {
