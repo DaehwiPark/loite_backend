@@ -9,5 +9,7 @@ import java.util.List;
 public interface AdminProductAdditionalRepository extends JpaRepository<AdminProductAdditionalEntity, Long> {
 
     List<AdminProductAdditionalEntity> findByProduct(AdminProductEntity product);
+
+    List<AdminProductAdditionalEntity> findByProductAndDeleteYn(AdminProductEntity entity, String deleteYn);
 }
 

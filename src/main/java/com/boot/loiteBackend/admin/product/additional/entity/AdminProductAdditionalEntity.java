@@ -33,4 +33,5 @@ public class AdminProductAdditionalEntity {
 
     @Column(name = "CREATED_AT", updatable = false, insertable = false)
     private LocalDateTime createdAt;
+
 }

@@ -9,4 +9,6 @@ import java.util.List;
 public interface AdminProductOptionRepository extends JpaRepository<AdminProductOptionEntity, Long> {
 
     List<AdminProductOptionEntity> findByProduct(AdminProductEntity product);
+
+    List<AdminProductOptionEntity> findByProductAndDeleteYn(AdminProductEntity product, String deleteYn);
 }

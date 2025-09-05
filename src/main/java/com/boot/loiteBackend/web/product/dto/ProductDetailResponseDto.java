@@ -29,6 +29,9 @@ public class ProductDetailResponseDto {
     @Schema(description = "선택 가능한 사은품 리스트", implementation = ProductGiftDto.class)
     private List<ProductGiftDto> gifts;
 
+    @Schema(description = "선택 가능한 추가구성품 리스트", implementation = ProductAdditionalDto.class)
+    private List<ProductAdditionalDto> additionals;
+
     @Schema(description = "상품 정가", example = "299000.00")
     private BigDecimal productPrice;
 
@@ -97,6 +100,29 @@ public class ProductDetailResponseDto {
 
         @Schema(description = "사은품 재고 수량", example = "5")
         private int giftStock;
+
+        @Schema(description = "품절 여부", example = "false")
+        private Boolean soldOutYn;
+    }
+
+    // 추가구성품
+    @Getter
+    @Builder
+    public static class ProductAdditionalDto {
+        @Schema(description = "상품과 추가구성품 고유 연결 ID", example = "11")
+        private Long productAdditionalId;
+
+        @Schema(description = "사은품 ID", example = "11")
+        private Long additionalId;
+
+        @Schema(description = "사은품명", example = "코튼 러그")
+        private String additionalName;
+
+        @Schema(description = "사은품 이미지", example = "example")
+        private String additionalImageUrl;
+
+        @Schema(description = "사은품 재고 수량", example = "5")
+        private int additionalStock;
 
         @Schema(description = "품절 여부", example = "false")
         private Boolean soldOutYn;

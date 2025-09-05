@@ -21,7 +21,6 @@ import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionR
 import com.boot.loiteBackend.admin.product.product.dto.*;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductImageEntity;
-import com.boot.loiteBackend.admin.product.product.enums.ImageType;
 import com.boot.loiteBackend.admin.product.product.mapper.AdminProductImageMapper;
 import com.boot.loiteBackend.admin.product.product.mapper.AdminProductMapper;
 import com.boot.loiteBackend.admin.product.product.repository.AdminProductImageRepository;
@@ -36,6 +35,7 @@ import com.boot.loiteBackend.admin.product.tag.repository.AdminProductTagReposit
 import com.boot.loiteBackend.admin.product.tag.repository.AdminTagRepository;
 import com.boot.loiteBackend.common.file.FileService;
 import com.boot.loiteBackend.common.file.FileUploadResult;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -454,6 +453,8 @@ public class AdminProductServiceImpl implements AdminProductService {
         AdminProductEntity product = adminProductRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
 
+        List<AdminProductOptionEntity> options = adminProductOptionRepository.findByProductAndDeleteYn(product, "N");
+
         AdminProductDetailResponseDto dto = new AdminProductDetailResponseDto();
         dto.setProductId(product.getProductId());
         dto.setProductName(product.getProductName());
@@ -560,6 +561,17 @@ public class AdminProductServiceImpl implements AdminProductService {
         dto.setAdditionals(additionalDtos);
 
         return dto;
+    }
+
+    @Transactional
+    @Override
+    public void deleteOption(Long optionId) {
+        AdminProductOptionEntity option = adminProductOptionRepository.findById(optionId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 옵션이 존재하지 않습니다. ID=" + optionId));
+
+        option.setDeleteYn("Y");
+        option.setSoldOutYn("Y"); // 삭제된건 품절 처리로
+        option.setOptionStock(0); // 재고도 0으로
     }
 
 }

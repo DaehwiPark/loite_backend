@@ -5,6 +5,7 @@ import com.boot.loiteBackend.admin.product.product.dto.AdminProductRequestDto;
 import com.boot.loiteBackend.admin.product.product.dto.AdminProductListResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,4 +21,6 @@ public interface AdminProductService {
     AdminProductDetailResponseDto getAllProductDetail(Long productId);
 
     void deleteProduct(Long productId);
+
+    void deleteOption(Long optionId);
 }

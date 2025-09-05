@@ -1,8 +1,16 @@
 package com.boot.loiteBackend.web.product.service;
 
+import com.boot.loiteBackend.admin.product.additional.entity.AdminAdditionalEntity;
+import com.boot.loiteBackend.admin.product.additional.entity.AdminProductAdditionalEntity;
+import com.boot.loiteBackend.admin.product.additional.repository.AdminAdditionalRepository;
+import com.boot.loiteBackend.admin.product.additional.repository.AdminProductAdditionalRepository;
 import com.boot.loiteBackend.admin.product.category.entity.AdminProductCategoryEntity;
 import com.boot.loiteBackend.admin.product.category.repository.AdminProductCategoryRepository;
 import com.boot.loiteBackend.admin.product.gift.entity.AdminGiftEntity;
+import com.boot.loiteBackend.admin.product.gift.entity.AdminProductGiftEntity;
+import com.boot.loiteBackend.admin.product.gift.repository.AdminProductGiftRepository;
+import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
+import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductImageEntity;
 import com.boot.loiteBackend.admin.product.product.repository.AdminProductRepository;
@@ -30,6 +38,9 @@ public class ProductServiceImpl implements ProductService {
 
     private final AdminProductRepository productRepository;
     private final AdminProductCategoryRepository adminProductCategoryRepository;
+    private final AdminProductOptionRepository adminProductOptionRepository;
+    private final AdminProductGiftRepository adminProductGiftRepository;
+    private final AdminProductAdditionalRepository adminProductAdditionalRepository;
 
     @Override
     public List<ProductMainResponseDto> getMainProducts() {
@@ -102,11 +113,16 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(dtoList, pageable, productPage.getTotalElements());
     }
 
-
     @Override
     public ProductDetailResponseDto getDetailProducts(Long productId) {
         AdminProductEntity entity = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
+
+        List<AdminProductOptionEntity> optionCheck = adminProductOptionRepository.findByProductAndDeleteYn(entity, "N");
+        List<AdminProductGiftEntity> giftCheck = adminProductGiftRepository.findByProductAndDeleteYn(entity, "N");
+        List<AdminProductAdditionalEntity> additionalCheck = adminProductAdditionalRepository.findByProductAndDeleteYn(entity, "N");
+
+
 
         // 썸네일 이미지
         List<String> thumbnailImages = entity.getProductImages().stream()
@@ -115,7 +131,7 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
 
         // 옵션
-        List<ProductDetailResponseDto.ProductOptionDto> options = entity.getProductOptions().stream()
+        List<ProductDetailResponseDto.ProductOptionDto> options = optionCheck.stream()
                 .map(option -> ProductDetailResponseDto.ProductOptionDto.builder()
                         .optionId(option.getOptionId())
                         .optionType(option.getOptionType())
@@ -128,7 +144,7 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
 
         // 사은품
-        List<ProductDetailResponseDto.ProductGiftDto> gifts = entity.getProductGifts().stream()
+        List<ProductDetailResponseDto.ProductGiftDto> gifts = giftCheck.stream()
                 .map(pg -> {
                     AdminGiftEntity gift = pg.getGift();
                     return ProductDetailResponseDto.ProductGiftDto.builder()
@@ -141,6 +157,22 @@ public class ProductServiceImpl implements ProductService {
                             .build();
                 })
                 .toList();
+
+        // 추가구성품
+        List<ProductDetailResponseDto.ProductAdditionalDto> additionals = additionalCheck.stream()
+                .map(pa -> {
+                    AdminAdditionalEntity additional = pa.getAdditional();
+                    return ProductDetailResponseDto.ProductAdditionalDto.builder()
+                            .productAdditionalId(pa.getProductAdditionalId())
+                            .additionalId(additional.getAdditionalId())
+                            .additionalName(additional.getAdditionalName())
+                            .additionalImageUrl(additional.getAdditionalImageUrl())
+                            .additionalStock(additional.getAdditionalStock())
+                            .soldOutYn("Y".equalsIgnoreCase(additional.getSoldOutYn()))
+                            .build();
+                })
+                .toList();
+
 
         // 상세 섹션
         List<ProductDetailResponseDto.ProductSectionDto> sections = entity.getProductSections().stream()
@@ -159,6 +191,7 @@ public class ProductServiceImpl implements ProductService {
                 .thumbnailImages(thumbnailImages)
                 .options(options)
                 .gifts(gifts)
+                .additionals(additionals)
                 .productPrice(entity.getProductPrice())
                 .discountedPrice(entity.getDiscountedPrice())
                 .discountRate(entity.getDiscountRate())

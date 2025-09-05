@@ -49,10 +49,18 @@ public class AdminProductController {
         return ResponseEntity.ok("ID가 " + productId + "인 상품이 수정되었습니다.");
     }
 
+    @Operation(summary = "상품 삭제", description = "상품을 삭제합니다.")
     @DeleteMapping("/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
         adminProductService.deleteProduct(productId);
         return ResponseEntity.ok("상품이 삭제되었습니다.");
+    }
+
+    @Operation(summary = "상품 옵션 삭제", description = "옵션을 삭제합니다.")
+    @DeleteMapping("/option/{optionId}")
+    public ResponseEntity<Void> deleteOption(@PathVariable Long optionId) {
+        adminProductService.deleteOption(optionId);
+        return ResponseEntity.noContent().build(); // 204 반환
     }
 
     @Operation(summary = "상품 목록 조회", description = "상품 목록을 조회합니다.")
