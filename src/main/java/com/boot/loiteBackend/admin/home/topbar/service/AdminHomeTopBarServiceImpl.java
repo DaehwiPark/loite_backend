@@ -2,6 +2,10 @@ package com.boot.loiteBackend.admin.home.topbar.service;
 
 import com.boot.loiteBackend.admin.home.topbar.dto.*;
 import com.boot.loiteBackend.admin.home.topbar.repository.AdminHomeTopBarRepository;
+import com.boot.loiteBackend.common.util.PageUtils;
+import com.boot.loiteBackend.common.util.SortUtils;
+import com.boot.loiteBackend.common.util.TextUtils;
+import com.boot.loiteBackend.common.util.YnUtils;
 import com.boot.loiteBackend.domain.home.topbar.entity.HomeTopBarEntity;
 import com.boot.loiteBackend.domain.home.topbar.mapper.HomeTopBarMapper;
 import com.boot.loiteBackend.global.error.exception.CustomException;
@@ -10,14 +14,14 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.boot.loiteBackend.admin.home.topbar.error.AdminHomeTopBarErrorCode.*;
 
@@ -33,16 +37,41 @@ public class AdminHomeTopBarServiceImpl implements AdminHomeTopBarService {
     @PersistenceContext
     private EntityManager em;
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+    /** 잘못된 Y/N이면 도메인 예외로 변환 */
+    private static String normalizeYnOrThrow(String value, String defaultWhenBlank) {
+        if (TextUtils.isBlank(value)) return defaultWhenBlank;
+        String v = value.trim().toUpperCase();
+        if (!YnUtils.isValidYn(v)) throw new CustomException(INVALID_REQUEST);
+        return "Y".equals(v) ? "Y" : "N";
     }
 
-    /** Y/N 정규화. 허용값 외 입력 시 INVALID_REQUEST */
-    private static String normalizeYnOrThrow(String value, String defaultWhenBlank) {
-        if (isBlank(value)) return defaultWhenBlank;
-        String v = value.trim().toUpperCase();
-        if (!"Y".equals(v) && !"N".equals(v)) throw new CustomException(INVALID_REQUEST);
-        return v;
+    /** 허용 정렬 컬럼 */
+    private static final Set<String> ALLOWED_SORTS =
+            Set.of("createdAt", "updatedAt", "defaultYn", "displayYn", "homeTopBarText");
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AdminHomeTopBarResponseDto> list(Pageable pageable, String keyword) {
+        // 1) 허용된 정렬만 남기고, 없다면 createdAt DESC 기본
+        Sort sanitizedSort = SortUtils.whitelist(
+                (pageable != null ? pageable.getSort() : null),
+                ALLOWED_SORTS,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        // 2) 페이지/사이즈 안전 보정 + 정렬 적용
+        Pageable sanitizedPageable = PageRequest.of(
+                pageable == null ? 0 : Math.max(0, pageable.getPageNumber()),
+                pageable == null ? 10 : Math.max(1, pageable.getPageSize()),
+                sanitizedSort
+        );
+        Pageable safePageable = PageUtils.safePageable(sanitizedPageable, sanitizedSort);
+
+        Page<HomeTopBarEntity> page = TextUtils.isBlank(keyword)
+                ? repository.findAll(safePageable)
+                : repository.search(keyword.trim(), safePageable);
+
+        return page.map(mapper::toResponse);
     }
 
     @Override
@@ -64,7 +93,7 @@ public class AdminHomeTopBarServiceImpl implements AdminHomeTopBarService {
 
         try {
             if (Objects.equals(entity.getDefaultYn(), "Y")) {
-                // 전역 스코프: 모두 N으로 초기화 후 flush
+                // 기존 대표 N 처리 후 flush (유니크 충돌 예방)
                 repository.clearDefaultAll(loginUserId);
                 em.flush();
             }
@@ -86,56 +115,48 @@ public class AdminHomeTopBarServiceImpl implements AdminHomeTopBarService {
         HomeTopBarEntity entity = repository.findById(dto.getId())
                 .orElseThrow(() -> new CustomException(TOPBAR_NOT_FOUND));
 
-        // 0) 요청 해석: 이번 요청이 "기본으로 설정(Y)" 의도인지 먼저 확정
-        final boolean wantsDefaultY =
-                dto.getDefaultYn() != null && "Y".equalsIgnoreCase(dto.getDefaultYn());
+        // "기본으로 설정(Y)" 의도 파악
+        final boolean wantsDefaultY = dto.getDefaultYn() != null && "Y".equalsIgnoreCase(dto.getDefaultYn());
 
-        // 1) ★중요★ 매퍼가 defaultYn을 먼저 Y로 올려버리는 상황을 차단
-        //    → bulk 실행 전 flush 시점에 Y가 반영되지 않도록!
-        String keepDefaultYnFromDto = dto.getDefaultYn(); // 나중에 재적용하기 위해 백업
-        if (wantsDefaultY) {
-            dto.setDefaultYn(null); // 매퍼가 defaultYn을 변경하지 못하게 제거
-        }
+        // bulk 이전 flush에서 Y가 먼저 반영되지 않도록 DTO 값 잠시 제거
+        String keepDefaultYnFromDto = dto.getDefaultYn();
+        if (wantsDefaultY) dto.setDefaultYn(null);
 
-        // 2) 부분 업데이트 (기타 필드만 patch)
+        // patch
         mapper.updateEntityFromDto(dto, entity);
 
-        // 3) displayYn 정규화/검증
+        // displayYn 정규화/검증
         entity.setDisplayYn(normalizeYnOrThrow(entity.getDisplayYn(), "Y"));
 
         try {
             if (wantsDefaultY) {
-                // 4) 본인 제외 전부 N → flush (유니크 충돌 예방을 위한 실제 DB 반영)
+                // 본인 제외 전부 N → flush
                 repository.clearDefaultAllExcept(entity.getId(), loginUserId);
-                em.flush(); // 이 시점에 "기존 기본"이 이미 N으로 바뀜
-
-                // 5) 이제 대상 엔티티만 Y로 설정
+                em.flush();
+                // 대상만 Y
                 entity.setDefaultYn("Y");
             } else if ("N".equalsIgnoreCase(keepDefaultYnFromDto)) {
                 entity.setDefaultYn("N");
             } else {
-                // 명시 없으면 현재값 정규화만
                 entity.setDefaultYn(normalizeYnOrThrow(entity.getDefaultYn(), "N"));
             }
 
-            // 6) 감사필드
+            // 감사필드
             entity.setUpdatedBy(loginUserId);
             entity.setUpdatedAt(LocalDateTime.now(clock));
 
             HomeTopBarEntity saved = repository.save(entity);
-            em.flush(); // 유니크 제약 즉시 검증
+            em.flush(); // unique 제약 즉시 검증
             return mapper.toResponse(saved);
 
         } catch (DataIntegrityViolationException e) {
-            // 혹시 동시 요청으로 경합이 생기면 일관된 도메인 예외로 변환
             log.error(e.getMessage(), e);
             throw new CustomException(DUPLICATE_DEFAULT);
         } finally {
-            // 원본 DTO 복구(테스트나 재사용 방지용; 선택 사항)
+            // 원본 DTO 복구(선택)
             dto.setDefaultYn(keepDefaultYnFromDto);
         }
     }
-
 
     @Override
     @Transactional
@@ -151,15 +172,5 @@ public class AdminHomeTopBarServiceImpl implements AdminHomeTopBarService {
         HomeTopBarEntity entity = repository.findById(id)
                 .orElseThrow(() -> new CustomException(TOPBAR_NOT_FOUND));
         return mapper.toResponse(entity);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<AdminHomeTopBarResponseDto> listAll() {
-        return repository.findAll().stream()
-                .sorted(Comparator.comparing(HomeTopBarEntity::getUpdatedAt,
-                        Comparator.nullsFirst(Comparator.naturalOrder())).reversed())
-                .map(mapper::toResponse)
-                .toList();
     }
 }
