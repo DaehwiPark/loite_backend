@@ -5,17 +5,12 @@ import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntit
 import com.boot.loiteBackend.admin.product.option.repository.AdminProductOptionRepository;
 import com.boot.loiteBackend.global.error.exception.CustomException;
 import com.boot.loiteBackend.web.cartItem.dto.*;
+import com.boot.loiteBackend.web.cartItem.entity.CartItemAdditionalEntity;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemEntity;
 import com.boot.loiteBackend.web.cartItem.entity.CartItemGiftEntity;
 import com.boot.loiteBackend.web.cartItem.error.CartItemErrorCode;
-import com.boot.loiteBackend.web.cartItem.projection.AvailableGiftProjection;
-import com.boot.loiteBackend.web.cartItem.projection.AvailableOptionProjection;
-import com.boot.loiteBackend.web.cartItem.projection.CartItemGiftProjection;
-import com.boot.loiteBackend.web.cartItem.projection.CartItemProjection;
-import com.boot.loiteBackend.web.cartItem.repository.CartItemGiftRepository;
-import com.boot.loiteBackend.web.cartItem.repository.CartItemOptionRepository;
-import com.boot.loiteBackend.web.cartItem.repository.CartItemProductGiftRepository;
-import com.boot.loiteBackend.web.cartItem.repository.CartItemRepository;
+import com.boot.loiteBackend.web.cartItem.projection.*;
+import com.boot.loiteBackend.web.cartItem.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -44,9 +39,10 @@ public class CartItemServiceImpl implements CartItemService {
     private final AdminProductOptionRepository productOptionRepository;
     private final AdminGiftRepository adminGiftRepository;
     private final CartItemProductGiftRepository cartItemProductGiftRepository;
+    private final CartItemAdditionalRepository cartItemAdditionalRepository;
 
-    @Transactional
     @Override
+    @Transactional
     public void addToCart(Long loginUserId, List<CartItemRequestDto> requestList) {
         for (CartItemRequestDto item : requestList) {
 
@@ -107,6 +103,28 @@ public class CartItemServiceImpl implements CartItemService {
                     }
                 }
             }
+
+            // 추가구성품 저장
+            if (item.getAdditionals() != null && !item.getAdditionals().isEmpty()) {
+                for (CartItemAdditionalDto additionalDto : item.getAdditionals()) {
+                    Optional<CartItemAdditionalEntity> existingAdditional =
+                            cartItemAdditionalRepository.findByCartItemIdAndAdditionalId(entity.getId(), additionalDto.getProductAdditionalId());
+
+                    if (existingAdditional.isPresent()) {
+                        CartItemAdditionalEntity additionalEntity = existingAdditional.get();
+                        additionalEntity.setQuantity(additionalEntity.getQuantity() + additionalDto.getQuantity());
+                        additionalEntity.setUpdatedAt(LocalDateTime.now());
+                    } else {
+                        CartItemAdditionalEntity additionalEntity = CartItemAdditionalEntity.builder()
+                                .cartItemId(entity.getId())
+                                .additionalId(additionalDto.getProductAdditionalId())
+                                .quantity(additionalDto.getQuantity())
+                                .createdAt(LocalDateTime.now())
+                                .build();
+                        cartItemAdditionalRepository.save(additionalEntity);
+                    }
+                }
+            }
         }
     }
 
@@ -137,42 +155,6 @@ public class CartItemServiceImpl implements CartItemService {
         }
     }
 
-    private void handleCartItem(Long userId, Long productId, Long optionId, List<CartItemGiftDto> gifts, int quantity) {
-        // 장바구니에 동일 상품+옵션이 있는지 확인 (사은품은 따로 비교 안 함)
-        Optional<CartItemEntity> existingItem = cartItemRepository
-                .findByUserIdAndProductIdAndProductOptionId(userId, productId, optionId);
-
-        CartItemEntity cartItem;
-        if (existingItem.isPresent()) {
-            cartItem = existingItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
-            cartItem.setUpdatedAt(LocalDateTime.now());
-        } else {
-            cartItem = CartItemEntity.builder()
-                    .userId(userId)
-                    .productId(productId)
-                    .productOptionId(optionId)
-                    .quantity(quantity)
-                    .checkedYn("1")
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            cartItemRepository.save(cartItem);
-        }
-
-        // 사은품 매핑 저장
-        if (gifts != null && !gifts.isEmpty()) {
-            List<CartItemGiftEntity> giftEntities = gifts.stream()
-                    .map(g -> CartItemGiftEntity.builder()
-                            .cartItemId(cartItem.getId()) // 장바구니 PK 참조
-                            .giftId(g.getProductGiftId()) // tb_product_gift의 PK
-                            .quantity(g.getQuantity())
-                            .createdAt(LocalDateTime.now())
-                            .build())
-                    .toList();
-            cartItemGiftRepository.saveAll(giftEntities);
-        }
-    }
-
     @Override
     @Transactional(readOnly = true)
     public List<CartItemResponseDto> getCartItemsByUser(Long loginUserId) {
@@ -198,6 +180,20 @@ public class CartItemServiceImpl implements CartItemService {
                         .giftSoldOutYn(Optional.ofNullable(p.getGiftStock()).orElse(0) <= 0)
                         .build())
                 .collect(Collectors.groupingBy(CartItemGiftResponseDto::getCartItemId));
+
+        List<CartItemAdditionalProjection> addtionalProjections = cartItemAdditionalRepository.findAdditionalDetailsByCartItemIds(cartItemIds);
+
+        Map<Long, List<CartItemAdditionalResponseDto>> additionalMap = addtionalProjections.stream()
+                .map(p -> CartItemAdditionalResponseDto.builder()
+                        .cartItemId(p.getCartItemId())
+                        .productAdditionalId(p.getProductAdditionalId())
+                        .additionalName(p.getAdditionalName())
+                        .additionalImageUrl(p.getAdditionalImageUrl())
+                        .additionalStock(p.getAdditionalStock())
+                        .quantity(p.getQuantity())
+                        .additionalSoldOutYn(Optional.ofNullable(p.getAdditionalStock()).orElse(0) <= 0)
+                        .build())
+                .collect(Collectors.groupingBy(CartItemAdditionalResponseDto::getCartItemId));
 
         return groupedByCartItemId.entrySet().stream()
                 .map(entry -> {
@@ -236,6 +232,7 @@ public class CartItemServiceImpl implements CartItemService {
                             .discountRate(Optional.ofNullable(p.getDiscountRate()).orElse(0)) // NPE 방지
                             .checked(p.getChecked() != null && p.getChecked() == 1)
                             .gifts(giftMap.getOrDefault(p.getCartItemId(), List.of()))
+                            .additionals(additionalMap.getOrDefault(p.getCartItemId(), List.of()))
                             .build();
                 })
                 .toList();

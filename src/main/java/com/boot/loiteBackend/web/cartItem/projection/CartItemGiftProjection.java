@@ -7,12 +7,4 @@ public interface CartItemGiftProjection {
     String getGiftImageUrl();
     Integer getGiftStock();
     Integer getQuantity();
-    String getGiftSoldOutYn();
-
-    /*Long getProductId();
-    String getProductName();
-
-    Long getOptionId();
-    String getOptionValue();
-    String getOptionColorCode();*/
 }

@@ -63,6 +63,8 @@ public class CartItemResponseDto {
 
     private List<CartItemGiftResponseDto> gifts;
 
+    private List<CartItemAdditionalResponseDto> additionals;
+
 
     public BigDecimal getTotalPrice() {
         BigDecimal basePrice = discountedPrice != null ? discountedPrice : unitPrice;

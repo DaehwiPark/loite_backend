@@ -36,20 +36,6 @@ public class CartItemController {
         return ResponseEntity.ok(items);
     }
 
-    @Operation(summary = "상품 선택 상태 수정", description = "장바구니에 담긴 상품의 선택 상태를 수정합니다.")
-    @PatchMapping("/{cartItemId}/checked")//?checked=false or true
-    public ResponseEntity<Void> updateCheckedYn(@PathVariable Long cartItemId, @RequestParam boolean checked, @AuthenticationPrincipal CustomUserDetails loginUser) {
-        cartItemService.updateCheckedYn(loginUser.getUserId(), cartItemId, checked);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "장바구니 상품 단일 삭제", description = "장바구니에 추가된 상품을 골라 삭제합니다.")
-    @DeleteMapping("/selectDelete") /*@AuthenticationPrincipal*/
-    public ResponseEntity<Void> deleteCartItems(@AuthenticationPrincipal CustomUserDetails loginUser, @RequestBody CartItemDeleteRequestDto requestDto) {
-        cartItemService.deleteCartItems(loginUser.getUserId(), requestDto.getCartItemIds());
-        return ResponseEntity.noContent().build(); // 204 응답
-    }
-
     @Operation(summary = "장바구니 상품 중복 삭제", description = "장바구니에 추가된 상품을 선택하여 중복 삭제합니다.")
     @DeleteMapping("/checkedDelete")
     public ResponseEntity<Void> deleteCheckedCartItems(@AuthenticationPrincipal CustomUserDetails loginUser, @RequestBody CartItemDeleteRequestDto requestDto) {
@@ -61,24 +47,6 @@ public class CartItemController {
     @PutMapping("/{cartItemId}/updateOption")
     public ResponseEntity<Void> updateCartItemOption(@PathVariable Long cartItemId, @RequestBody CartItemOptionUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
         cartItemService.updateCartItemOption(loginUser.getUserId(), cartItemId, requestDto);
-        return ResponseEntity.ok().build();
-    }
-
-    /*@Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니에 추가된 상품의 사은품을 변경합니다.")
-    @PutMapping("/{cartItemId}/updateGift") 
-    public ResponseEntity<Void> updateCartItemGifts(
-            @AuthenticationPrincipal CustomUserDetails loginUser,
-            @PathVariable Long cartItemId,
-            @RequestBody List<CartItemGiftUpdateRequestDto.GiftItem> requestDtoList
-    ){
-        cartItemService.updateCartItemGifts(loginUser.getUserId(), cartItemId, requestDtoList);
-        return ResponseEntity.ok().build();
-    }*/
-
-    @Operation(summary = "장바구니 상품 수량 변경", description = "장바구니에 추가된 상품의 수량을 변경합니다.")
-    @PatchMapping("/{cartItemId}/updateProductQuantity")
-    public ResponseEntity<Void> updateCartItemQuantity(@PathVariable Long cartItemId, @RequestBody CartItemQuantityUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
-        cartItemService.updateCartItemQuantity(loginUser.getUserId(), cartItemId, requestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -102,4 +70,36 @@ public class CartItemController {
         cartItemService.updateCartItemGifts(loginUser.getUserId(), cartItemId, requestDto);
         return ResponseEntity.ok().build();
     }
+
+    /*@Operation(summary = "상품 선택 상태 수정", description = "장바구니에 담긴 상품의 선택 상태를 수정합니다.")
+    @PatchMapping("/{cartItemId}/checked")//?checked=false or true
+    public ResponseEntity<Void> updateCheckedYn(@PathVariable Long cartItemId, @RequestParam boolean checked, @AuthenticationPrincipal CustomUserDetails loginUser) {
+        cartItemService.updateCheckedYn(loginUser.getUserId(), cartItemId, checked);
+        return ResponseEntity.ok().build();
+    }*/
+
+    /*@Operation(summary = "장바구니 상품 단일 삭제", description = "장바구니에 추가된 상품을 골라 삭제합니다.")
+    @DeleteMapping("/selectDelete") *//*@AuthenticationPrincipal*//*
+    public ResponseEntity<Void> deleteCartItems(@AuthenticationPrincipal CustomUserDetails loginUser, @RequestBody CartItemDeleteRequestDto requestDto) {
+        cartItemService.deleteCartItems(loginUser.getUserId(), requestDto.getCartItemIds());
+        return ResponseEntity.noContent().build(); // 204 응답
+    }*/
+
+    /*@Operation(summary = "장바구니 상품 사은품 변경", description = "장바구니에 추가된 상품의 사은품을 변경합니다.")
+    @PutMapping("/{cartItemId}/updateGift") 
+    public ResponseEntity<Void> updateCartItemGifts(
+            @AuthenticationPrincipal CustomUserDetails loginUser,
+            @PathVariable Long cartItemId,
+            @RequestBody List<CartItemGiftUpdateRequestDto.GiftItem> requestDtoList
+    ){
+        cartItemService.updateCartItemGifts(loginUser.getUserId(), cartItemId, requestDtoList);
+        return ResponseEntity.ok().build();
+    }*/
+
+    /*@Operation(summary = "장바구니 상품 수량 변경", description = "장바구니에 추가된 상품의 수량을 변경합니다.")
+    @PatchMapping("/{cartItemId}/updateProductQuantity")
+    public ResponseEntity<Void> updateCartItemQuantity(@PathVariable Long cartItemId, @RequestBody CartItemQuantityUpdateRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails loginUser) {
+        cartItemService.updateCartItemQuantity(loginUser.getUserId(), cartItemId, requestDto);
+        return ResponseEntity.ok().build();
+    }*/
 }

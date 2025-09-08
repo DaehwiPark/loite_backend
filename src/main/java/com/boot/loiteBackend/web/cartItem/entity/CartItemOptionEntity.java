@@ -1,0 +1,33 @@
+package com.boot.loiteBackend.web.cartItem.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "tb_product_cart_item_option")
+public class CartItemOptionEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "CART_ITEM_OPTION_ID")
+    private Long id;
+
+    @Column(name = "CART_ITEM_ID", nullable = false)
+    private Long cartItemId;
+
+    @Column(name = "PRODUCT_OPTION_ID", nullable = false)
+    private Long optionId;
+
+    @Column(name = "CREATED_AT")
+    private LocalDateTime createdAt;
+
+    @Column(name = "UPDATED_AT")
+    private LocalDateTime updatedAt;
+}

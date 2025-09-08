@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class CartItemOptionGiftDto {
 
-    @Schema(description = "옵션id", example = "1")
+    @Schema(description = "옵션 ID", example = "1")
     private Long productOptionId;
 
     @Schema(description = "수량", example = "1")
