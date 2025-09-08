@@ -80,7 +80,7 @@ public class AdminHomeEventBannerController {
     @GetMapping
     public ResponseEntity<Page<AdminHomeEventBannerResponseDto>> list(
             @ParameterObject
-            @PageableDefault(page = 0, size = 10) Pageable pageable, // 정렬은 서비스에서 기본값 적용
+            @PageableDefault(page = 0, size = 10) Pageable pageable,
             @ParameterObject
             @ModelAttribute AdminHomeEventBannerListRequestDto filter
     ) {
