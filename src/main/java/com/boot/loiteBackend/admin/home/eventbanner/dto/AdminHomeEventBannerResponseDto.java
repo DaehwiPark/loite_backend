@@ -1,6 +1,7 @@
 package com.boot.loiteBackend.admin.home.eventbanner.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -43,14 +44,14 @@ public class AdminHomeEventBannerResponseDto {
     @Schema(description = "노출 여부", example = "Y", allowableValues = {"Y", "N"})
     private String displayYn;
 
+    @Schema(description = "기본값 여부", example = "Y", allowableValues = {"Y", "N"})
+    private String defaultYn;
+
     @Schema(description = "노출 시작일시")
     private LocalDateTime startAt;
 
     @Schema(description = "노출 종료일시")
     private LocalDateTime endAt;
-
-    @Schema(description = "정렬 순서 (낮을수록 먼저 노출)", example = "1")
-    private Integer sortOrder;
 
     @Schema(description = "대표 슬롯(1/2), 일반 배너는 null", example = "1", nullable = true)
     private Integer defaultSlot;

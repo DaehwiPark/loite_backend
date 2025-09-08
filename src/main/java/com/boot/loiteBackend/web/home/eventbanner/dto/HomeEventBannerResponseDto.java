@@ -40,9 +40,6 @@ public class HomeEventBannerResponseDto {
     @Schema(description = "노출 종료일시(포함)", example = "2025-09-30T23:59:59")
     private LocalDateTime endAt;
 
-    @Schema(description = "정렬 순서(낮을수록 먼저 노출)", example = "0")
-    private Integer sortOrder;
-
     @Schema(description = "대표 슬롯(1/2), 일반 배너는 null", example = "1", nullable = true)
     private Integer defaultSlot;
 }

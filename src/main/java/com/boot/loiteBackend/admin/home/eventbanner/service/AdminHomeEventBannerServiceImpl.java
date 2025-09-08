@@ -11,7 +11,6 @@ import com.boot.loiteBackend.common.file.FileUploadResult;
 import com.boot.loiteBackend.domain.home.eventbanner.entity.HomeEventBannerEntity;
 import com.boot.loiteBackend.domain.home.eventbanner.mapper.HomeEventBannerMapper;
 import com.boot.loiteBackend.global.error.exception.CustomException;
-import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.*;
@@ -21,9 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.boot.loiteBackend.admin.home.eventbanner.error.AdminHomeEventBannerErrorCode.*;
 
@@ -39,36 +35,58 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
     private static final String UPLOAD_CATEGORY = "etc";
 
     /**
-     * 기본 정렬: sortOrder ASC → startAt DESC → id DESC
+     * 기본 정렬: startAt DESC → id DESC (sortOrder 제거됨)
      */
     private Sort defaultSort() {
         return Sort.by(
-                Sort.Order.asc("sortOrder"),
                 Sort.Order.desc("startAt"),
                 Sort.Order.desc("id")
         );
     }
 
+    /**
+     * DEFAULT_YN='Y' 규칙 검증: DEFAULT_SLOT은 1 또는 2만 허용
+     */
+    private void validateDefaultRule(String defaultYn, Integer defaultSlot) {
+        if ("Y".equalsIgnoreCase(defaultYn)) {
+            if (defaultSlot == null || (defaultSlot != 1 && defaultSlot != 2)) {
+                throw new CustomException(INVALID_REQUEST);
+            }
+        }
+    }
+
+    /**
+     * DEFAULT_YN='Y' 저장 전에 같은 슬롯의 기존 기본값들을 'N'으로 초기화
+     */
+    private void ensureSingleDefaultPerSlot(String defaultYn, Integer defaultSlot, Long excludeId) {
+        if ("Y".equalsIgnoreCase(defaultYn)) {
+            repository.clearDefaultYnBySlot(defaultSlot, excludeId);
+        }
+    }
 
     @Override
-    public AdminHomeEventBannerResponseDto create(AdminHomeEventBannerCreateRequestDto req, MultipartFile pcImage,  MultipartFile mobileImage, Long loginUserId) {
-        if (loginUserId == null)
-            throw new CustomException(UNAUTHORIZED);
-        if (req == null)
-            throw new CustomException(INVALID_REQUEST);
+    public AdminHomeEventBannerResponseDto create(AdminHomeEventBannerCreateRequestDto req,
+                                                  MultipartFile pcImage,
+                                                  MultipartFile mobileImage,
+                                                  Long loginUserId) {
+        if (loginUserId == null) throw new CustomException(UNAUTHORIZED);
+        if (req == null) throw new CustomException(INVALID_REQUEST);
 
         try {
             HomeEventBannerEntity e = mapper.toEntity(req);
 
             // 기본값/정규화
             e.setDisplayYn(YnUtils.normalizeYnOrDefault(e.getDisplayYn(), "Y"));
+            e.setDefaultYn(YnUtils.normalizeYnOrDefault(e.getDefaultYn(), "N"));
             e.setLinkTarget(TextUtils.isBlank(e.getLinkTarget()) ? "_self" : e.getLinkTarget());
-            if (e.getSortOrder() == null) e.setSortOrder(0);
+
+            // DEFAULT 규칙 검증 및 단일성 보장 (등록은 excludeId=null)
+            validateDefaultRule(e.getDefaultYn(), e.getDefaultSlot());
+            ensureSingleDefaultPerSlot(e.getDefaultYn(), e.getDefaultSlot(), null);
 
             // 감사필드
             e.setCreatedBy(loginUserId);
             e.setUpdatedBy(loginUserId);
-            // createdAt/updatedAt 은 DB 기본값 사용 시 세팅 불필요
 
             // 파일 업로드 (PC)
             if (pcImage != null && !pcImage.isEmpty()) {
@@ -96,7 +114,7 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
             throw new CustomException(SAVE_FAILED);
         } catch (CustomException ce) {
             throw ce;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             throw new CustomException(SAVE_FAILED);
         }
     }
@@ -114,6 +132,14 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
 
         // patch (null 무시)
         mapper.updateEntityFromDto(req, e);
+
+        // Y/N 정규화 (명시 없으면 기존 값 유지)
+        e.setDisplayYn(YnUtils.normalizeYnOrDefault(e.getDisplayYn(), e.getDisplayYn()));
+        e.setDefaultYn(YnUtils.normalizeYnOrDefault(e.getDefaultYn(), e.getDefaultYn()));
+
+        // DEFAULT 규칙 검증 및 단일성 보장 (자기 자신 제외)
+        validateDefaultRule(e.getDefaultYn(), e.getDefaultSlot());
+        ensureSingleDefaultPerSlot(e.getDefaultYn(), e.getDefaultSlot(), e.getId());
 
         // 교체 전 경로 백업
         final String oldPcPath = e.getPcImagePath();
@@ -156,37 +182,32 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
             }
         }
 
-        // Y/N 정규화 (명시 없으면 유지)
-        e.setDisplayYn(YnUtils.normalizeYnOrDefault(e.getDisplayYn(), "Y"));
-
         // 감사필드
         e.setUpdatedBy(loginUserId);
 
         try {
             HomeEventBannerEntity saved = repository.save(e);
 
-            // ===== 캡처용 final 복사본 생성 (중요) =====
+            // 커밋 후 기존 파일 삭제(성공 시에만)
             final boolean pcReplacedFinal = pcReplaced;
             final boolean moReplacedFinal = moReplaced;
             final String newPcPathFinal = newPcPath;
             final String newMoPathFinal = newMoPath;
 
-            // 커밋 후 기존 파일 삭제(성공 시에만)
             if (pcReplacedFinal || moReplacedFinal) {
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
                         try {
-                            if (pcReplacedFinal && oldPcPath != null && !oldPcPath.equals(newPcPathFinal)) {
+                            if (pcReplacedFinal && oldPcPath != null && !oldPcPath.equals(newPcPathFinal))
                                 fileService.deleteQuietly(oldPcPath);
-                            }
-                        } catch (Exception ignore) {}
-
+                        } catch (Exception ignore) {
+                        }
                         try {
-                            if (moReplacedFinal && oldMoPath != null && !oldMoPath.equals(newMoPathFinal)) {
+                            if (moReplacedFinal && oldMoPath != null && !oldMoPath.equals(newMoPathFinal))
                                 fileService.deleteQuietly(oldMoPath);
-                            }
-                        } catch (Exception ignore) {}
+                        } catch (Exception ignore) {
+                        }
                     }
                 });
             }
@@ -194,17 +215,19 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
             return mapper.toAdminResponse(saved);
 
         } catch (DataAccessException dae) {
-            // DB 실패 시 새로 업로드한 파일 보상 삭제
             try {
                 if (pcReplaced && newPcPath != null) fileService.deleteQuietly(newPcPath);
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
             try {
                 if (moReplaced && newMoPath != null) fileService.deleteQuietly(newMoPath);
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
             throw new CustomException(SAVE_FAILED);
         }
     }
 
+    @Override
     public void delete(Long id, Long loginUserId) {
         if (loginUserId == null) throw new CustomException(UNAUTHORIZED);
         if (id == null) throw new CustomException(INVALID_REQUEST);
@@ -212,13 +235,11 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
         HomeEventBannerEntity e = repository.findById(id)
                 .orElseThrow(() -> new CustomException(NOT_FOUND));
 
-        // 파일 경로 백업
         final String pcPath = e.getPcImagePath();
         final String moPath = e.getMobileImagePath();
 
         repository.delete(e); // 물리 삭제
 
-        // 커밋 후 파일 삭제
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -234,7 +255,6 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
         });
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public AdminHomeEventBannerResponseDto detail(Long id) {
@@ -244,22 +264,16 @@ public class AdminHomeEventBannerServiceImpl implements AdminHomeEventBannerServ
         return mapper.toAdminResponse(e);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public Page<AdminHomeEventBannerResponseDto> list(Pageable pageable, AdminHomeEventBannerListRequestDto filter) {
-
-        // 기간 유효성 체크 (startFrom <= endTo)
         if (filter != null && filter.getStartFrom() != null && filter.getEndTo() != null) {
             if (filter.getStartFrom().isAfter(filter.getEndTo())) {
                 throw new CustomException(INVALID_REQUEST);
             }
         }
-
         Pageable safe = PageUtils.safePageable(pageable, defaultSort());
-
-        Specification<HomeEventBannerEntity> spec =
-                AdminHomeEventBannerSpecification.buildListSpec(filter);
+        Specification<HomeEventBannerEntity> spec = AdminHomeEventBannerSpecification.buildListSpec(filter);
         Page<HomeEventBannerEntity> page = repository.findAll(spec, safe);
         return page.map(mapper::toAdminResponse);
     }

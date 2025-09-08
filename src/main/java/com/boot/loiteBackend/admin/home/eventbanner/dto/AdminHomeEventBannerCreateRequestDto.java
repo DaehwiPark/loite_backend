@@ -23,22 +23,22 @@ public class AdminHomeEventBannerCreateRequestDto {
     private String linkUrl;
 
     @Schema(description = "링크 타겟", example = "_self", allowableValues = {"_self", "_blank"})
-    @Pattern(regexp = "_self|_blank", message = "linkTarget은 '_self' 또는 '_blank'만 허용됩니다.")
+    @Pattern(regexp = "_self/_blank", message = "linkTarget은 '_self' 또는 '_blank'만 허용됩니다.")
     private String linkTarget;
 
     @Schema(description = "노출 여부", example = "Y", allowableValues = {"Y", "N"})
     @Pattern(regexp = "Y|N", message = "displayYn은 'Y' 또는 'N'만 허용됩니다.")
     private String displayYn;
 
+    @Schema(description = "기본값 여부", example = "Y", allowableValues = {"Y", "N"})
+    @Pattern(regexp = "Y|N", message = "defaultYn은 'Y' 또는 'N'만 허용됩니다.")
+    private String defaultYn;
+
     @Schema(description = "노출 시작일시", example = "2025-09-01T00:00:00")
     private LocalDateTime startAt;
 
     @Schema(description = "노출 종료일시", example = "2025-10-01T00:00:00")
     private LocalDateTime endAt;
-
-    @Schema(description = "노출 정렬순서(낮을수록 상단)", example = "0")
-    @Min(value = 0, message = "sortOrder는 0 이상이어야 합니다.")
-    private Integer sortOrder;
 
     @Schema(description = "대표 슬롯(1/2) - 일반이면 null", example = "1", nullable = true)
     @Min(value = 1, message = "defaultSlot은 1 또는 2만 허용됩니다.")

@@ -23,6 +23,10 @@ public class AdminHomeEventBannerListRequestDto {
     @Pattern(regexp = "Y|N", message = "displayYn은 'Y' 또는 'N'만 허용됩니다.")
     private String displayYn;
 
+    @Schema(description = "기본값 여부", example = "Y", allowableValues = {"Y", "N"})
+    @Pattern(regexp = "Y|N", message = "defaultYn은 'Y' 또는 'N'만 허용됩니다.")
+    private String defaultYn;
+
     @Schema(description = "노출 시작일(이후, inclusive)", example = "2025-09-01T00:00:00")
     private LocalDateTime startFrom;
 
