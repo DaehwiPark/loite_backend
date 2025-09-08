@@ -76,6 +76,10 @@ public class HomeEventBannerEntity {
             columnDefinition = "CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '노출 여부(Y/N)'")
     private String displayYn;
 
+    @Column(name = "DEFAULT_YN", length = 1, nullable = false,
+            columnDefinition = "CHAR(1) NOT NULL DEFAULT 'N' COMMENT '기본 값 (Y/N)'")
+    private String defaultYn;
+
     @Column(name = "START_AT",
             columnDefinition = "DATETIME DEFAULT NULL COMMENT '노출 시작일시(옵션)'")
     private LocalDateTime startAt;
@@ -83,10 +87,6 @@ public class HomeEventBannerEntity {
     @Column(name = "END_AT",
             columnDefinition = "DATETIME DEFAULT NULL COMMENT '노출 종료일시(옵션)'")
     private LocalDateTime endAt;
-
-    @Column(name = "SORT_ORDER", nullable = false,
-            columnDefinition = "INT(11) NOT NULL DEFAULT 0 COMMENT '노출 정렬순서(낮을수록 상단)'")
-    private Integer sortOrder;
 
     @Column(name = "DEFAULT_SLOT",
             columnDefinition = "TINYINT(4) DEFAULT NULL COMMENT '대표 슬롯(1/2), NULL=일반'")

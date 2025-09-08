@@ -47,7 +47,6 @@ public interface HomeEventBannerMapper {
             @Mapping(source = "linkTarget", target = "linkTarget"),
             @Mapping(source = "startAt", target = "startAt"),
             @Mapping(source = "endAt", target = "endAt"),
-            @Mapping(source = "sortOrder", target = "sortOrder"),
             @Mapping(source = "defaultSlot", target = "defaultSlot")
     })
     HomeEventBannerResponseDto toWebResponse(HomeEventBannerEntity e);
