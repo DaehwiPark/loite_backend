@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AdminProductListResponseDto {
 
+    @Schema(description = "상품 고유 ID", example = "1001")
+    private Long productId;
+
     @Schema(description = "상품 등록일시", example = "2025-07-20T14:30:00")
     private LocalDateTime createdAt;
 
