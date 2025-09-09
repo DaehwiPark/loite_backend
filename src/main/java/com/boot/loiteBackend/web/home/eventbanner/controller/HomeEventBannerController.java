@@ -22,8 +22,8 @@ public class HomeEventBannerController {
     @Operation(summary = "이벤트 활성 배너", description = "DISPLAY_YN='Y' + 기간 충족 + 정렬 우선순위")
     @GetMapping
     public ResponseEntity<List<HomeEventBannerResponseDto>> list(
-            @Parameter(description = "최대 개수", example = "10")
-            @RequestParam(defaultValue = "10") int limit
+            @Parameter(description = "최대 개수", example = "2")
+            @RequestParam(defaultValue = "2") int limit
     ) {
         return ResponseEntity.ok(homeEventBannerService.getActiveBySection(limit));
     }
