@@ -426,6 +426,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
         return page.map(product -> {
             AdminProductListResponseDto dto = new AdminProductListResponseDto();
+            dto.setProductId(product.getProductId());
             dto.setProductName(product.getProductName());
             dto.setActiveYn(product.getActiveYn());
             dto.setCreatedAt(product.getCreatedAt());
