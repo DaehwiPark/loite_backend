@@ -14,7 +14,7 @@ public enum AdminHomeTopBarErrorCode implements ErrorCode {
     UNAUTHORIZED("AHTB_401", "인증되지 않았습니다.", HttpStatus.UNAUTHORIZED),
     DUPLICATE_DEFAULT("AHTB_409", "이미 다른 탑바가 기본으로 설정되어 있습니다.", HttpStatus.CONFLICT);
 
-    private final String code;      // 에러 코드
-    private final String message;   // 에러 메시지
-    private final HttpStatus status; // HTTP 상태 코드
+    private final String code;
+    private final String message;
+    private final HttpStatus status;
 }
