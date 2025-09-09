@@ -23,7 +23,6 @@ public class AdminHomeEventBannerCreateRequestDto {
     private String linkUrl;
 
     @Schema(description = "링크 타겟", example = "_self", allowableValues = {"_self", "_blank"})
-    @Pattern(regexp = "_self/_blank", message = "linkTarget은 '_self' 또는 '_blank'만 허용됩니다.")
     private String linkTarget;
 
     @Schema(description = "노출 여부", example = "Y", allowableValues = {"Y", "N"})
