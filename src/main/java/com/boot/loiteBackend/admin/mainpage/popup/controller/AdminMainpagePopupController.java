@@ -5,6 +5,7 @@ import com.boot.loiteBackend.admin.mainpage.popup.service.AdminMainpagePopupServ
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +37,18 @@ public class AdminMainpagePopupController {
         return ResponseEntity.noContent().build();
     }
 
-    // 관리자 리스트
+//    // 관리자 리스트
+//    @GetMapping
+//    public ResponseEntity<List<AdminMainpagePopupDetailDto>> listAllForAdmin() {
+//        return ResponseEntity.ok(adminMainpagePopupService.listAllForAdmin());
+//    }
+
     @GetMapping
-    public ResponseEntity<List<AdminMainpagePopupDetailDto>> listAllForAdmin() {
-        return ResponseEntity.ok(adminMainpagePopupService.listAllForAdmin());
+    public ResponseEntity<List<AdminMainpagePopupListItemDto>> listAllForAdmin(
+            @RequestParam(required = false) Integer titleMax,
+            @RequestParam(required = false) Integer detailMax
+    ) {
+        return ResponseEntity.ok(adminMainpagePopupService.listAllForAdminSummary(titleMax, detailMax));
     }
 
     // 실제 노출(현재 시각)
@@ -75,4 +84,19 @@ public class AdminMainpagePopupController {
         adminMainpagePopupService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
+
+    //팝업 저장 테스트
+    @PostMapping("/test")
+    public ResponseEntity<AdminMainPagePopupIdDto> createTest(@Valid @RequestBody AdminMainpagePopupCreateTestDto req) {
+        Long id = adminMainpagePopupService.createTest(req);   // 서비스 메서드 추가 필요
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AdminMainPagePopupIdDto(id));
+    }
+
+    // /api/admin/mainpage/popup/{id}
+    // 한 개만 호출 (자세히 보기용)
+    @GetMapping("/{id}")
+    public ResponseEntity<AdminMainpagePopupDetailDto> get(@PathVariable Long id) {
+        return ResponseEntity.ok(adminMainpagePopupService.getOne(id));
+    }
+
 }

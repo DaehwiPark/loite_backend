@@ -1,8 +1,6 @@
 package com.boot.loiteBackend.admin.mainpage.popup.service;
 
-import com.boot.loiteBackend.admin.mainpage.popup.dto.AdminMainpagePopupDetailDto;
-import com.boot.loiteBackend.admin.mainpage.popup.dto.AdminMainpagePopupDto;
-import com.boot.loiteBackend.admin.mainpage.popup.dto.AdminMainpagePopupUpdateDto;
+import com.boot.loiteBackend.admin.mainpage.popup.dto.*;
 import com.boot.loiteBackend.admin.mainpage.popup.repository.AdminMainpagePopupRepository;
 import com.boot.loiteBackend.domain.mainpage.popup.MainpagePopupEntity;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +23,17 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
 
     // ---------- 조회 ----------
 
-    @Override
-    public List<AdminMainpagePopupDetailDto> listAllForAdmin() {
-        // 활성만 보려면 findAllByPopupIsActiveTrueOrderBy... 사용
-        return adminMainpagePopupRepository.findAll().stream()
-                .sorted((a, b) -> {
-                    int c = Integer.compare(a.getPopupSortOrder(), b.getPopupSortOrder());
-                    return (c != 0) ? c : a.getCreatedAt().compareTo(b.getCreatedAt());
-                })
-                .map(this::toItemDto)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<AdminMainpagePopupDetailDto> listAllForAdmin() {
+//        // 활성만 보려면 findAllByPopupIsActiveTrueOrderBy... 사용
+//        return adminMainpagePopupRepository.findAll().stream()
+//                .sorted((a, b) -> {
+//                    int c = Integer.compare(a.getPopupSortOrder(), b.getPopupSortOrder());
+//                    return (c != 0) ? c : a.getCreatedAt().compareTo(b.getCreatedAt());
+//                })
+//                .map(this::toItemDto)
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public List<AdminMainpagePopupDetailDto> listVisible(LocalDateTime now) {
@@ -73,18 +71,30 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
     @Override
     @Transactional
     public void update(Long popupId, AdminMainpagePopupUpdateDto req) {
-        MainpagePopupEntity entity = getOrThrow(popupId);
+        MainpagePopupEntity e = getOrThrow(popupId);
 
-        if (req.getPopupImageUrl() != null) entity.setPopupImageUrl(req.getPopupImageUrl());
-        if (req.getPopupLinkUrl()  != null) entity.setPopupLinkUrl(req.getPopupLinkUrl());
-        if (req.getPopupTarget()   != null) entity.setPopupTarget(req.getPopupTarget());
-        if (req.getPopupStartAt()  != null) entity.setPopupStartAt(req.getPopupStartAt());
-        if (req.getPopupEndAt()    != null) entity.setPopupEndAt(req.getPopupEndAt());
-        if (req.getPopupIsActive() != null) entity.setPopupIsActive(req.getPopupIsActive());
-        if (req.getPopupSortOrder()!= null) entity.setPopupSortOrder(req.getPopupSortOrder());
+        // 문자열은 "빈문자열"이면 null로 저장하고 싶다면 normalize 사용
+        if (req.getPopupTitle()   != null) e.setPopupTitle(normalize(req.getPopupTitle()));
+        if (req.getPopupDetail()  != null) e.setPopupDetail(normalize(req.getPopupDetail()));
+        if (req.getPopupImageUrl()!= null) e.setPopupImageUrl(normalize(req.getPopupImageUrl()));
+        if (req.getPopupLinkUrl() != null) e.setPopupLinkUrl(normalize(req.getPopupLinkUrl()));
 
-        checkSchedule(entity.getPopupStartAt(), entity.getPopupEndAt());
-        // JPA dirty checking으로 자동 업데이트
+        if (req.getPopupTarget()   != null) e.setPopupTarget(req.getPopupTarget());
+        if (req.getPopupIsActive() != null) e.setPopupIsActive(req.getPopupIsActive());
+        if (req.getPopupSortOrder()!= null) e.setPopupSortOrder(req.getPopupSortOrder());
+
+        if (req.getPopupStartAt()  != null) e.setPopupStartAt(req.getPopupStartAt());
+        if (req.getPopupEndAt()    != null) e.setPopupEndAt(req.getPopupEndAt());
+
+        // 기간 유효성
+        checkSchedule(e.getPopupStartAt(), e.getPopupEndAt());
+    }
+
+    //공백이 돌아올 시 null로 문자열 변경
+    private String normalize(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        return t.isEmpty() ? null : t;
     }
 
     @Override
@@ -156,6 +166,8 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
     private AdminMainpagePopupDetailDto toItemDto(MainpagePopupEntity e) {
         return AdminMainpagePopupDetailDto.builder()
                 .popupId(e.getPopupId())
+                .popupTitle(e.getPopupTitle())
+                .popupDetail(e.getPopupDetail())
                 .popupImageUrl(e.getPopupImageUrl())
                 .popupLinkUrl(e.getPopupLinkUrl())
                 .popupTarget(e.getPopupTarget())
@@ -167,5 +179,68 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
                 .updatedAt(e.getUpdatedAt())
                 .popupDeletedAt(e.getPopupDeletedAt())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public Long createTest(AdminMainpagePopupCreateTestDto req) {
+        if (req == null) throw new IllegalArgumentException("CreateReq is null");
+        if (req.getPopupLinkUrl() == null || req.getPopupLinkUrl().trim().isEmpty())
+            throw new IllegalArgumentException("popup_link_url is required");
+
+        // 기간 검증 재사용
+        checkSchedule(req.getPopupStartAt(), req.getPopupEndAt());
+
+        int nextOrder = adminMainpagePopupRepository.findMaxSortOrderOfActive() + 10;
+
+        MainpagePopupEntity e = MainpagePopupEntity.builder()
+                // A안: null 저장 (DB/엔티티가 NULL 허용이어야 함)
+                .popupImageUrl(null)
+                // B안(대안): .popupImageUrl(DEFAULT_PLACEHOLDER_IMG)
+                .popupTitle(req.getPopupTitle())
+                .popupDetail(req.getPopupDetail())
+                .popupLinkUrl(req.getPopupLinkUrl())
+                .popupTarget(req.getPopupTarget() != null ? req.getPopupTarget() : MainpagePopupEntity.Target._self)
+                .popupIsActive(req.isPopupIsActive())
+                .popupSortOrder(nextOrder)
+                .popupStartAt(req.getPopupStartAt())
+                .popupEndAt(req.getPopupEndAt())
+                .build();
+
+        adminMainpagePopupRepository.save(e);
+        return e.getPopupId();
+    }
+
+    @Override
+    public AdminMainpagePopupDetailDto getOne(Long id) {
+        return toItemDto(getOrThrow(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminMainpagePopupListItemDto> listAllForAdminSummary(Integer titleMax, Integer detailMax) {
+        int tMax = titleMax == null ? 0 : Math.max(0, titleMax);
+        int dMax = detailMax == null ? 0 : Math.max(0, detailMax);
+
+        return adminMainpagePopupRepository.findAllForAdminOrder().stream()
+                .map(p -> new AdminMainpagePopupListItemDto(
+                        p.getPopupId(),
+                        summarize(p.getPopupTitle(), tMax),
+                        summarize(p.getPopupDetail(), dMax),
+                        p.getPopupImageUrl(),
+                        p.getPopupLinkUrl(),
+                        p.getPopupTarget(),
+                        p.isPopupIsActive(),
+                        p.getPopupSortOrder(),
+                        p.getPopupStartAt(),
+                        p.getPopupEndAt(),
+                        p.getCreatedAt()
+                ))
+                .toList();
+    }
+
+    private static String summarize(String s, int max) {
+        if (s == null) return "";
+        if (max <= 0 || s.length() <= max) return s;
+        return s.substring(0, max) + "…";  // U+2026
     }
 }

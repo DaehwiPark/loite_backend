@@ -11,7 +11,6 @@ import lombok.Setter;
 import java.util.List;
 
 //일괄 활성화, 비활성화
-
 @Getter
 @Setter
 @NoArgsConstructor

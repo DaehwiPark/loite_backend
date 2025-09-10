@@ -11,7 +11,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//기존 팝업 부분 수정 요청 바디
 public class AdminMainpagePopupUpdateDto {
+    @Size(max = 100)
+    private String popupTitle;
+
+    @Size(max = 100)
+    private String popupDetail;
+
     @Size(max = 512)
     private String popupImageUrl;
 

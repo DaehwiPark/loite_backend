@@ -2,6 +2,8 @@ package com.boot.loiteBackend.domain.mainpage.popup;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.lang.annotation.Target;
 import java.time.LocalDateTime;
@@ -20,10 +22,10 @@ public class MainpagePopupEntity {
     @Column(name = "popup_id")
     private Long popupId;
 
-    @Column(name = "popup_image_url", length = 512, nullable = false)
+    @Column(name = "popup_image_url", length = 512)
     private String popupImageUrl;
 
-    @Column(name = "popup_link_url", length = 512, nullable = false)
+    @Column(name = "popup_link_url", length = 512)
     private String popupLinkUrl;
 
     @Enumerated(EnumType.STRING)
@@ -43,14 +45,22 @@ public class MainpagePopupEntity {
     @Column(name = "popup_end_at")
     private LocalDateTime popupEndAt;
 
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false,
             columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at",
             columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
     @Column(name = "popup_deleted_at")
     private LocalDateTime popupDeletedAt;
+
+    @Column(name = "popup_title")
+    private String popupTitle;
+
+    @Column(name = "popup_detail")
+    private String popupDetail;
 }

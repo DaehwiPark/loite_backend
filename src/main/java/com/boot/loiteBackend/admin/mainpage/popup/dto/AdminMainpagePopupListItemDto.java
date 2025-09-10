@@ -1,17 +1,13 @@
+// package: com.boot.loiteBackend.admin.mainpage.popup.dto
 package com.boot.loiteBackend.admin.mainpage.popup.dto;
 
-import com.boot.loiteBackend.domain.mainpage.popup.MainpagePopupEntity;
+import com.boot.loiteBackend.domain.mainpage.popup.MainpagePopupEntity.Target;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-//관리 리스트, 상세, 실노출 목록 응답에 쓰는 출력용
-public class AdminMainpagePopupDetailDto {
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
+public class AdminMainpagePopupListItemDto {
     private Long popupId;
 
     private String popupTitle;
@@ -19,17 +15,10 @@ public class AdminMainpagePopupDetailDto {
 
     private String popupImageUrl;
     private String popupLinkUrl;
-    private MainpagePopupEntity.Target popupTarget;
-
+    private Target popupTarget;
     private boolean popupIsActive;
     private int popupSortOrder;
-
     private LocalDateTime popupStartAt;
     private LocalDateTime popupEndAt;
-
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime popupDeletedAt;
 }
-
-

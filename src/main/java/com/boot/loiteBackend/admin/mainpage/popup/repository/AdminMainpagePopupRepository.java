@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.admin.mainpage.popup.repository;
 
+import com.boot.loiteBackend.admin.mainpage.popup.dto.AdminMainpagePopupListItemDto;
 import com.boot.loiteBackend.domain.mainpage.popup.MainpagePopupEntity;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -50,4 +51,42 @@ public interface AdminMainpagePopupRepository extends JpaRepository<MainpagePopu
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from MainpagePopupEntity p where p.popupId in :ids")
     List<MainpagePopupEntity> lockForReorder(@Param("ids") List<Long> ids);
+
+    /* 8) 리스트 요약용(제목/본문 길이 제한, 초과 시 … 붙임) */
+//    @Query("""
+//      select new com.boot.loiteBackend.admin.mainpage.popup.dto.AdminMainpagePopupListItemDto(
+//        p.popupId,
+//        case
+//          when :titleLen > 0 and function('char_length', coalesce(p.popupTitle, '')) > :titleLen
+//            then function('concat', function('substring', coalesce(p.popupTitle, ''), 1, :titleLen), '\u2026')
+//          else coalesce(p.popupTitle, '')
+//        end,
+//        case
+//          when :detailLen > 0 and function('char_length', coalesce(p.popupDetail, '')) > :detailLen
+//            then function('concat', function('substring', coalesce(p.popupDetail, ''), 1, :detailLen), '\u2026')
+//          else coalesce(p.popupDetail, '')
+//        end,
+//        p.popupImageUrl,
+//        p.popupLinkUrl,
+//        p.popupTarget,
+//        p.popupIsActive,
+//        p.popupSortOrder,
+//        p.popupStartAt,
+//        p.popupEndAt,
+//        p.createdAt
+//      )
+//      from MainpagePopupEntity p
+//      order by p.popupSortOrder asc, p.createdAt asc
+//      """)
+//    List<AdminMainpagePopupListItemDto> findAllSummarized(
+//            @Param("titleLen") int titleLen,
+//            @Param("detailLen") int detailLen
+//    );
+
+    @Query("""
+       select p
+       from MainpagePopupEntity p
+       order by p.popupSortOrder asc, p.createdAt asc
+       """)
+    List<MainpagePopupEntity> findAllForAdminOrder();
 }

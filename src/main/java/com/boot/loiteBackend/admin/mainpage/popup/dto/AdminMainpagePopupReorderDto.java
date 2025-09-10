@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.util.List;
 
+//노출 순서 변경
 @Getter
 @Setter
 @NoArgsConstructor
