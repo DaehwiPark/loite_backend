@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> {
-
-    Optional<CartItemEntity> findByUserIdAndProductIdAndProductOptionId(Long userId, Long productId, Long productOptionId);
-
     @Query(value = """
     SELECT
         ci.CART_ITEM_ID            AS cartItemId,
@@ -51,5 +48,5 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
 
     List<CartItemEntity> findByUserIdAndIdIn(Long userId, List<Long> ids);
 
-    List<CartItemEntity> findByUserIdAndCheckedYn(Long userId, String checkedYn);
+    List<CartItemEntity> findByUserIdAndProductId(Long loginUserId, Long productId);
 }

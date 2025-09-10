@@ -25,8 +25,8 @@ public class CartItemEntity {
     @Column(name = "PRODUCT_ID", nullable = false)
     private Long productId;
 
-    @Column(name = "PRODUCT_OPTION_ID")
-    private Long productOptionId;
+    /*@Column(name = "PRODUCT_OPTION_ID")
+    private Long productOptionId;*/
 
     /*@Column(name = "PRODUCT_GIFT_ID")
     private Long giftId;*/
