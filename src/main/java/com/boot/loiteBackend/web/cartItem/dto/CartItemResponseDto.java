@@ -28,24 +28,6 @@ public class CartItemResponseDto {
     @Schema(description = "대표 썸네일 이미지 URL", example = "https://cdn.loite.com/images/product/thumb-wood-table.jpg")
     private String thumbnailUrl;
 
-    @Schema(description = "옵션 ID", example = "3")
-    private Long optionId;
-
-    @Schema(description = "선택한 옵션 타입 (예: 색상)", example = "색상")
-    private String optionType;
-
-    @Schema(description = "선택한 옵션 값", example = "내추럴 우드")
-    private String optionValue;
-
-    @Schema(description = "옵션 추가 금액", example = "5000")
-    private Integer optionAdditionalPrice;
-
-    @Schema(description = "재고", example = "100")
-    private Integer optionStock;
-
-    @Schema(description = "옵션 품절 여부", example = "true,false")
-    private boolean optionSoldOutYn;
-
     @Schema(description = "주문 수량", example = "2")
     private int quantity;
 
@@ -58,20 +40,17 @@ public class CartItemResponseDto {
     @Schema(description = "할인율 (%)", example = "10")
     private int discountRate;
 
+    @Schema(description = "총 금액", example = "299000.00")
+    private BigDecimal totalPrice;
+
     @Schema(description = "체크 여부 (UI 선택용)", example = "true")
     private boolean checked;
+
+    private List<CartItemOptionResponseDto> options;
 
     private List<CartItemGiftResponseDto> gifts;
 
     private List<CartItemAdditionalResponseDto> additionals;
-
-
-    public BigDecimal getTotalPrice() {
-        BigDecimal basePrice = discountedPrice != null ? discountedPrice : unitPrice;
-        int additionalPrice = optionAdditionalPrice != null ? optionAdditionalPrice : 0; // null 처리
-        BigDecimal totalUnit = basePrice.add(BigDecimal.valueOf(additionalPrice));
-        return totalUnit.multiply(BigDecimal.valueOf(quantity));
-    }
 }
 
 

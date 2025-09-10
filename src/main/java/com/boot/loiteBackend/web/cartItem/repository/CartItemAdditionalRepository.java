@@ -19,7 +19,8 @@ public interface CartItemAdditionalRepository extends JpaRepository<CartItemAddi
         cia.ADDITIONAL_QUANTITY       AS quantity,
         a.ADDITIONAL_NAME             AS additionalName,
         a.ADDITIONAL_IMAGE_URL        AS additionalImageUrl,
-        a.ADDITIONAL_STOCK            AS additionalStock
+        a.ADDITIONAL_STOCK            AS additionalStock,
+        a.ADDITIONAL_PRICE            AS additionalPrice
     FROM TB_PRODUCT_CART_ITEM_ADDITIONAL cia
     JOIN TB_PRODUCT_ADDITIONAL pa ON cia.PRODUCT_ADDITIONAL_ID = pa.PRODUCT_ADDITIONAL_ID
     JOIN TB_ADDITIONAL a ON pa.ADDITIONAL_ID = a.ADDITIONAL_ID
@@ -28,4 +29,6 @@ public interface CartItemAdditionalRepository extends JpaRepository<CartItemAddi
     List<CartItemAdditionalProjection> findAdditionalDetailsByCartItemIds(@Param("cartItemIds") List<Long> cartItemIds);
 
     Optional<CartItemAdditionalEntity> findByCartItemIdAndAdditionalId(Long id, Long additionalId);
+
+    void deleteByCartItemId(Long cartItemId);
 }
