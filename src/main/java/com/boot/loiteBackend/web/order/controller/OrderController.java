@@ -47,4 +47,11 @@ public class OrderController {
         Page<OrderResponseDto> response = orderService.getOrders(loginUser.getUserId(), pageable);
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "주문서 삭제", description = "로그인한 사용자의 주문 내역을 삭제합니다.")
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<Void> deleteOrder(@AuthenticationPrincipal CustomUserDetails loginUser, @PathVariable Long orderId) {
+        orderService.deleteOrder(loginUser.getUserId(), orderId);
+        return ResponseEntity.noContent().build();
+    }
 }

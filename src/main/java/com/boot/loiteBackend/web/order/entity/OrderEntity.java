@@ -69,6 +69,10 @@ public class OrderEntity {
     @Column(name = "DELIVERY_STATUS", nullable = false, length = 20)
     private DeliveryStatus deliveryStatus;
 
+    @Builder.Default
+    @Column(name = "DELETE_YN", nullable = false, length = 1)
+    private String deleteYn = "N";
+
     @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt;
 

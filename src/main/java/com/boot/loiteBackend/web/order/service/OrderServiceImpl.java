@@ -232,7 +232,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderResponseDto getOrder(Long userId, Long orderId) {
         // 주문 조회
-        OrderEntity order = orderRepository.findByOrderIdAndUserId(orderId, userId)
+        OrderEntity order = orderRepository.findByOrderIdAndUserIdAndDeleteYn(orderId, userId, "N")
                 .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
         // 주문 아이템 조회
@@ -310,7 +310,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
-        Page<OrderEntity> orders = orderRepository.findByUserId(userId, pageable);
+        Page<OrderEntity> orders = orderRepository.findByUserIdAndDeleteYn(userId, "N", pageable);
 
         return orders.map(order -> {
             List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
@@ -389,5 +389,18 @@ public class OrderServiceImpl implements OrderService {
         });
     }
 
+    @Transactional
+    @Override
+    public void deleteOrder(Long userId, Long orderId) {
+        OrderEntity order = orderRepository.findByOrderIdAndUserIdAndDeleteYn(orderId, userId, "N")
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
+        if (!(order.getOrderStatus() == OrderStatus.CREATED || order.getOrderStatus() == OrderStatus.CANCELLED)) {
+            throw new IllegalStateException("해당 주문은 삭제할 수 없습니다.");
+        }
+
+        order.setDeleteYn("Y");
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
+    }
 }
