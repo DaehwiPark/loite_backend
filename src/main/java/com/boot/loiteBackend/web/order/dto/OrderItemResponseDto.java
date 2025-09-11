@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,12 +22,6 @@ public class OrderItemResponseDto {
     @Schema(description = "상품 이미지", example = "url 어쩌구 저쩌구")
     private String productImageUrl;
 
-    @Schema(description = "옵션 ID", example = "301")
-    private Long optionId;
-
-    @Schema(description = "옵션 값", example = "화이트 / 500L")
-    private String optionValue;
-
     @Schema(description = "수량", example = "2")
     private Integer quantity;
 
@@ -35,4 +30,10 @@ public class OrderItemResponseDto {
 
     @Schema(description = "총 금액", example = "120000")
     private BigDecimal totalPrice;
+
+    private List<OrderOptionResponseDto> options;
+
+    private List<OrderAdditionalResponseDto> additionals;
+
+    private List<OrderGiftResponseDto> gifts;
 }
