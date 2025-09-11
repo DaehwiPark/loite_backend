@@ -23,7 +23,7 @@ public class OrderItemGiftEntity {
     private OrderItemEntity orderItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "GIFT_ID", nullable = false)
+    @JoinColumn(name = "PRODUCT_GIFT_ID", nullable = false)
     private AdminProductGiftEntity productGift;
 
     @Column(name = "QUANTITY", nullable = false)

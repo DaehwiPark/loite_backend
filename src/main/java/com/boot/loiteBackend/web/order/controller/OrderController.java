@@ -29,17 +29,17 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "주문서 단건 조회", description = "로그인한 사용자의 단건 주문 내역을 조회합니다.")
+    /*@Operation(summary = "주문서 단건 조회", description = "로그인한 사용자의 단건 주문 내역을 조회합니다.")
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder(@AuthenticationPrincipal CustomUserDetails loginUser, @PathVariable Long orderId) {
         OrderResponseDto response = orderService.getOrder(loginUser.getUserId(), orderId);
         return ResponseEntity.ok(response);
-    }
+    }*/
 
-    @Operation(summary = "주문서 전체 조회", description = "로그인한 사용자의 모든 주문 내역을 조회합니다.")
+    /*@Operation(summary = "주문서 전체 조회", description = "로그인한 사용자의 모든 주문 내역을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getOrders(@AuthenticationPrincipal CustomUserDetails loginUser) {
         List<OrderResponseDto> response = orderService.getOrders(loginUser.getUserId());
         return ResponseEntity.ok(response);
-    }
+    }*/
 }

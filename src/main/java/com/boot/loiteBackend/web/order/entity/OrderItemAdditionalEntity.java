@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_order_item_additional")
@@ -25,7 +26,7 @@ public class OrderItemAdditionalEntity {
     private OrderItemEntity orderItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ADDITIONAL_ID", nullable = false)
+    @JoinColumn(name = "PRODUCT_ADDITIONAL_ID", nullable = false)
     private AdminProductAdditionalEntity productAdditional;
 
     @Column(name = "ADDITIONAL_PRICE", precision = 15, scale = 2, nullable = false)

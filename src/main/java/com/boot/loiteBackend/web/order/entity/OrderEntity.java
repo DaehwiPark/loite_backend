@@ -34,6 +34,7 @@ public class OrderEntity {
     @Column(name = "ORDER_STATUS", nullable = false, length = 20)
     private OrderStatus orderStatus;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemEntity> orderItems = new ArrayList<>();
 

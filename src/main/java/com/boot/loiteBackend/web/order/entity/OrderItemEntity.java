@@ -34,15 +34,17 @@ public class OrderItemEntity {
     @JoinColumn(name = "PRODUCT_ID", nullable = false)
     private AdminProductEntity product;
 
+    @Builder.Default
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemOptionEntity> options = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemAdditionalEntity> additionals = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemGiftEntity> gifts = new ArrayList<>();
-
 
     @Column(name = "QUANTITY", nullable = false)
     private Integer quantity;

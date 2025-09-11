@@ -15,7 +15,7 @@ public interface OrderMapper {
     // OrderItemEntity -> OrderItemResponseDto
     @Mapping(source = "product.productId", target = "productId")
     @Mapping(source = "product.productName", target = "productName")
-    @Mapping(source = "product.mainImageUrl", target = "productImageUrl")
+    //@Mapping(source = "product.mainImageUrl", target = "productImageUrl")
     OrderItemResponseDto toDto(OrderItemEntity entity);
 
     // 옵션
