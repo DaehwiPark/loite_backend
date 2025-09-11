@@ -94,7 +94,7 @@ public class CartItemServiceImpl implements CartItemService {
                         .equals(newGiftIds.stream().sorted().toList());
 
                 if (sameOptions && sameAdditionals && sameGifts) {
-                    entity = existing; // ✅ 세트가 동일하면 기존 장바구니에 수량 +
+                    entity = existing;
                     break;
                 }
             }

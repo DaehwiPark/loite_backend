@@ -22,6 +22,9 @@ public class PaymentVerifyResponseDto {
     @Schema(description = "결제 ID (PK)", example = "10")
     private Long paymentId;
 
+    @Schema(description = "결제 수단", example = "카카오페이")
+    private String paymentMethod;
+
     @Schema(description = "결제 상태", example = "PAID")
     private PaymentStatus paymentStatus;
 }

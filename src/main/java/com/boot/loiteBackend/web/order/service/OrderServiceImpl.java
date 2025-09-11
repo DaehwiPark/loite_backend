@@ -19,6 +19,8 @@ import com.boot.loiteBackend.web.order.mapper.OrderMapper;
 import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
 import com.boot.loiteBackend.web.order.repository.OrderRepository;
 import com.boot.loiteBackend.web.order.repository.OrderSequenceRepository;
+import com.boot.loiteBackend.web.payment.entity.PaymentEntity;
+import com.boot.loiteBackend.web.payment.repository.PaymentRepository;
 import com.boot.loiteBackend.web.user.address.repository.UserAddressRepository;
 import com.boot.loiteBackend.web.user.address.service.UserAddressService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +52,9 @@ public class OrderServiceImpl implements OrderService {
     private final UserAddressService userAddressService;
     private final AdminProductAdditionalRepository productAdditionalRepository;
     private final AdminProductGiftRepository productGiftRepository;
+    private final PaymentRepository paymentRepository;
     private final OrderMapper orderMapper;
+
 
     @Override
     @Transactional
@@ -238,6 +242,17 @@ public class OrderServiceImpl implements OrderService {
         // 주문 아이템 조회
         List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
 
+        Optional<PaymentEntity> paymentOpt = paymentRepository.findByOrderId(order.getOrderId());
+
+        String paymentMethod = null;
+        String pgProvider = null;
+
+        if (paymentOpt.isPresent()) {
+            PaymentEntity payment = paymentOpt.get();
+            paymentMethod = translatePaymentMethod(payment.getPaymentMethod());
+            pgProvider = payment.getPgProvider();
+        }
+
         List<OrderItemResponseDto> responseItems = items.stream()
                 .map(item -> {
                     String productImageUrl = item.getProduct().getProductImages().stream()
@@ -297,6 +312,8 @@ public class OrderServiceImpl implements OrderService {
                 .totalAmount(order.getTotalAmount())
                 .deliveryFee(order.getDeliveryFee())
                 .payAmount(order.getTotalAmount()) // == totalAmount
+                .paymentMethod(paymentMethod)
+                .pgProvider(pgProvider)
                 .receiverName(order.getReceiverName())
                 .receiverPhone(order.getReceiverPhone())
                 .receiverAddress(order.getReceiverAddress())
@@ -402,5 +419,17 @@ public class OrderServiceImpl implements OrderService {
         order.setDeleteYn("Y");
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
+    }
+
+    private String translatePaymentMethod(String provider) {
+        if (provider == null) return null;
+        return switch (provider.toUpperCase()) {
+            case "KAKAOPAY" -> "카카오페이";
+            case "NAVERPAY" -> "네이버페이";
+            case "CARD" -> "신용/체크카드";
+            case "VIRTUAL_ACCOUNT" -> "가상계좌";
+            case "TRANSFER" -> "계좌이체";
+            default -> provider; // 정의 안 된 건 그냥 그대로
+        };
     }
 }
