@@ -71,17 +71,34 @@ public class CartItemServiceImpl implements CartItemService {
             CartItemEntity entity = null;
 
             for (CartItemEntity existing : existingItems) {
+                // === 기존 항목에서 옵션/추가/사은품 ID 뽑기 ===
                 List<Long> existingOptionIds = cartItemOptionRepository.findOptionIdsByCartItemId(existing.getId());
+                List<Long> existingAdditionalIds = cartItemAdditionalRepository.findAdditionalIdsByCartItemId(existing.getId());
+                List<Long> existingGiftIds = cartItemGiftRepository.findGiftIdsByCartItemId(existing.getId());
 
-                // 정렬해서 비교 (순서 달라도 같은 조합으로 인정)
-                List<Long> sortedExisting = existingOptionIds.stream().sorted().toList();
-                List<Long> sortedNew = optionIds.stream().sorted().toList();
+                // === 새 요청에서 옵션/추가/사은품 ID 뽑기 (null → 빈 리스트) ===
+                List<Long> newOptionIds = (item.getOptions() != null) ? item.getOptions() : List.of();
+                List<Long> newAdditionalIds = (item.getAdditionals() != null)
+                        ? item.getAdditionals().stream().map(CartItemAdditionalDto::getProductAdditionalId).toList()
+                        : List.of();
+                List<Long> newGiftIds = (item.getGifts() != null)
+                        ? item.getGifts().stream().map(CartItemGiftDto::getProductGiftId).toList()
+                        : List.of();
 
-                if (sortedExisting.equals(sortedNew)) {
-                    entity = existing;
+                // === 정렬 후 비교 (순서 무시) ===
+                boolean sameOptions = existingOptionIds.stream().sorted().toList()
+                        .equals(newOptionIds.stream().sorted().toList());
+                boolean sameAdditionals = existingAdditionalIds.stream().sorted().toList()
+                        .equals(newAdditionalIds.stream().sorted().toList());
+                boolean sameGifts = existingGiftIds.stream().sorted().toList()
+                        .equals(newGiftIds.stream().sorted().toList());
+
+                if (sameOptions && sameAdditionals && sameGifts) {
+                    entity = existing; // ✅ 세트가 동일하면 기존 장바구니에 수량 +
                     break;
                 }
             }
+
 
             if (entity != null) {
 

@@ -31,5 +31,8 @@ public interface CartItemGiftRepository extends JpaRepository<CartItemGiftEntity
     void deleteByCartItemId(Long cartItemId);
 
     Optional<CartItemGiftEntity> findByCartItemIdAndGiftId(Long id, Long productGiftId);
+
+    @Query("select g.giftId from CartItemGiftEntity g where g.cartItemId = :cartItemId")
+    List<Long> findGiftIdsByCartItemId(@Param("cartItemId") Long cartItemId);
 }
 

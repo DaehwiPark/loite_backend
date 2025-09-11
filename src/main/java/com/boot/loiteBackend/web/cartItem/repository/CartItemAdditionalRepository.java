@@ -31,4 +31,7 @@ public interface CartItemAdditionalRepository extends JpaRepository<CartItemAddi
     Optional<CartItemAdditionalEntity> findByCartItemIdAndAdditionalId(Long id, Long additionalId);
 
     void deleteByCartItemId(Long cartItemId);
+
+    @Query("select cia.additionalId from CartItemAdditionalEntity cia where cia.cartItemId = :cartItemId")
+    List<Long> findAdditionalIdsByCartItemId(@Param("cartItemId") Long cartItemId);
 }
