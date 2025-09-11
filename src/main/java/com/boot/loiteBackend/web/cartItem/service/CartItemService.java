@@ -8,17 +8,16 @@ import java.util.List;
 public interface CartItemService {
 
     @Transactional
-    void addToCart(Long loginUserId, List<CartItemRequestDto> requestList);
+    CartItemResponseDto addToCart(Long loginUserId, List<CartItemRequestDto> requestList);
 
     List<CartItemResponseDto> getCartItemsByUser(Long loginUserId);
 
-    void updateCheckedYn(Long loginUserId, Long cartItemId, boolean checked);
-
     void deleteCartItems(Long loginUserId, List<Long> cartItemIds);
 
-    void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto);
+    @Transactional
+    void updateCartItem(Long loginUserId, Long cartItemId, CartItemUpdateRequestDto dto);
 
-    void updateCartItemQuantity(Long loginUserId, Long cartItemId, CartItemQuantityUpdateRequestDto requestDto);
+    /*void updateCartItemOption(Long loginUserId, Long cartItemId, CartItemOptionUpdateRequestDto requestDto);*/
 
     @Transactional(readOnly = true)
     List<AvailableOptionResponseDto> getAvailableOptions(Long cartItemId);
