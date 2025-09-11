@@ -54,13 +54,11 @@ public class AdminHomeRecoItemServiceImpl implements AdminHomeRecoItemService {
         Integer free = adminHomeRecoItemRepository.findFirstFreeSlotFrom(sectionId, desired);
         if (free == null) throw new CustomException(AdminHomeRecoItemErrorCode.SAVE_FAILED);
 
-        // 구간 시프트 → flush
         if (free > desired) {
             adminHomeRecoItemRepository.shiftRangeRightByOne(sectionId, desired, free - 1);
             em.flush();
         }
 
-        // INSERT
         try {
             HomeRecoItemEntity e = adminHomeRecoItemMapper.toEntity(req);
             e.setSectionId(sectionId);
