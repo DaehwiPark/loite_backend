@@ -2,12 +2,16 @@ package com.boot.loiteBackend.admin.mainpage.popup.service;
 
 import com.boot.loiteBackend.admin.mainpage.popup.dto.*;
 import com.boot.loiteBackend.admin.mainpage.popup.repository.AdminMainpagePopupRepository;
+import com.boot.loiteBackend.common.file.FileServiceImpl;
+import com.boot.loiteBackend.common.file.FileUploadResult;
 import com.boot.loiteBackend.domain.mainpage.popup.MainpagePopupEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
 
     private final AdminMainpagePopupRepository adminMainpagePopupRepository;
+    private final FileServiceImpl fileService;
 
     // ---------- 조회 ----------
 
@@ -67,6 +72,24 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
         adminMainpagePopupRepository.save(entity);
         return entity.getPopupId();
     }
+
+    @Override
+    @Transactional
+    public Long create(AdminMainpagePopupDto req, MultipartFile image) throws IOException {
+        Long id = create(req); // (여기서 엔티티가 저장됨 - 이미지 URL은 아직 null이어도 OK)
+
+        if (image != null && !image.isEmpty()) {
+            String category = "noti/popup/" + id;
+            FileUploadResult r = fileService.save(image, category);
+
+            // 저장된 팝업 엔티티에 URL 주입
+            MainpagePopupEntity e = getOrThrow(id);
+            e.setPopupImageUrl(r.getUrlPath());   // 예: /uploads/noti/popup/{id}/uuid_name.jpg
+            // 필요시: e.setUpdatedAt(LocalDateTime.now());  // @PreUpdate가 있으면 생략 가능
+        }
+        return id;
+    }
+
 
     @Override
     @Transactional
@@ -154,7 +177,8 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
 
     private void validateCreate(AdminMainpagePopupDto req) {
         if (req == null) throw new IllegalArgumentException("CreateReq is null");
-        if (isBlank(req.getPopupImageUrl())) throw new IllegalArgumentException("popup_image_url is required");
+        // 이미지 URL은 멀티파트 경로에서 이후에 세팅하므로 필수 X
+        // if (isBlank(req.getPopupImageUrl())) throw new IllegalArgumentException("popup_image_url is required");
         if (isBlank(req.getPopupLinkUrl()))  throw new IllegalArgumentException("popup_link_url is required");
         checkSchedule(req.getPopupStartAt(), req.getPopupEndAt());
     }
@@ -210,6 +234,43 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
         adminMainpagePopupRepository.save(e);
         return e.getPopupId();
     }
+
+    @Override
+    @Transactional
+    public Long createTest(AdminMainpagePopupCreateTestDto req, MultipartFile image) throws IOException {
+        if (req == null) throw new IllegalArgumentException("CreateReq is null");
+        if (req.getPopupLinkUrl() == null || req.getPopupLinkUrl().trim().isEmpty())
+            throw new IllegalArgumentException("popup_link_url is required");
+
+        // 기간 검증
+        checkSchedule(req.getPopupStartAt(), req.getPopupEndAt());
+
+        int nextOrder = adminMainpagePopupRepository.findMaxSortOrderOfActive() + 10;
+
+        // 1) 이미지 파일 저장 (/uploads/popup)
+        String imageUrl = null;
+        if (image != null && !image.isEmpty()) {
+            var result = fileService.save(image, "popup"); // ← 폴더: /uploads/popup/*
+            imageUrl = result.getUrlPath();               // 예) /uploads/popup/uuid_name.png
+        }
+
+        // 2) 엔티티 저장 (URL 세팅)
+        MainpagePopupEntity e = MainpagePopupEntity.builder()
+                .popupImageUrl(imageUrl)  // ★ 파일이 있으면 /uploads/popup/*, 없으면 null
+                .popupTitle(req.getPopupTitle())
+                .popupDetail(req.getPopupDetail())
+                .popupLinkUrl(req.getPopupLinkUrl())
+                .popupTarget(req.getPopupTarget() != null ? req.getPopupTarget() : MainpagePopupEntity.Target._self)
+                .popupIsActive(req.isPopupIsActive())
+                .popupSortOrder(nextOrder)
+                .popupStartAt(req.getPopupStartAt())
+                .popupEndAt(req.getPopupEndAt())
+                .build();
+
+        adminMainpagePopupRepository.save(e);
+        return e.getPopupId();
+    }
+
 
     @Override
     public AdminMainpagePopupDetailDto getOne(Long id) {

@@ -2,14 +2,19 @@ package com.boot.loiteBackend.admin.mainpage.popup.controller;
 
 import com.boot.loiteBackend.admin.mainpage.popup.dto.*;
 import com.boot.loiteBackend.admin.mainpage.popup.service.AdminMainpagePopupService;
+import com.boot.loiteBackend.common.file.FileService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,12 +26,24 @@ import java.util.List;
 public class AdminMainpagePopupController {
 
     private final AdminMainpagePopupService adminMainpagePopupService;
+    private  final FileService fileService;
 
     // 등록
     @PostMapping
     public ResponseEntity<AdminMainPagePopupIdDto> create(@Valid @RequestBody AdminMainpagePopupDto req) {
         Long id = adminMainpagePopupService.create(req);
         return ResponseEntity.ok(new AdminMainPagePopupIdDto(id));
+    }
+
+    @Operation(summary = "팝업 저장 테스트(이미지 1장 포함)",
+            description = "multipart/form-data 로 JSON(popup)과 이미지(image)를 함께 전송합니다.")
+    @PostMapping(path = "/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AdminMainPagePopupIdDto> createTest(
+            @RequestPart("popup") @Valid AdminMainpagePopupCreateTestDto req,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) throws IOException {
+        Long id = adminMainpagePopupService.createTest(req, image); // ← 오버로드 호출
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AdminMainPagePopupIdDto(id));
     }
 
     // 수정

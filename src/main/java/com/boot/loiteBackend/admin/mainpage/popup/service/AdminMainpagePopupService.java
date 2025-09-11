@@ -1,7 +1,9 @@
 package com.boot.loiteBackend.admin.mainpage.popup.service;
 
 import com.boot.loiteBackend.admin.mainpage.popup.dto.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +18,8 @@ public interface AdminMainpagePopupService {
 
     // 신규 등록 (정렬값은 MAX+10 자동 배정)
     Long create(AdminMainpagePopupDto req);
+
+    Long create(AdminMainpagePopupDto req, MultipartFile image) throws IOException;
 
     // 수정 (링크/타겟/기간/활성/이미지 경로 등)
     void update(Long popupId, AdminMainpagePopupUpdateDto req);
@@ -34,6 +38,7 @@ public interface AdminMainpagePopupService {
 
     // create Test
     Long createTest(AdminMainpagePopupCreateTestDto req);
+    Long createTest(AdminMainpagePopupCreateTestDto req, MultipartFile image) throws IOException;
 
     // 단건 조회
     AdminMainpagePopupDetailDto getOne(Long id);
