@@ -25,6 +25,7 @@ public class AdminHomeRecoItemServiceImpl implements AdminHomeRecoItemService {
     private final EntityManager em;
 
     private Sort defaultSort() {
+
         return Sort.by(Sort.Order.asc("slotNo"), Sort.Order.desc("id"));
     }
 
@@ -35,29 +36,23 @@ public class AdminHomeRecoItemServiceImpl implements AdminHomeRecoItemService {
     }
 
     @Override
+    @Transactional
     public AdminHomeRecoItemResponseDto create(AdminHomeRecoItemCreateDto req, Long userId) {
         if (userId == null) throw new CustomException(AdminHomeRecoItemErrorCode.UNAUTHORIZED);
         if (req == null) throw new CustomException(AdminHomeRecoItemErrorCode.INVALID_REQUEST);
-        assertSlotRange(req.getSlotNo());
+        assertSlotRange(req.getSlotNo()); // 1..10
 
-        // 최대 10개 규칙(비즈니스) 유지
+        // 섹션별 최대 10개 제한
         int count = adminHomeRecoItemRepository.countBySectionId(req.getSectionId());
-        Integer maxSlot = adminHomeRecoItemRepository.findMaxSlotNo(req.getSectionId());
-        if (count >= 10 || (maxSlot != null && maxSlot >= 10)) {
+        if (count >= 10) {
             throw new CustomException(AdminHomeRecoItemErrorCode.MAX_ITEMS);
         }
 
         final long sectionId = req.getSectionId();
         final int desired = req.getSlotNo();
 
-        // desired..10 중 첫 빈 슬롯
-        Integer free = adminHomeRecoItemRepository.findFirstFreeSlotFrom(sectionId, desired);
-        if (free == null) throw new CustomException(AdminHomeRecoItemErrorCode.SAVE_FAILED);
-
-        if (free > desired) {
-            adminHomeRecoItemRepository.shiftRangeRightByOne(sectionId, desired, free - 1);
-            em.flush();
-        }
+        // 원하는 슬롯(desired)을 비우기: "위쪽(desired..10) 우선", 없으면 "아래쪽(1..desired-1) 끌어올리기"
+        ensureDesiredSlotAvailableInSection(sectionId, desired);
 
         try {
             HomeRecoItemEntity e = adminHomeRecoItemMapper.toEntity(req);
@@ -75,7 +70,36 @@ public class AdminHomeRecoItemServiceImpl implements AdminHomeRecoItemService {
         }
     }
 
+    /** 섹션 내에서 desired 슬롯을 반드시 비워둔다. (위쪽 우선 정책) */
+    private void ensureDesiredSlotAvailableInSection(long sectionId, int desired) {
+        // 1) 위쪽(desired..10)에서 첫 빈칸
+        Integer freeAbove = adminHomeRecoItemRepository.findFirstFreeSlotFrom(sectionId, desired);
+        if (freeAbove != null) {
+            if (freeAbove > desired) {
+                // [desired .. freeAbove-1] 을 +1 → desired 비움
+                adminHomeRecoItemRepository.shiftRangeRightByOne(sectionId, desired, freeAbove - 1);
+                em.flush();
+            }
+            return; // freeAbove == desired → 이미 비어 있음
+        }
+
+        // 2) 위쪽이 꽉 찼다면, 아래쪽(1..desired-1)의 마지막 빈칸을 끌어올림(왼쪽 -1)
+        if (desired > 1) {
+            Integer freeBelow = adminHomeRecoItemRepository.findLastFreeSlotUpTo(sectionId, desired - 1);
+            if (freeBelow != null) {
+                // [freeBelow+1 .. desired] 을 -1 → desired 비움
+                adminHomeRecoItemRepository.shiftRangeLeftByOne(sectionId, freeBelow + 1, desired);
+                em.flush();
+                return;
+            }
+        }
+
+        // 3) 위아래 모두 빈칸 없음 → 실패
+        throw new CustomException(AdminHomeRecoItemErrorCode.SAVE_FAILED);
+    }
+
     @Override
+    @Transactional
     public AdminHomeRecoItemResponseDto update(AdminHomeRecoItemUpdateDto req, Long userId) {
         if (userId == null) throw new CustomException(AdminHomeRecoItemErrorCode.UNAUTHORIZED);
         if (req == null || req.getId() == null) throw new CustomException(AdminHomeRecoItemErrorCode.INVALID_REQUEST);
@@ -83,7 +107,7 @@ public class AdminHomeRecoItemServiceImpl implements AdminHomeRecoItemService {
         var e = adminHomeRecoItemRepository.findById(req.getId())
                 .orElseThrow(() -> new CustomException(AdminHomeRecoItemErrorCode.NOT_FOUND));
 
-        // 1) 슬롯 이동 먼저 (대상 slotNo 아직 변경하지 않음)
+        // 1) 슬롯 이동: 동일 섹션 내에서 '다른 아이템' 보정(+1/-1) → 대상만 최종 위치로
         if (req.getSlotNo() != null) {
             int newPos = req.getSlotNo();
             assertSlotRange(newPos);
@@ -103,14 +127,14 @@ public class AdminHomeRecoItemServiceImpl implements AdminHomeRecoItemService {
                     );
                     em.flush();
                 }
-                // 2) 대상 하나만 최종 위치로
+                // 대상 하나를 최종 위치로
                 adminHomeRecoItemRepository.updateSlot(e.getId(), newPos);
                 em.flush();
                 e.setSlotNo(newPos);
             }
         }
 
-        // 다른 필드 패치 (slotNo/sectionId는 매퍼가 무시하도록 설정되어 있어야 안전ㅎ미)
+        // 2) 기타 필드 패치 (slotNo/sectionId는 매퍼에서 덮어쓰지 않도록 권장)
         adminHomeRecoItemMapper.updateFromDto(req, e);
 
         e.setUpdatedBy(userId);
