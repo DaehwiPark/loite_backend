@@ -19,10 +19,11 @@ import com.boot.loiteBackend.web.order.mapper.OrderMapper;
 import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
 import com.boot.loiteBackend.web.order.repository.OrderRepository;
 import com.boot.loiteBackend.web.order.repository.OrderSequenceRepository;
-import com.boot.loiteBackend.web.user.address.dto.UserAddressCreateDto;
 import com.boot.loiteBackend.web.user.address.repository.UserAddressRepository;
 import com.boot.loiteBackend.web.user.address.service.UserAddressService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -197,7 +198,7 @@ public class OrderServiceImpl implements OrderService {
 
             orderItem.setTotalPrice(itemDiscountedTotal);
 
-            orderItems.add(orderItem);
+            order.getOrderItems().add(orderItem);
 
             originalTotal = originalTotal.add(itemOriginalTotal);
             discountedTotal = discountedTotal.add(itemDiscountedTotal);
@@ -227,33 +228,62 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    /*@Override
-    @Transactional
+    @Override
+    @Transactional(readOnly = true)
     public OrderResponseDto getOrder(Long userId, Long orderId) {
+        // 주문 조회
         OrderEntity order = orderRepository.findByOrderIdAndUserId(orderId, userId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("주문을 찾을 수 없습니다.")
-                );
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
+        // 주문 아이템 조회
         List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
 
         List<OrderItemResponseDto> responseItems = items.stream()
                 .map(item -> {
-                    String imageUrl = item.getProduct().getProductImages().stream()
+                    String productImageUrl = item.getProduct().getProductImages().stream()
                             .sorted(Comparator.comparingInt(img -> Optional.ofNullable(img.getImageSortOrder()).orElse(9999)))
                             .map(AdminProductImageEntity::getImageUrl)
                             .findFirst()
                             .orElse(null);
 
+                    List<OrderOptionResponseDto> optionDtos = item.getOptions().stream()
+                            .map(opt -> OrderOptionResponseDto.builder()
+                                    .optionId(opt.getProductOption().getOptionId())
+                                    .optionValue(opt.getProductOption().getOptionValue())
+                                    .additionalPrice(opt.getAdditionalPrice())
+                                    .quantity(opt.getQuantity())
+                                    .build())
+                            .toList();
+
+                    List<OrderAdditionalResponseDto> additionalDtos = item.getAdditionals().stream()
+                            .map(add -> OrderAdditionalResponseDto.builder()
+                                    .additionalId(add.getProductAdditional().getProductAdditionalId())
+                                    .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
+                                    .additionalPrice(add.getAdditionalPrice())
+                                    .quantity(add.getQuantity())
+                                    .additionalImageUrl(add.getProductAdditional().getAdditional().getAdditionalImageUrl())
+                                    .build())
+                            .toList();
+
+                    List<OrderGiftResponseDto> giftDtos = item.getGifts().stream()
+                            .map(gift -> OrderGiftResponseDto.builder()
+                                    .giftId(gift.getProductGift().getProductGiftId())
+                                    .giftName(gift.getProductGift().getGift().getGiftName())
+                                    .quantity(gift.getQuantity())
+                                    .giftImageUrl(gift.getProductGift().getGift().getGiftImageUrl())
+                                    .build())
+                            .toList();
+
                     return OrderItemResponseDto.builder()
                             .productId(item.getProduct().getProductId())
                             .productName(item.getProduct().getProductName())
-                            .productImageUrl(imageUrl)
-                            .optionId(item.getOption() != null ? item.getOption().getOptionId() : null)
-                            .optionValue(item.getOption() != null ? item.getOption().getOptionValue() : null)
+                            .productImageUrl(productImageUrl)
                             .quantity(item.getQuantity())
                             .unitPrice(item.getUnitPrice())
                             .totalPrice(item.getTotalPrice())
+                            .options(optionDtos)
+                            .additionals(additionalDtos)
+                            .gifts(giftDtos)
                             .build();
                 })
                 .toList();
@@ -266,7 +296,7 @@ public class OrderServiceImpl implements OrderService {
                 .discountAmount(order.getDiscountAmount())
                 .totalAmount(order.getTotalAmount())
                 .deliveryFee(order.getDeliveryFee())
-                .payAmount(order.getTotalAmount())
+                .payAmount(order.getTotalAmount()) // == totalAmount
                 .receiverName(order.getReceiverName())
                 .receiverPhone(order.getReceiverPhone())
                 .receiverAddress(order.getReceiverAddress())
@@ -276,24 +306,70 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    public List<OrderResponseDto> getOrders(Long userId) {
-        List<OrderEntity> orders = orderRepository.findByUserId(userId);
 
-        return orders.stream().map(order -> {
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
+        Page<OrderEntity> orders = orderRepository.findByUserId(userId, pageable);
+
+        return orders.map(order -> {
             List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
 
             List<OrderItemResponseDto> responseItems = items.stream()
-                    .map(item -> OrderItemResponseDto.builder()
-                            .productId(item.getProduct().getProductId())
-                            .productName(item.getProduct().getProductName())
-                            .optionId(item.getOption() != null ? item.getOption().getOptionId() : null)
-                            .optionValue(item.getOption() != null ? item.getOption().getOptionValue() : null)
-                            .quantity(item.getQuantity())
-                            .unitPrice(item.getUnitPrice())
-                            .totalPrice(item.getTotalPrice())
-                            .build())
+                    .map(item -> {
+                        // 상품 대표 이미지
+                        String productImageUrl = item.getProduct().getProductImages().stream()
+                                .sorted(Comparator.comparingInt(img -> Optional.ofNullable(img.getImageSortOrder()).orElse(9999)))
+                                .map(AdminProductImageEntity::getImageUrl)
+                                .findFirst()
+                                .orElse(null);
+
+                        // 옵션 매핑
+                        List<OrderOptionResponseDto> optionDtos = item.getOptions().stream()
+                                .map(opt -> OrderOptionResponseDto.builder()
+                                        .optionId(opt.getProductOption().getOptionId())
+                                        .optionValue(opt.getProductOption().getOptionValue())
+                                        .additionalPrice(opt.getAdditionalPrice())
+                                        .quantity(opt.getQuantity())
+                                        .build())
+                                .toList();
+
+                        // 추가구성품 매핑
+                        List<OrderAdditionalResponseDto> additionalDtos = item.getAdditionals().stream()
+                                .map(add -> OrderAdditionalResponseDto.builder()
+                                        .additionalId(add.getProductAdditional().getProductAdditionalId())
+                                        .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
+                                        .additionalPrice(add.getAdditionalPrice())
+                                        .quantity(add.getQuantity())
+                                        .additionalImageUrl(add.getProductAdditional().getAdditional().getAdditionalImageUrl())
+                                        .build())
+                                .toList();
+
+                        // 사은품 매핑
+                        List<OrderGiftResponseDto> giftDtos = item.getGifts().stream()
+                                .map(gift -> OrderGiftResponseDto.builder()
+                                        .giftId(gift.getProductGift().getProductGiftId())
+                                        .giftName(gift.getProductGift().getGift().getGiftName())
+                                        .quantity(gift.getQuantity())
+                                        .giftImageUrl(gift.getProductGift().getGift().getGiftImageUrl())
+                                        .build())
+                                .toList();
+
+                        return OrderItemResponseDto.builder()
+                                .productId(item.getProduct().getProductId())
+                                .productName(item.getProduct().getProductName())
+                                .productImageUrl(productImageUrl)
+                                .quantity(item.getQuantity())
+                                .unitPrice(item.getUnitPrice())
+                                .totalPrice(item.getTotalPrice())
+                                .options(optionDtos)
+                                .additionals(additionalDtos)
+                                .gifts(giftDtos)
+                                .build();
+                    })
                     .toList();
 
+            // 최종 주문 DTO
             return OrderResponseDto.builder()
                     .orderId(order.getOrderId())
                     .orderNumber(order.getOrderNumber())
@@ -310,6 +386,8 @@ public class OrderServiceImpl implements OrderService {
                     .createdAt(order.getCreatedAt())
                     .items(responseItems)
                     .build();
-        }).toList();
-    }*/
+        });
+    }
+
+
 }

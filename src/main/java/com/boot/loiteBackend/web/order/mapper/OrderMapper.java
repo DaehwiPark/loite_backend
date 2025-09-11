@@ -10,6 +10,7 @@ public interface OrderMapper {
 
     // OrderEntity -> OrderResponseDto
     @Mapping(source = "orderItems", target = "items")
+    @Mapping(target = "payAmount", expression = "java(entity.getTotalAmount())")
     OrderResponseDto toDto(OrderEntity entity);
 
     // OrderItemEntity -> OrderItemResponseDto

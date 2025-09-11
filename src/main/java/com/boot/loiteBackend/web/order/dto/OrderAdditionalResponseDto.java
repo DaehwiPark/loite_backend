@@ -21,6 +21,9 @@ public class OrderAdditionalResponseDto {
     @Schema(description = "추가구성품 금액", example = "10000")
     private BigDecimal additionalPrice;
 
+    @Schema(description = "추가구성품 이미지", example = "url")
+    private String additionalImageUrl;
+
     @Schema(description = "추가구성품 수량", example = "1")
     private int quantity;
 }

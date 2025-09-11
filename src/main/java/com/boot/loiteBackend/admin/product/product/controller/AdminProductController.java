@@ -7,6 +7,7 @@ import com.boot.loiteBackend.admin.product.product.service.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -67,6 +68,7 @@ public class AdminProductController {
     @GetMapping("/list")
     public ResponseEntity<Page<AdminProductListResponseDto>> getPagedProducts(
             @RequestParam(required = false) String keyword,
+            @ParameterObject
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<AdminProductListResponseDto> result = adminProductService.getPagedProducts(keyword, pageable);

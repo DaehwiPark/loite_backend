@@ -16,6 +16,9 @@ public class OrderGiftResponseDto {
     @Schema(description = "사은품명", example = "마우스 패드")
     private String giftName;
 
+    @Schema(description = "사은품명", example = "마우스 패드")
+    private String giftImageUrl;
+
     @Schema(description = "사은품 수량", example = "1")
     private int quantity;
 }

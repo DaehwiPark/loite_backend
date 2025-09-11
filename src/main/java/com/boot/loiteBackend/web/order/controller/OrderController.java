@@ -8,6 +8,11 @@ import com.boot.loiteBackend.web.user.address.dto.UserAddressCreateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,17 +34,17 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
-    /*@Operation(summary = "주문서 단건 조회", description = "로그인한 사용자의 단건 주문 내역을 조회합니다.")
+    @Operation(summary = "주문서 단건 조회", description = "로그인한 사용자의 단건 주문 내역을 조회합니다.")
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder(@AuthenticationPrincipal CustomUserDetails loginUser, @PathVariable Long orderId) {
         OrderResponseDto response = orderService.getOrder(loginUser.getUserId(), orderId);
         return ResponseEntity.ok(response);
-    }*/
+    }
 
-    /*@Operation(summary = "주문서 전체 조회", description = "로그인한 사용자의 모든 주문 내역을 조회합니다.")
+    @Operation(summary = "주문서 전체 조회", description = "로그인한 사용자의 모든 주문 내역을 조회합니다.")
     @GetMapping
-    public ResponseEntity<List<OrderResponseDto>> getOrders(@AuthenticationPrincipal CustomUserDetails loginUser) {
-        List<OrderResponseDto> response = orderService.getOrders(loginUser.getUserId());
+    public ResponseEntity<Page<OrderResponseDto>> getOrders(@AuthenticationPrincipal CustomUserDetails loginUser, @ParameterObject @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<OrderResponseDto> response = orderService.getOrders(loginUser.getUserId(), pageable);
         return ResponseEntity.ok(response);
-    }*/
+    }
 }
