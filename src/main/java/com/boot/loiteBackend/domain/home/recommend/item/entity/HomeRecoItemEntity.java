@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tb_home_reco_item",
         uniqueConstraints = @UniqueConstraint(name = "UX_HOME_RECO_ITEM_SECTION_SLOT",
-                columnNames = {"HOME_RECO_SECTION_ID", "HOME_RECO_SLOT_NO"}),
+                columnNames = {"HOME_RECO_SECTION_ID", "HOME_RECO_ITEM_SLOT_NO"}),
         indexes = {
                 @Index(name = "IX_HOME_RECO_ITEM_SECTION", columnList = "HOME_RECO_SECTION_ID"),
                 @Index(name = "IX_HOME_RECO_ITEM_PRODUCT", columnList = "PRODUCT_ID")
