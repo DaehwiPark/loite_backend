@@ -3,14 +3,15 @@ package com.boot.loiteBackend.web.order.entity;
 import com.boot.loiteBackend.admin.product.option.entity.AdminProductOptionEntity;
 import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,10 +34,17 @@ public class OrderItemEntity {
     @JoinColumn(name = "PRODUCT_ID", nullable = false)
     private AdminProductEntity product;
 
-    // 옵션과 다대일 관계 (N:1) - 옵션이 없을 수도 있음
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OPTION_ID")
-    private AdminProductOptionEntity option;
+    @Builder.Default
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemOptionEntity> options = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemAdditionalEntity> additionals = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemGiftEntity> gifts = new ArrayList<>();
 
     @Column(name = "QUANTITY", nullable = false)
     private Integer quantity;

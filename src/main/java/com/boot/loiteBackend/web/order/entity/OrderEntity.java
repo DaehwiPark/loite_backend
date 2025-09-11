@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +33,10 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "ORDER_STATUS", nullable = false, length = 20)
     private OrderStatus orderStatus;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemEntity> orderItems = new ArrayList<>();
 
     @Column(name = "ORIGINAL_AMOUNT", nullable = false, precision = 15, scale = 2)
     private BigDecimal originalAmount;
