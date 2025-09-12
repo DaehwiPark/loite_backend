@@ -32,13 +32,13 @@ public interface HomeBestItemRepository extends Repository<HomeBestItemEntity, L
                 left join AdminProductImageEntity img
                        on img.product = p
                       and img.activeYn = 'Y'
-                      and img.imageType = 'MAIN'
+                      and img.imageType = 'THUMBNAIL'
                       and img.imageSortOrder = (
                             select min(i.imageSortOrder)
                             from AdminProductImageEntity i
                             where i.product = p
                               and i.activeYn = 'Y'
-                              and i.imageType = 'MAIN'
+                              and i.imageType = 'THUMBNAIL'
                        )
                 where e.displayYn = 'Y'
                 order by e.slotNo,
