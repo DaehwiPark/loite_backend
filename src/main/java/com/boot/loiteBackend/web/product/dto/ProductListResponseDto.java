@@ -40,6 +40,12 @@ public class ProductListResponseDto {
     @Schema(description = "품절 여부", example = "false")
     private boolean soldOutYn;
 
+    @Schema(description = "베스트 상품 Y/N", example = "true")
+    private boolean bestProductYn;
+
+    @Schema(description = "새로운 상품 Y/N", example = "true")
+    private boolean newProductYn;
+
     // private Double reviewRating;  // 추후 확장 예정
 
     public static ProductListResponseDto from(AdminProductEntity entity) {

@@ -98,8 +98,17 @@ public class AdminProductEntity {
     @Column(name = "PRODUCT_STOCK")
     private int productStock;
 
+    @Builder.Default
     @Column(name = "RECOMMENDED_YN")
-    private String recommendedYn;
+    private String recommendedYn = "N";
+
+    @Builder.Default
+    @Column(name = "BEST_PRODUCT_YN")
+    private String bestProductYn = "N";;
+
+    @Builder.Default
+    @Column(name = "NEW_PRODUCT_YN")
+    private String newProductYn = "N";;
 
     @Column(name = "PRODUCT_DELIVERY_CHARGE")
     private BigDecimal productDeliveryCharge;

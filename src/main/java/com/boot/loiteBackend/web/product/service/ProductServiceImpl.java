@@ -45,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductMainResponseDto> getMainProducts() {
         // 최대 10개만 가져오기
-        PageRequest top10 = PageRequest.of(0, 10);
+        PageRequest top10 = PageRequest.of(0, 24);
 
         List<AdminProductEntity> products = productRepository.findTop20MainExposedProducts(top10);
 
@@ -64,6 +64,8 @@ public class ProductServiceImpl implements ProductService {
                             .discountedPrice(entity.getDiscountedPrice())
                             .discountRate(entity.getDiscountRate())
                             .imageUrl(imageUrl)
+                            .bestProductYn("Y".equals(entity.getBestProductYn()))
+                            .newProductYn("Y".equals(entity.getNewProductYn()))
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -106,6 +108,8 @@ public class ProductServiceImpl implements ProductService {
                             .soldOutYn(entity.getProductOptions() != null &&
                                     !entity.getProductOptions().isEmpty() &&
                                     entity.getProductOptions().stream().allMatch(opt -> opt.getOptionStock() <= 0))
+                            .bestProductYn("Y".equals(entity.getBestProductYn()))
+                            .newProductYn("Y".equals(entity.getNewProductYn()))
                             .build();
                 })
                 .toList();
@@ -200,6 +204,8 @@ public class ProductServiceImpl implements ProductService {
                 .modelName(entity.getProductModelName())
                 .productCode(String.valueOf(entity.getProductId()))
                 .productStock(entity.getProductStock())
+                .bestProductYn("Y".equals(entity.getBestProductYn()))
+                .newProductYn("Y".equals(entity.getNewProductYn()))
                 .sections(sections)
                 .build();
     }

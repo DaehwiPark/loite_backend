@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/api/private/payments")
 @RequiredArgsConstructor
 @Tag(name = "결제 API", description = "결제 정보 저장 및 조회를 관리합니다.")
