@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/public/reco/item")
-@Tag(name = "메인 추천상품 API", description = "홈 추천 섹션 리스트 조회")
+@Tag(name = "메인 추천상품 배너 API", description = "홈 추천 섹션 리스트 조회")
 public class HomeRecoItemController {
 
     private final HomeRecoItemService homeRecoItemService;

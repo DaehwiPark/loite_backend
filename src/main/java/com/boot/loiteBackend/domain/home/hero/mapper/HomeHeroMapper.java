@@ -52,7 +52,6 @@ public interface HomeHeroMapper {
             @Mapping(source = "titleText",     target = "titleText"),
             @Mapping(source = "bodyText",      target = "bodyText"),
             @Mapping(source = "leftImageUrl",  target = "leftImageUrl"),
-            // leftImageAlt 컬럼/필드가 제거되었으므로 매핑하지 않음(있어도 null 반환)
             @Mapping(source = "rightTextColor",  target = "rightTextColor"),
             @Mapping(source = "rightBgColor",    target = "rightBgColor"),
             @Mapping(source = "rightBgGradient", target = "rightBgGradient"),

@@ -17,13 +17,12 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class HomeMagazineBannerServiceImpl implements HomeMagazineBannerService {
 
-    private final HomeMagazineBannerRepository repository;
+    private final HomeMagazineBannerRepository homeMagazineBannerRepository;
 
     @Override
     public List<HomeMagazineBannerDto> getAllBanners() {
         List<HomeMagazineBannerDto> list =
-                repository.findActiveMagazineBannersAsDto(ImageType.THUMBNAIL);
-
+                homeMagazineBannerRepository.findActiveMagazineBannersAsDto(ImageType.THUMBNAIL);
         if (list == null || list.isEmpty()) {
             throw new CustomException(HomeMagazineBannerErrorCode.NOT_FOUND);
         }
