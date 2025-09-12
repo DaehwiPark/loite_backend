@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**", "/api/auth/**").permitAll()
 
                         // 일반 사용자 전용 API(로그인 필요)
-                        .requestMatchers("/api/private/**").authenticated()
+                        .requestMatchers("/api/private/**").permitAll() //.authenticated()
 
                         // 관리자 전용 API
                         .requestMatchers("/api/admin/**").permitAll() //.hasRole("ADMIN")

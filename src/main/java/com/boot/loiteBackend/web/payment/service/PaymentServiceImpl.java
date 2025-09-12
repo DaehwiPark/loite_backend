@@ -130,34 +130,26 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void processWebhook(Map<String, Object> payload) {
-        // 1. 주문번호 가져오기
-        String orderNumber = (String) payload.get("id"); // 포트원 응답 JSON의 주문번호
+        String orderNumber = (String) payload.get("id");
         OrderEntity order = orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없음: " + orderNumber));
 
-        // 2. 결제 상태 확인
         String statusStr = (String) payload.get("status");
-        PaymentStatus status = PaymentStatus.valueOf(statusStr); // READY, PAID, FAILED, CANCELED 등
+        PaymentStatus status = PaymentStatus.valueOf(statusStr);
 
-        // 3. 결제 수단 / PG사 정보 추출
         Map<String, Object> method = (Map<String, Object>) payload.get("method");
         Map<String, Object> channel = (Map<String, Object>) payload.get("channel");
+        Map<String, Object> amount = (Map<String, Object>) payload.get("amount");
 
         String pgProvider = channel != null ? (String) channel.get("pgProvider") : null;
         String provider = method != null ? (String) method.get("provider") : null;
 
-        // 4. 금액 추출
-        Map<String, Object> amount = (Map<String, Object>) payload.get("amount");
         BigDecimal paidAmount = amount != null
                 ? new BigDecimal(((Number) amount.get("total")).toString())
                 : BigDecimal.ZERO;
 
-        // 5. PaymentEntity 저장/업데이트
         PaymentEntity payment = paymentRepository.findByOrder(order)
-                .orElse(PaymentEntity.builder()
-                        .order(order)
-                        .merchantUid(order.getOrderNumber())
-                        .build());
+                .orElse(PaymentEntity.builder().order(order).merchantUid(order.getOrderNumber()).build());
 
         payment.setTxId((String) payload.get("transactionId"));
         payment.setPgProvider(pgProvider);
@@ -173,7 +165,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         paymentRepository.save(payment);
 
-        // 6. 주문 상태 갱신
+        // 주문 상태 갱신
         if (status == PaymentStatus.PAID) {
             order.setOrderStatus(OrderStatus.PAID);
         } else if (status == PaymentStatus.CANCELLED) {
