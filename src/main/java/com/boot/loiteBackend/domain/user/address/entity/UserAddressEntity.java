@@ -55,7 +55,7 @@ public class UserAddressEntity {
     private String defaultYn = "N";
 
     @Builder.Default
-    @Column(name = "DELETE_YN", nullable = false, length = 1,
+    @Column(name = "DELETE_YN", nullable = false, length = 200,
             columnDefinition = "CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제 여부(Y/N)'")
     private String deleteYn = "N";
 

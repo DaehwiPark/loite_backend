@@ -25,9 +25,6 @@ public class HomeHeroResponseDto {
     @Schema(description = "좌측 이미지 URL")
     private String leftImageUrl;
 
-    @Schema(description = "좌측 이미지 ALT (스키마에는 있으나 DB 컬럼이 없으면 null)")
-    private String leftImageAlt;
-
     @Schema(description = "우측 텍스트 색상", example = "#FFFFFF")
     private String rightTextColor;
 

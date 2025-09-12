@@ -19,6 +19,8 @@ import com.boot.loiteBackend.web.order.mapper.OrderMapper;
 import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
 import com.boot.loiteBackend.web.order.repository.OrderRepository;
 import com.boot.loiteBackend.web.order.repository.OrderSequenceRepository;
+import com.boot.loiteBackend.web.payment.entity.PaymentEntity;
+import com.boot.loiteBackend.web.payment.repository.PaymentRepository;
 import com.boot.loiteBackend.web.user.address.repository.UserAddressRepository;
 import com.boot.loiteBackend.web.user.address.service.UserAddressService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +52,9 @@ public class OrderServiceImpl implements OrderService {
     private final UserAddressService userAddressService;
     private final AdminProductAdditionalRepository productAdditionalRepository;
     private final AdminProductGiftRepository productGiftRepository;
+    private final PaymentRepository paymentRepository;
     private final OrderMapper orderMapper;
+
 
     @Override
     @Transactional
@@ -232,11 +236,22 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderResponseDto getOrder(Long userId, Long orderId) {
         // 주문 조회
-        OrderEntity order = orderRepository.findByOrderIdAndUserId(orderId, userId)
+        OrderEntity order = orderRepository.findByOrderIdAndUserIdAndDeleteYn(orderId, userId, "N")
                 .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
         // 주문 아이템 조회
         List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
+
+        Optional<PaymentEntity> paymentOpt = paymentRepository.findByOrderId(order.getOrderId());
+
+        String paymentMethod = null;
+        String pgProvider = null;
+
+        if (paymentOpt.isPresent()) {
+            PaymentEntity payment = paymentOpt.get();
+            paymentMethod = translatePaymentMethod(payment.getPaymentMethod());
+            pgProvider = payment.getPgProvider();
+        }
 
         List<OrderItemResponseDto> responseItems = items.stream()
                 .map(item -> {
@@ -297,6 +312,8 @@ public class OrderServiceImpl implements OrderService {
                 .totalAmount(order.getTotalAmount())
                 .deliveryFee(order.getDeliveryFee())
                 .payAmount(order.getTotalAmount()) // == totalAmount
+                .paymentMethod(paymentMethod)
+                .pgProvider(pgProvider)
                 .receiverName(order.getReceiverName())
                 .receiverPhone(order.getReceiverPhone())
                 .receiverAddress(order.getReceiverAddress())
@@ -310,7 +327,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
-        Page<OrderEntity> orders = orderRepository.findByUserId(userId, pageable);
+        Page<OrderEntity> orders = orderRepository.findByUserIdAndDeleteYn(userId, "N", pageable);
 
         return orders.map(order -> {
             List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
@@ -389,5 +406,30 @@ public class OrderServiceImpl implements OrderService {
         });
     }
 
+    @Transactional
+    @Override
+    public void deleteOrder(Long userId, Long orderId) {
+        OrderEntity order = orderRepository.findByOrderIdAndUserIdAndDeleteYn(orderId, userId, "N")
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
+        if (!(order.getOrderStatus() == OrderStatus.CREATED || order.getOrderStatus() == OrderStatus.CANCELLED)) {
+            throw new IllegalStateException("해당 주문은 삭제할 수 없습니다.");
+        }
+
+        order.setDeleteYn("Y");
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
+    }
+
+    private String translatePaymentMethod(String provider) {
+        if (provider == null) return null;
+        return switch (provider.toUpperCase()) {
+            case "KAKAOPAY" -> "카카오페이";
+            case "NAVERPAY" -> "네이버페이";
+            case "CARD" -> "신용/체크카드";
+            case "VIRTUAL_ACCOUNT" -> "가상계좌";
+            case "TRANSFER" -> "계좌이체";
+            default -> provider; // 정의 안 된 건 그냥 그대로
+        };
+    }
 }

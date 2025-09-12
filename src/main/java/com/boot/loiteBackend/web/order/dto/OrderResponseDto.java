@@ -38,6 +38,12 @@ public class OrderResponseDto {
     @Schema(description = "결제 예정 금액 (총액 - 할인 + 배송비)", example = "118000")
     private BigDecimal payAmount;
 
+    @Schema(description = "결제수단 (CARD, KAKAOPAY 등)", example = "KAKAOPAY")
+    private String paymentMethod;
+
+    @Schema(description = "PG사 (TOSS, INICIS 등)", example = "TOSSPAYMENTS")
+    private String pgProvider;
+
     @Schema(description = "배송지 이름", example = "홍길동")
     private String receiverName;
 

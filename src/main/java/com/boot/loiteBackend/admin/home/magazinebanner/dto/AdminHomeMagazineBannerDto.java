@@ -20,7 +20,7 @@ public class AdminHomeMagazineBannerDto {
         private String videoUrl;
 
         @Schema(description = "배너 영상 썸네일 URL", example = "https://cdn.example.com/thumb.jpg")
-        private String videoThumbnail;
+        private String videoThumbnailUrl;
 
         @Schema(description = "배너 제목", example = "심플하고 모던한 무드등")
         private String title;
@@ -46,7 +46,7 @@ public class AdminHomeMagazineBannerDto {
             return HomeMagazineBannerEntity.builder()
                     .productId(dto.getProductId())
                     .videoUrl(dto.getVideoUrl())
-                    .videoThumbnail(dto.getVideoThumbnail())
+                    .videoThumbnailUrl(dto.getVideoThumbnailUrl())
                     .title(dto.getTitle())
                     .subtitle(dto.getSubtitle())
                     .buttonText(dto.getButtonText())
@@ -61,7 +61,7 @@ public class AdminHomeMagazineBannerDto {
             if (dto == null || entity == null) return;
             entity.setProductId(dto.getProductId());
             entity.setVideoUrl(dto.getVideoUrl());
-            entity.setVideoThumbnail(dto.getVideoThumbnail());
+            entity.setVideoThumbnailUrl(dto.getVideoThumbnailUrl());
             entity.setTitle(dto.getTitle());
             entity.setSubtitle(dto.getSubtitle());
             entity.setButtonText(dto.getButtonText());
@@ -88,7 +88,7 @@ public class AdminHomeMagazineBannerDto {
         private String videoType;
 
         private String thumbnailName;
-        private String videoThumbnail;
+        private String videoThumbnailUrl;
         private String thumbnailPath;
         private Long thumbnailSize;
         private String thumbnailType;
@@ -115,7 +115,7 @@ public class AdminHomeMagazineBannerDto {
                     .videoType(entity.getVideoType())
 
                     .thumbnailName(entity.getThumbnailName())
-                    .videoThumbnail(entity.getVideoThumbnail())
+                    .videoThumbnailUrl(entity.getVideoThumbnailUrl())
                     .thumbnailPath(entity.getThumbnailPath())
                     .thumbnailSize(entity.getThumbnailSize())
                     .thumbnailType(entity.getThumbnailType())

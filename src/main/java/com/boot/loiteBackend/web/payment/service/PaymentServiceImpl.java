@@ -66,12 +66,17 @@ public class PaymentServiceImpl implements PaymentService {
         String statusStr = (String) portOneRes.get("status");
         PaymentStatus status = PaymentStatus.valueOf(statusStr);
 
+        // === method/provider 추출 ===
+        Map<String, Object> methodMap = (Map<String, Object>) portOneRes.get("method");
+        String provider = methodMap != null ? (String) methodMap.get("provider") : null; // KAKAOPAY, CARD 등
+        String methodType = methodMap != null ? (String) methodMap.get("type") : null;   // PaymentMethodEasyPay 등 (참고용)
+
         if (existingOpt.isPresent()) {
             // 기존 결제 row 업데이트
             payment = existingOpt.get();
             payment.setTxId((String) portOneRes.get("transactionId"));
             payment.setPgProvider(((Map<String, Object>) portOneRes.get("channel")).get("pgProvider").toString());
-            payment.setPaymentMethod(((Map<String, Object>) portOneRes.get("method")).get("type").toString());
+            payment.setPaymentMethod(provider);   // ✅ provider 저장
             payment.setPaymentAmountApproved(paidAmount);
             payment.setPaymentStatus(status);
             payment.setReceiptUrl((String) portOneRes.get("receiptUrl"));
@@ -85,7 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .merchantUid(order.getOrderNumber())
                     .txId((String) portOneRes.get("transactionId"))
                     .pgProvider(((Map<String, Object>) portOneRes.get("channel")).get("pgProvider").toString())
-                    .paymentMethod(((Map<String, Object>) portOneRes.get("method")).get("type").toString())
+                    .paymentMethod(provider)
                     .paymentTotalAmount(order.getTotalAmount())
                     .paymentAmountApproved(paidAmount)
                     .paymentCurrency((String) portOneRes.getOrDefault("currency", "KRW"))
@@ -103,16 +108,13 @@ public class PaymentServiceImpl implements PaymentService {
         order.setOrderStatus(status == PaymentStatus.PAID ? OrderStatus.PAID : OrderStatus.PAYMENT_FAILED);
         orderRepository.save(order);
 
-
-        // 5. 주문 상태 업데이트
-        order.setOrderStatus(OrderStatus.PAID);
-        orderRepository.save(order);
-
+        // 6. 응답 변환 (한글 변환 포함)
         return PaymentVerifyResponseDto.builder()
                 .orderId(order.getOrderId())
                 .orderNumber(order.getOrderNumber())
                 .paymentId(payment.getPaymentId())
-                .paymentStatus(PaymentStatus.PAID)
+                .paymentStatus(status)
+                .paymentMethod(translatePaymentMethod(payment.getPaymentMethod()))
                 .build();
     }
 
@@ -120,5 +122,18 @@ public class PaymentServiceImpl implements PaymentService {
         if (isoTime == null) return null;
         return LocalDateTime.parse(isoTime, DateTimeFormatter.ISO_DATE_TIME);
     }
+
+    private String translatePaymentMethod(String provider) {
+        if (provider == null) return null;
+        return switch (provider.toUpperCase()) {
+            case "KAKAOPAY" -> "카카오페이";
+            case "NAVERPAY" -> "네이버페이";
+            case "CARD" -> "신용/체크카드";
+            case "VIRTUAL_ACCOUNT" -> "가상계좌";
+            case "TRANSFER" -> "계좌이체";
+            default -> provider; // 정의 안 된 건 그대로
+        };
+    }
 }
+
 

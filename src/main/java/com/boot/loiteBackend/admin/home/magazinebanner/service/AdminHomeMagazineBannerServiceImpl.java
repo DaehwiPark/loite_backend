@@ -35,7 +35,7 @@ public class AdminHomeMagazineBannerServiceImpl implements AdminHomeMagazineBann
         }
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             thumbResult = fileService.save(thumbnailFile, UPLOAD_CATEGORY);
-            request.setVideoThumbnail(thumbResult.getUrlPath());
+            request.setVideoThumbnailUrl(thumbResult.getUrlPath());
         }
 
         HomeMagazineBannerEntity entity = HomeMagazineBannerEntity.builder()
@@ -48,7 +48,7 @@ public class AdminHomeMagazineBannerServiceImpl implements AdminHomeMagazineBann
                 .videoType(videoResult != null ? videoResult.getContentType() : null)
 
                 .thumbnailName(thumbResult != null ? thumbResult.getFileName() : null)
-                .videoThumbnail(request.getVideoThumbnail())
+                .videoThumbnailUrl(request.getVideoThumbnailUrl())
                 .thumbnailPath(thumbResult != null ? thumbResult.getPhysicalPath() : null)
                 .thumbnailSize(thumbResult != null ? thumbResult.getSize() : null)
                 .thumbnailType(thumbResult != null ? thumbResult.getContentType() : null)
@@ -91,7 +91,7 @@ public class AdminHomeMagazineBannerServiceImpl implements AdminHomeMagazineBann
 
             FileUploadResult result = fileService.save(thumbnailFile, UPLOAD_CATEGORY);
             banner.setThumbnailName(result.getFileName());
-            banner.setVideoThumbnail(result.getUrlPath());
+            banner.setVideoThumbnailUrl(result.getUrlPath());
             banner.setThumbnailPath(result.getPhysicalPath());
             banner.setThumbnailSize(result.getSize());
             banner.setThumbnailType(result.getContentType());

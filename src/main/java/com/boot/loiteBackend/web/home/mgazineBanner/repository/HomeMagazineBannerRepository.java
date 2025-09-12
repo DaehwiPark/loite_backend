@@ -15,6 +15,8 @@ public interface HomeMagazineBannerRepository extends JpaRepository<HomeMagazine
             select new com.boot.loiteBackend.web.home.mgazineBanner.dto.HomeMagazineBannerDto(
                 mb.id,
                 p.productId,
+                mb.videoThumbnailUrl,
+                mb.videoUrl,
                 p.productName,
                 p.productModelName,
                 mb.title,
