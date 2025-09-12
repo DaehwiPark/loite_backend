@@ -57,6 +57,12 @@ public class AdminProductRequestDto {
     @Schema(description = "추천 상품 여부 (Y/N)", example = "N")
     private String recommendedYn;
 
+    @Schema(description = "베스트 상품 여부 (Y/N)", example = "N")
+    private boolean bestProductYn;
+
+    @Schema(description = "새로운 상품 여부 (Y/N)", example = "N")
+    private boolean newProductYn;
+
     @Schema(description = "기본 배송비", example = "3000.00")
     private BigDecimal productDeliveryCharge;
 

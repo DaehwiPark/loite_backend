@@ -89,6 +89,8 @@ public class AdminProductServiceImpl implements AdminProductService {
         product.setProductBrand(brand);
         product.setProductCategory(category);
         product.setProductOptions(null);
+        product.setBestProductYn(dto.isBestProductYn() ? "Y" : "N");
+        product.setNewProductYn(dto.isNewProductYn() ? "Y" : "N");
 
         BigDecimal price = dto.getProductPrice();
         Integer rate = dto.getDiscountRate();
@@ -230,6 +232,8 @@ public class AdminProductServiceImpl implements AdminProductService {
         product.setActiveYn(dto.getActiveYn());
         product.setDeleteYn(dto.getDeleteYn());
         product.setMainExposureYn(dto.getMainExposureYn());
+        product.setBestProductYn(dto.isBestProductYn() ? "Y" : "N");
+        product.setNewProductYn(dto.isNewProductYn() ? "Y" : "N");
 
         // 할인가 재계산
         BigDecimal price = dto.getProductPrice();
@@ -472,6 +476,8 @@ public class AdminProductServiceImpl implements AdminProductService {
         dto.setActiveYn(product.getActiveYn());
         dto.setMainExposureYn(product.getMainExposureYn());
         dto.setRecommendedYn(product.getRecommendedYn());
+        dto.setBestProductYn("Y".equals(product.getBestProductYn()));
+        dto.setNewProductYn("Y".equals(product.getNewProductYn()));
 
         //섹션
         List<AdminProductSectionResponseDto> sectionDtos = product.getProductSections().stream()

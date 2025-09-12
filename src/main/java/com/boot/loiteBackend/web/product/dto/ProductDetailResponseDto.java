@@ -53,6 +53,12 @@ public class ProductDetailResponseDto {
     @Schema(description = "총 재고 수량", example = "35")
     private Integer productStock;
 
+    @Schema(description = "베스트 상품 Y/N", example = "true")
+    private boolean bestProductYn;
+
+    @Schema(description = "새로운 상품 Y/N", example = "true")
+    private boolean newProductYn;
+
     @Schema(description = "상품 상세 섹션 리스트", implementation = ProductSectionDto.class)
     private List<ProductSectionDto> sections;
 

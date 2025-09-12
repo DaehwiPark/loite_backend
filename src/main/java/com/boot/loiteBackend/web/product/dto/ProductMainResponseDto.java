@@ -30,5 +30,11 @@ public class ProductMainResponseDto {
 
     @Schema(description = "대표 이미지 URL", example = "https://cdn.loite.com/images/product/wood-table-main.jpg")
     private String imageUrl;
+
+    @Schema(description = "베스트 상품 Y/N", example = "true")
+    private boolean bestProductYn;
+
+    @Schema(description = "새로운 상품 Y/N", example = "true")
+    private boolean newProductYn;
 }
 

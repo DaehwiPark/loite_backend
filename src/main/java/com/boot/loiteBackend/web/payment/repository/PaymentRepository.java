@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.web.payment.repository;
 
+import com.boot.loiteBackend.web.order.entity.OrderEntity;
 import com.boot.loiteBackend.web.payment.entity.PaymentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,4 +13,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
 
     @Query("select p from PaymentEntity p where p.order.orderId = :orderId")
     Optional<PaymentEntity> findByOrderId(@Param("orderId") Long orderId);
+
+    Optional<PaymentEntity> findByOrder(OrderEntity order);
 }
