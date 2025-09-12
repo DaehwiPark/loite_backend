@@ -2,7 +2,6 @@ package com.boot.loiteBackend.admin.mainpage.popup.controller;
 
 import com.boot.loiteBackend.admin.mainpage.popup.dto.*;
 import com.boot.loiteBackend.admin.mainpage.popup.service.AdminMainpagePopupService;
-import com.boot.loiteBackend.common.file.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -26,27 +25,22 @@ import java.util.List;
 public class AdminMainpagePopupController {
 
     private final AdminMainpagePopupService adminMainpagePopupService;
-    private  final FileService fileService;
 
-    // 등록
-    @PostMapping
-    public ResponseEntity<AdminMainPagePopupIdDto> create(@Valid @RequestBody AdminMainpagePopupDto req) {
-        Long id = adminMainpagePopupService.create(req);
-        return ResponseEntity.ok(new AdminMainPagePopupIdDto(id));
-    }
-
-    @Operation(summary = "팝업 저장 테스트(이미지 1장 포함)",
-            description = "multipart/form-data 로 JSON(popup)과 이미지(image)를 함께 전송합니다.")
+    //생성
+    @Operation(
+            summary = "팝업 저장(이미지 1장 포함)",
+            description = "multipart/form-data 로 JSON(popup)과 이미지(image)를 함께 전송합니다."
+    )
     @PostMapping(path = "/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdminMainPagePopupIdDto> createTest(
             @RequestPart("popup") @Valid AdminMainpagePopupCreateTestDto req,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) throws IOException {
-        Long id = adminMainpagePopupService.createTest(req, image); // ← 오버로드 호출
+        Long id = adminMainpagePopupService.createTest(req, image);
         return ResponseEntity.status(HttpStatus.CREATED).body(new AdminMainPagePopupIdDto(id));
     }
 
-    // 수정
+    @Operation(summary = "수정", description = "팝업 내용을 수정")
     @PatchMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id,
                                        @Valid @RequestBody AdminMainpagePopupUpdateDto req) {
@@ -54,12 +48,7 @@ public class AdminMainpagePopupController {
         return ResponseEntity.noContent().build();
     }
 
-//    // 관리자 리스트
-//    @GetMapping
-//    public ResponseEntity<List<AdminMainpagePopupDetailDto>> listAllForAdmin() {
-//        return ResponseEntity.ok(adminMainpagePopupService.listAllForAdmin());
-//    }
-
+    @Operation(summary = "리스트 조회", description = "팝업 리스트 조회")
     @GetMapping
     public ResponseEntity<List<AdminMainpagePopupListItemDto>> listAllForAdmin(
             @RequestParam(required = false) Integer titleMax,
@@ -68,52 +57,43 @@ public class AdminMainpagePopupController {
         return ResponseEntity.ok(adminMainpagePopupService.listAllForAdminSummary(titleMax, detailMax));
     }
 
-    // 실제 노출(현재 시각)
+    @Operation(summary = "실제 노출", description = "실제 시간 반영")
     @GetMapping("/visible")
     public ResponseEntity<List<AdminMainpagePopupDetailDto>> visible() {
         return ResponseEntity.ok(adminMainpagePopupService.listVisible(LocalDateTime.now()));
     }
 
-    // 활성 토글(단건)
+    @Operation(summary = "노출 여부", description = "단건 노출 여부 변경")
     @PostMapping("/{id}/active")
     public ResponseEntity<Void> setActive(@PathVariable Long id, @RequestParam boolean active) {
         adminMainpagePopupService.setActive(id, active);
         return ResponseEntity.noContent().build();
     }
 
-    // 일괄 활성/비활성
+    @Operation(summary = "일괄 노출 여부 변경", description = "모든 팝업 노출 여부 변경")
     @PostMapping("/bulk-active")
     public ResponseEntity<Void> bulkActive(@Valid @RequestBody AdminMainpagePopupBulkActiveDto req) {
         adminMainpagePopupService.bulkSetActive(req.getIds(), req.isActive());
         return ResponseEntity.noContent().build();
     }
 
-    // 정렬 저장
+    @Operation(summary = "정렬 저장", description = "팝업 노출 우선 순위 변경")
     @PostMapping("/reorder")
     public ResponseEntity<Void> reorder(@Valid @RequestBody AdminMainpagePopupReorderDto req) {
         adminMainpagePopupService.reorder(req.getOrderedIds());
         return ResponseEntity.noContent().build();
     }
 
-    // 소프트 삭제
+    @Operation(summary = "소프트 삭제", description = "팝업 소프트 삭제(필요없으면 삭제)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         adminMainpagePopupService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
 
-    //팝업 저장 테스트
-    @PostMapping("/test")
-    public ResponseEntity<AdminMainPagePopupIdDto> createTest(@Valid @RequestBody AdminMainpagePopupCreateTestDto req) {
-        Long id = adminMainpagePopupService.createTest(req);   // 서비스 메서드 추가 필요
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AdminMainPagePopupIdDto(id));
-    }
-
-    // /api/admin/mainpage/popup/{id}
-    // 한 개만 호출 (자세히 보기용)
+    @Operation(summary = "단건 조회", description = "팝업 단건 상세 조회")
     @GetMapping("/{id}")
     public ResponseEntity<AdminMainpagePopupDetailDto> get(@PathVariable Long id) {
         return ResponseEntity.ok(adminMainpagePopupService.getOne(id));
     }
-
 }
