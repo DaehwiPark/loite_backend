@@ -17,9 +17,9 @@ public interface AdminMainpagePopupService {
     List<AdminMainpagePopupDetailDto> listVisible(LocalDateTime now);
 
     // 신규 등록 (정렬값은 MAX+10 자동 배정)
-    Long create(AdminMainpagePopupDto req);
-
-    Long create(AdminMainpagePopupDto req, MultipartFile image) throws IOException;
+//    Long create(AdminMainpagePopupDto req);
+//
+//    Long create(AdminMainpagePopupDto req, MultipartFile image) throws IOException;
 
     // 수정 (링크/타겟/기간/활성/이미지 경로 등)
     void update(Long popupId, AdminMainpagePopupUpdateDto req);
@@ -37,8 +37,8 @@ public interface AdminMainpagePopupService {
     void softDelete(Long popupId);
 
     // create Test
-    Long createTest(AdminMainpagePopupCreateTestDto req);
-    Long createTest(AdminMainpagePopupCreateTestDto req, MultipartFile image) throws IOException;
+    Long create(AdminMainpagePopupCreateDto req);
+    Long create(AdminMainpagePopupCreateDto req, MultipartFile image) throws IOException;
 
     // 단건 조회
     AdminMainpagePopupDetailDto getOne(Long id);

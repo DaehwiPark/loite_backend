@@ -12,11 +12,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// 새 팝업 등록 요청 바디
-public class AdminMainpagePopupDto {
-    @NotBlank
-    @Size(max = 512)
-    private String popupImageUrl;
+public class AdminMainpagePopupCreateDto {
+    @Size(max = 100)
+    private String popupTitle;
+
+    @Size(max = 100)
+    private String popupDetail;
 
     @NotBlank
     @Size(max = 512)
@@ -30,4 +31,6 @@ public class AdminMainpagePopupDto {
 
     private LocalDateTime popupStartAt;
     private LocalDateTime popupEndAt;
+
+    // 이미지 없음: popupImageUrl 은 아예 보내지 않음(서버에서 null 저장)
 }

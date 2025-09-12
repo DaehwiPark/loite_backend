@@ -32,11 +32,11 @@ public class AdminMainpagePopupController {
             description = "multipart/form-data 로 JSON(popup)과 이미지(image)를 함께 전송합니다."
     )
     @PostMapping(path = "/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<AdminMainPagePopupIdDto> createTest(
-            @RequestPart("popup") @Valid AdminMainpagePopupCreateTestDto req,
+    public ResponseEntity<AdminMainPagePopupIdDto> create(
+            @RequestPart("popup") @Valid AdminMainpagePopupCreateDto req,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) throws IOException {
-        Long id = adminMainpagePopupService.createTest(req, image);
+        Long id = adminMainpagePopupService.create(req, image);
         return ResponseEntity.status(HttpStatus.CREATED).body(new AdminMainPagePopupIdDto(id));
     }
 

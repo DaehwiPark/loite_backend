@@ -3,7 +3,6 @@ package com.boot.loiteBackend.admin.mainpage.popup.service;
 import com.boot.loiteBackend.admin.mainpage.popup.dto.*;
 import com.boot.loiteBackend.admin.mainpage.popup.repository.AdminMainpagePopupRepository;
 import com.boot.loiteBackend.common.file.FileServiceImpl;
-import com.boot.loiteBackend.common.file.FileUploadResult;
 import com.boot.loiteBackend.domain.mainpage.popup.MainpagePopupEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,45 +48,45 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
 
     // ---------- 등록/수정/정렬/삭제 ----------
 
-    @Override
-    @Transactional
-    public Long create(AdminMainpagePopupDto req) {
-        validateCreate(req);
-
-        int nextOrder = adminMainpagePopupRepository.findMaxSortOrderOfActive() + 10;
-
-        MainpagePopupEntity entity = MainpagePopupEntity.builder()
-                .popupImageUrl(req.getPopupImageUrl())
-                .popupLinkUrl(req.getPopupLinkUrl())
-                .popupTarget(Objects.requireNonNullElse(req.getPopupTarget(), MainpagePopupEntity.Target._self))
-                .popupIsActive(req.isPopupIsActive())
-                .popupSortOrder(nextOrder)
-                .popupStartAt(req.getPopupStartAt())
-                .popupEndAt(req.getPopupEndAt())
-                .build();
-
-        checkSchedule(entity.getPopupStartAt(), entity.getPopupEndAt());
-
-        adminMainpagePopupRepository.save(entity);
-        return entity.getPopupId();
-    }
-
-    @Override
-    @Transactional
-    public Long create(AdminMainpagePopupDto req, MultipartFile image) throws IOException {
-        Long id = create(req); // (여기서 엔티티가 저장됨 - 이미지 URL은 아직 null이어도 OK)
-
-        if (image != null && !image.isEmpty()) {
-            String category = "noti/popup/" + id;
-            FileUploadResult r = fileService.save(image, category);
-
-            // 저장된 팝업 엔티티에 URL 주입
-            MainpagePopupEntity e = getOrThrow(id);
-            e.setPopupImageUrl(r.getUrlPath());   // 예: /uploads/noti/popup/{id}/uuid_name.jpg
-            // 필요시: e.setUpdatedAt(LocalDateTime.now());  // @PreUpdate가 있으면 생략 가능
-        }
-        return id;
-    }
+//    @Override
+//    @Transactional
+//    public Long create(AdminMainpagePopupDto req) {
+//        validateCreate(req);
+//
+//        int nextOrder = adminMainpagePopupRepository.findMaxSortOrderOfActive() + 10;
+//
+//        MainpagePopupEntity entity = MainpagePopupEntity.builder()
+//                .popupImageUrl(req.getPopupImageUrl())
+//                .popupLinkUrl(req.getPopupLinkUrl())
+//                .popupTarget(Objects.requireNonNullElse(req.getPopupTarget(), MainpagePopupEntity.Target._self))
+//                .popupIsActive(req.isPopupIsActive())
+//                .popupSortOrder(nextOrder)
+//                .popupStartAt(req.getPopupStartAt())
+//                .popupEndAt(req.getPopupEndAt())
+//                .build();
+//
+//        checkSchedule(entity.getPopupStartAt(), entity.getPopupEndAt());
+//
+//        adminMainpagePopupRepository.save(entity);
+//        return entity.getPopupId();
+//    }
+//
+//    @Override
+//    @Transactional
+//    public Long create(AdminMainpagePopupDto req, MultipartFile image) throws IOException {
+//        Long id = create(req); // (여기서 엔티티가 저장됨 - 이미지 URL은 아직 null이어도 OK)
+//
+//        if (image != null && !image.isEmpty()) {
+//            String category = "noti/popup/" + id;
+//            FileUploadResult r = fileService.save(image, category);
+//
+//            // 저장된 팝업 엔티티에 URL 주입
+//            MainpagePopupEntity e = getOrThrow(id);
+//            e.setPopupImageUrl(r.getUrlPath());   // 예: /uploads/noti/popup/{id}/uuid_name.jpg
+//            // 필요시: e.setUpdatedAt(LocalDateTime.now());  // @PreUpdate가 있으면 생략 가능
+//        }
+//        return id;
+//    }
 
 
     @Override
@@ -175,13 +173,13 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
         }
     }
 
-    private void validateCreate(AdminMainpagePopupDto req) {
-        if (req == null) throw new IllegalArgumentException("CreateReq is null");
-        // 이미지 URL은 멀티파트 경로에서 이후에 세팅하므로 필수 X
-        // if (isBlank(req.getPopupImageUrl())) throw new IllegalArgumentException("popup_image_url is required");
-        if (isBlank(req.getPopupLinkUrl()))  throw new IllegalArgumentException("popup_link_url is required");
-        checkSchedule(req.getPopupStartAt(), req.getPopupEndAt());
-    }
+//    private void validateCreate(AdminMainpagePopupDto req) {
+//        if (req == null) throw new IllegalArgumentException("CreateReq is null");
+//        // 이미지 URL은 멀티파트 경로에서 이후에 세팅하므로 필수 X
+//        // if (isBlank(req.getPopupImageUrl())) throw new IllegalArgumentException("popup_image_url is required");
+//        if (isBlank(req.getPopupLinkUrl()))  throw new IllegalArgumentException("popup_link_url is required");
+//        checkSchedule(req.getPopupStartAt(), req.getPopupEndAt());
+//    }
 
     private boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
@@ -207,7 +205,7 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
 
     @Override
     @Transactional
-    public Long createTest(AdminMainpagePopupCreateTestDto req) {
+    public Long create(AdminMainpagePopupCreateDto req) {
         if (req == null) throw new IllegalArgumentException("CreateReq is null");
         if (req.getPopupLinkUrl() == null || req.getPopupLinkUrl().trim().isEmpty())
             throw new IllegalArgumentException("popup_link_url is required");
@@ -237,7 +235,7 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
 
     @Override
     @Transactional
-    public Long createTest(AdminMainpagePopupCreateTestDto req, MultipartFile image) throws IOException {
+    public Long create(AdminMainpagePopupCreateDto req, MultipartFile image) throws IOException {
         if (req == null) throw new IllegalArgumentException("CreateReq is null");
         if (req.getPopupLinkUrl() == null || req.getPopupLinkUrl().trim().isEmpty())
             throw new IllegalArgumentException("popup_link_url is required");
