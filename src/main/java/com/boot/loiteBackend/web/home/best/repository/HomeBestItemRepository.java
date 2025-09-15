@@ -15,6 +15,8 @@ public interface HomeBestItemRepository extends Repository<HomeBestItemEntity, L
                     p.productModelName,
                     p.productSummary,
                     p.productPrice,
+                    p.bestProductYn,
+                    p.newProductYn,
                     e.slotNo,
                     p.productId,
                     pc.categoryId,

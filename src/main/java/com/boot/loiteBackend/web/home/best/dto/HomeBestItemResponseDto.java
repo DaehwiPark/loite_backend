@@ -16,18 +16,21 @@ public class HomeBestItemResponseDto {
     private String productModelName;
     private String productSummary;
     private BigDecimal productPrice;
+    private String bestProductYn;
+    private String newProductYn;
     private Long categoryId;
     private String depth1Path;
     private String depth2Path;
     private String depth3Path;
     private String imageUrl;
 
-    // JPQL constructor expression
     public HomeBestItemResponseDto(
             String productName,
             String productModelName,
             String productSummary,
             BigDecimal productPrice,
+            String bestProductYn,
+            String newProductYn,
             Integer slotNo,
             Long productId,
             Long categoryId,
@@ -40,6 +43,8 @@ public class HomeBestItemResponseDto {
         this.productModelName = productModelName;
         this.productSummary = productSummary;
         this.productPrice = productPrice;
+        this.bestProductYn = bestProductYn;
+        this.newProductYn = newProductYn;
         this.slotNo = slotNo;
         this.productId = productId;
         this.categoryId = categoryId;

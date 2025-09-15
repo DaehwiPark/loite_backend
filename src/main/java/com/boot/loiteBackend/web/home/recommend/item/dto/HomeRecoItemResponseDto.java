@@ -20,6 +20,8 @@ public class HomeRecoItemResponseDto {
     private String productModelName;
     private String productSummary;
     private BigDecimal productPrice;
+    private String bestProductYn;
+    private String newProductYn;
 
     // category 영역
     private Long categoryId;
@@ -38,6 +40,8 @@ public class HomeRecoItemResponseDto {
             String productModelName,
             String productSummary,
             BigDecimal productPrice,
+            String bestProductYn,
+            String newProductYn,
             Integer slotNo,
             Long productId,
             Long categoryId,
@@ -51,6 +55,8 @@ public class HomeRecoItemResponseDto {
         this.productModelName = productModelName;
         this.productSummary = productSummary;
         this.productPrice = productPrice;
+        this.bestProductYn = bestProductYn;
+        this.newProductYn = newProductYn;
         this.slotNo = slotNo;
         this.productId = productId;
         this.categoryId = categoryId;
