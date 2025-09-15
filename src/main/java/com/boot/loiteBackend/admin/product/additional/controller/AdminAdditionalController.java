@@ -35,10 +35,7 @@ public class AdminAdditionalController {
 
     @Operation(summary = "추가구성품 수정", description = "추가구성품을 수정합니다.")
     @PutMapping(value = "/{additionalId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<AdminAdditionalResponseDto> updateAdditional(
-            @PathVariable Long additionalId,
-            @ModelAttribute AdminAdditionalRequestDto requestDto,
-            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+    public ResponseEntity<AdminAdditionalResponseDto> updateAdditional(@PathVariable Long additionalId, @ModelAttribute AdminAdditionalRequestDto requestDto, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
         AdminAdditionalResponseDto response = adminAdditionalService.updateAdditional(additionalId, requestDto, imageFile);
         return ResponseEntity.ok(response);
     }
