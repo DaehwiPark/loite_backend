@@ -9,7 +9,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface HomeRecoItemRepository extends Repository<HomeRecoItemEntity, Long> {
-    boolean existsById(Long id);
+
+
 
     @Query("""
         select new com.boot.loiteBackend.web.home.recommend.item.dto.HomeRecoItemResponseDto(
@@ -18,6 +19,8 @@ public interface HomeRecoItemRepository extends Repository<HomeRecoItemEntity, L
             p.productModelName,
             p.productSummary,
             p.productPrice,
+            p.bestProductYn,
+            p.newProductYn,
             ri.slotNo,
             p.productId,
             pc.categoryId,
