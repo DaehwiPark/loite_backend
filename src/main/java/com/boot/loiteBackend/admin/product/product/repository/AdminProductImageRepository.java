@@ -14,4 +14,6 @@ public interface AdminProductImageRepository extends JpaRepository<AdminProductI
     Optional<AdminProductImageEntity> findFirstByProduct_ProductIdAndImageTypeAndActiveYnOrderByImageSortOrderAsc(
             Long productId, ImageType imageType, String activeYn
     );
+
+    Optional<AdminProductImageEntity> findFirstByProduct_ProductIdOrderByImageSortOrderAsc(Long productId);
 }
