@@ -322,4 +322,16 @@ public class ReviewServiceImpl implements ReviewService{
         }
     }
 
+    @Override
+    public ReviewSummaryDto getReviewSummary(Long productId) {
+        Double avgRating = reviewRepository.findAverageRatingByProductId(productId);
+        Long reviewCount = reviewRepository.countByProductIdAndDeleteYn(productId);
+
+        return ReviewSummaryDto.builder()
+                .productId(productId)
+                .averageRating(avgRating != null ? Math.round(avgRating * 10) / 10.0 : 0.0)
+                .reviewCount(reviewCount)
+                .build();
+    }
+
 }

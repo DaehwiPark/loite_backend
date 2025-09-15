@@ -1,9 +1,6 @@
 package com.boot.loiteBackend.web.review.service;
 
-import com.boot.loiteBackend.web.review.dto.ReviewRequestDto;
-import com.boot.loiteBackend.web.review.dto.ReviewResponseDto;
-import com.boot.loiteBackend.web.review.dto.ReviewUpdateRequestDto;
-import com.boot.loiteBackend.web.review.dto.ReviewUserResponseDto;
+import com.boot.loiteBackend.web.review.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,4 +20,6 @@ public interface ReviewService {
     Page<ReviewResponseDto> getReviewsByProduct(Long productId,String sortType, Pageable pageable);
 
     boolean toggleHelpful(Long userId, Long reviewId);
+
+    ReviewSummaryDto getReviewSummary(Long productId);
 }

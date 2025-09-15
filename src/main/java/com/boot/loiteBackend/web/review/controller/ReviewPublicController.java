@@ -1,6 +1,7 @@
 package com.boot.loiteBackend.web.review.controller;
 
 import com.boot.loiteBackend.web.review.dto.ReviewResponseDto;
+import com.boot.loiteBackend.web.review.dto.ReviewSummaryDto;
 import com.boot.loiteBackend.web.review.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +34,13 @@ public class ReviewPublicController {
         Pageable pageable = PageRequest.of(page, size);
         Page<ReviewResponseDto> response = reviewService.getReviewsByProduct(productId, sortType, pageable);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "상품 리뷰 요약 조회", description = "상품의 리뷰 평균 평점과 개수를 조회합니다.")
+    @GetMapping("/product/{productId}/summary")
+    public ResponseEntity<ReviewSummaryDto> getReviewSummary(@PathVariable Long productId) {
+        ReviewSummaryDto response = reviewService.getReviewSummary(productId);
         return ResponseEntity.ok(response);
     }
 
