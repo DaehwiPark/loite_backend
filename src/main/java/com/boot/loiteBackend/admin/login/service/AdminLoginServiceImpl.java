@@ -2,11 +2,15 @@ package com.boot.loiteBackend.admin.login.service;
 
 import com.boot.loiteBackend.admin.login.dto.AdminLoginRequestDto;
 import com.boot.loiteBackend.admin.login.error.AdminLoginErrorCode;
+import com.boot.loiteBackend.admin.user.dto.AdminUserSummaryDto;
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.config.security.jwt.JwtCookieUtil;
 import com.boot.loiteBackend.config.security.jwt.JwtTokenProvider;
 import com.boot.loiteBackend.domain.token.service.TokenService;
 import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import com.boot.loiteBackend.global.error.exception.CustomException;
+import com.boot.loiteBackend.web.login.error.LoginErrorCode;
+import com.boot.loiteBackend.web.user.general.dto.UserSummaryDto;
 import jakarta.servlet.http.Cookie;
 // ↓ 실제 사용 중인 경로에 맞춰 하나만 사용하세요.
 import com.boot.loiteBackend.web.user.general.repository.UserRepository;
@@ -17,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,24 +73,19 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     }
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        // 1) AccessToken 추출 (쿠키 우선, 없으면 Authorization 헤더)
-        String accessToken = extractAccessToken(request);
-
-        if (accessToken != null && !accessToken.isBlank()) {
-            // 2) userId 추출 → Redis의 refreshToken:<userId> 삭제
-            try {
-                Long userId = jwtTokenProvider.getUserId(accessToken);
-                if (userId != null) {
-                    tokenService.deleteRefreshToken(String.valueOf(userId));
-                }
-            } catch (Exception ignore) {
-                // 토큰 만료/파싱 실패여도 쿠키 제거는 진행
-            }
+    public void logout(CustomUserDetails userDetails, HttpServletResponse response) {
+        // 1) Redis에서 refresh 토큰 제거
+        if (userDetails != null) {
+            String userId = String.valueOf(userDetails.getUserId());
+            tokenService.deleteRefreshToken(userId);
         }
 
-        // 3) AccessToken 쿠키 제거
-        clearAccessTokenCookie(response);
+        // 2) 브라우저 쿠키 제거 (발급 시와 동일한 속성으로!)
+        jwtCookieUtil.deleteAccessTokenCookie(response);
+        jwtCookieUtil.deleteRefreshTokenCookie(response);
+
+        // 3) (선택) 시큐리티 컨텍스트 정리
+        SecurityContextHolder.clearContext();
     }
 
     private String extractAccessToken(HttpServletRequest request) {
@@ -143,5 +143,48 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         cookie.setMaxAge(0);        // 즉시 만료
         // SameSite 설정이 필요하면 JwtCookieUtil과 동일하게 적용
         response.addCookie(cookie);
+    }
+
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public AdminUserSummaryDto myInfo(CustomUserDetails user, String token) {
+        if (user == null) {
+            throw new CustomException(LoginErrorCode.UNAUTHORIZED);
+        }
+
+        UserEntity userEntity = userRepository.findById(user.getUserId())
+                .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
+
+        String userLoginType = jwtTokenProvider.getUserLoginType(token);
+
+        return AdminUserSummaryDto.builder()
+                .userId(userEntity.getUserId())
+                .userEmail(userEntity.getUserEmail())
+                .userName(userEntity.getUserName())
+                .userRole(userEntity.getUserRole() != null ? userEntity.getUserRole().getRoleCode() : null)
+                .userRegisterType(userEntity.getUserRegisterType())
+                .userLoginType(userLoginType)
+                .build();
+    }
+
+    @Override
+    public boolean check(CustomUserDetails user, String password) {
+        if (user == null) {
+            throw new CustomException(LoginErrorCode.UNAUTHORIZED);
+        }
+
+        UserEntity userEntity = userRepository.findById(user.getUserId())
+                .orElseThrow(() -> new CustomException(LoginErrorCode.NOT_FOUND));
+
+        if (userEntity.getUserPassword() == null) {
+            throw new CustomException(LoginErrorCode.SOCIAL_USER_CANNOT_VERIFY_PASSWORD);
+        }
+
+        if (!passwordEncoder.matches(password, userEntity.getUserPassword())) {
+            throw new CustomException(LoginErrorCode.INVALID_PASSWORD);
+        }
+
+        return true;
     }
 }

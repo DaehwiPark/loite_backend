@@ -15,18 +15,18 @@ public class AdminUserSummaryDto {
     @Schema(description = "사용자 ID", example = "1")
     private Long userId;
 
-    @Schema(description = "사용자 이메일", example = "u7ser@example.com")
+    @Schema(description = "사용자 이메일", example = "user@example.com")
     private String userEmail;
 
     @Schema(description = "사용자 이름", example = "홍길동")
-    private String name;
+    private String userName;
+
+    @Schema(description = "가입 시 소셜 타입 또는 이메일", example = "KAKAO / NAVER / GOOGLE / EMAIL")
+    private String userRegisterType;
+
+    @Schema(description = "현재 로그인 방식", example = "KAKAO / NAVER / GOOGLE / EMAIL")
+    private String userLoginType;
 
     @Schema(description = "사용자 역할", example = "ADMIN / USER")
-    private String role;
-
-    @Schema(description = "사용자 상태", example = "ACTIVE / INACTIVE")
-    private String status;
-
-    @Schema(description = "계정 생성 일시", example = "2024-01-01T09:00:00")
-    private LocalDateTime createdAt;
+    private String userRole;
 }

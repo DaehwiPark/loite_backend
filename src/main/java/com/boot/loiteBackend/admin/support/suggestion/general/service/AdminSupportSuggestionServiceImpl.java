@@ -58,7 +58,7 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
                 AdminUserSummaryDto userDto = adminUserRepository.findById(entity.getSuggestionUserId())
                         .map(user -> AdminUserSummaryDto.builder()
                                 .userId(user.getUserId())
-                                .name(user.getUserName())
+                                .userName(user.getUserName())
                                 .build())
                         .orElse(null);
                 dto.setAdminUserSummaryDto(userDto);
@@ -94,10 +94,8 @@ public class AdminSupportSuggestionServiceImpl implements AdminSupportSuggestion
                     .map(user -> AdminUserSummaryDto.builder()
                             .userId(user.getUserId())
                             .userEmail(user.getUserEmail())
-                            .name(user.getUserName())
-                            .role(user.getUserRole() != null ? user.getUserRole().getRoleName() : null)
-                            .status(user.getUserStatus() != null ? user.getUserStatus().getStatusName() : null)
-                            .createdAt(user.getCreatedAt())
+                            .userName(user.getUserName())
+                            .userRole(user.getUserRole() != null ? user.getUserRole().getRoleName() : null)
                             .build())
                     .orElse(null);
             dto.setAdminUserSummaryDto(userDto);
