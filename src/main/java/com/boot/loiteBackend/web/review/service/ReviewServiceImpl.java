@@ -45,36 +45,52 @@ public class ReviewServiceImpl implements ReviewService{
     private final FileService fileService;
 
     @Override
-    public ReviewResponseDto createReview(Long userId, ReviewRequestDto requestDto, List<MultipartFile> files){
+    public ReviewResponseDto createReview(Long userId, ReviewRequestDto requestDto, List<MultipartFile> files) {
 
+        // 1. 상품 검증
         AdminProductEntity product = adminProductRepository.findById(requestDto.getProductId())
-                .orElseThrow(()-> new IllegalArgumentException("상품 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("상품 없음"));
 
+        // 2. 유저 검증
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("유저 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
-        boolean validOrder = orderRepository.existsByOrderIdAndUserIdAndOrderStatus(requestDto.getOrderId(), userId, OrderStatus.PAID);
+        // 3. orderId 결정 (마이페이지에서 오면 그대로, 상품 상세에서 오면 최근 결제건 찾기)
+        Long orderId = requestDto.getOrderId();
+        if (orderId == null) {
+            orderId = orderRepository.findMostRecentPaidOrderIdByUserIdAndProductId(
+                    userId,
+                    requestDto.getProductId(),
+                    OrderStatus.PAID
+            ).orElseThrow(() -> new IllegalStateException("해당 상품 구매 내역이 없어 리뷰 작성 불가합니다."));
+        }
+
+        // 4. 결제 완료 여부 검증
+        boolean validOrder = orderRepository.existsByOrderIdAndUserIdAndOrderStatus(orderId, userId, OrderStatus.PAID);
         if (!validOrder) {
             throw new IllegalStateException("결제 완료된 주문만 리뷰 작성이 가능합니다.");
         }
-        boolean exists = reviewRepository.existsByUser_UserIdAndProduct_ProductIdAndOrderId(userId, requestDto.getProductId(), requestDto.getOrderId());
-        if (exists) {
+
+        // 5. 중복 리뷰 방지 (주문 1건당 리뷰 1개)
+        if (reviewRepository.existsByOrderIdAndDeleteYn(orderId, "N")) {
             throw new IllegalStateException("이미 해당 주문에 대한 리뷰가 존재합니다. 수정 또는 삭제만 가능합니다.");
         }
 
+        // 6. 리뷰 저장
         ReviewEntity review = ReviewEntity.builder()
                 .product(product)
                 .user(user)
-                .orderId(requestDto.getOrderId())
+                .orderId(orderId)
                 .rating(requestDto.getRating())
                 .content(requestDto.getContent())
                 .activeYn("Y")
+                .deleteYn("N")
                 .helpfulCount(0)
                 .build();
         reviewRepository.save(review);
 
+        // 7. 첨부파일 저장
         List<ReviewMediaEntity> medias = new ArrayList<>();
-
         if (files != null && !files.isEmpty()) {
             int sortOrder = 0;
             for (MultipartFile file : files) {
@@ -83,19 +99,22 @@ public class ReviewServiceImpl implements ReviewService{
                 String mediaType = file.getContentType() != null && file.getContentType().startsWith("video")
                         ? "VIDEO"
                         : "IMAGE";
+
                 FileUploadResult result = fileService.save(file, "review/" + mediaType.toLowerCase());
+
                 ReviewMediaEntity media = ReviewMediaEntity.builder()
                         .review(review)
                         .mediaType(mediaType)
                         .url(result.getUrlPath())
                         .sortOrder(sortOrder++)
                         .build();
+
                 medias.add(media);
             }
             reviewMediaRepository.saveAll(medias);
         }
 
-
+        // 8. DTO 변환 후 반환
         List<ReviewMediaDto> mediaDtos = medias.stream()
                 .map(m -> ReviewMediaDto.builder()
                         .mediaType(m.getMediaType())
@@ -114,6 +133,7 @@ public class ReviewServiceImpl implements ReviewService{
                 .medias(mediaDtos)
                 .build();
     }
+
 
     @Override
     public ReviewResponseDto updateReview(Long userId, Long reviewId, ReviewUpdateRequestDto requestDto, List<MultipartFile> files) {
