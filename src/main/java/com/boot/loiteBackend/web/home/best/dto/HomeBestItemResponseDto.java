@@ -1,6 +1,8 @@
 package com.boot.loiteBackend.web.home.best.dto;
 
 import lombok.*;
+
+import javax.swing.text.StyledEditorKit;
 import java.math.BigDecimal;
 
 @Getter
@@ -16,8 +18,8 @@ public class HomeBestItemResponseDto {
     private String productModelName;
     private String productSummary;
     private BigDecimal productPrice;
-    private String bestProductYn;
-    private String newProductYn;
+    private Boolean bestProductYn;
+    private Boolean newProductYn;
     private Long categoryId;
     private String depth1Path;
     private String depth2Path;
@@ -29,8 +31,8 @@ public class HomeBestItemResponseDto {
             String productModelName,
             String productSummary,
             BigDecimal productPrice,
-            String bestProductYn,
-            String newProductYn,
+            Boolean bestProductYn,
+            Boolean newProductYn,
             Integer slotNo,
             Long productId,
             Long categoryId,

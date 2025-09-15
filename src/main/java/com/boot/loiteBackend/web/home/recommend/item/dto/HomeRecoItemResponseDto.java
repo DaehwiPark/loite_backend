@@ -20,8 +20,8 @@ public class HomeRecoItemResponseDto {
     private String productModelName;
     private String productSummary;
     private BigDecimal productPrice;
-    private String bestProductYn;
-    private String newProductYn;
+    private boolean bestProductYn;
+    private boolean newProductYn;
 
     // category 영역
     private Long categoryId;
@@ -40,8 +40,8 @@ public class HomeRecoItemResponseDto {
             String productModelName,
             String productSummary,
             BigDecimal productPrice,
-            String bestProductYn,
-            String newProductYn,
+            Boolean bestProductYn,
+            Boolean newProductYn,
             Integer slotNo,
             Long productId,
             Long categoryId,
