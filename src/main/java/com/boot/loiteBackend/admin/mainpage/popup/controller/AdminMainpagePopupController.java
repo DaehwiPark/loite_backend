@@ -57,7 +57,7 @@ public class AdminMainpagePopupController {
         return ResponseEntity.ok(adminMainpagePopupService.listAllForAdminSummary(titleMax, detailMax));
     }
 
-    @Operation(summary = "실제 노출", description = "실제 시간 반영")
+    @Operation(summary = "실제 노출", description = "관리자가 아닌 사용자에게 직접 보여줄 팝업리스트 반환")
     @GetMapping("/visible")
     public ResponseEntity<List<AdminMainpagePopupDetailDto>> visible() {
         return ResponseEntity.ok(adminMainpagePopupService.listVisible(LocalDateTime.now()));

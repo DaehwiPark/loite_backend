@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.lang.annotation.Target;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_mainpage_popup")
+@Where(clause = "popup_deleted_at IS NULL")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -24,20 +24,6 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
     private final AdminMainpagePopupRepository adminMainpagePopupRepository;
     private final FileServiceImpl fileService;
 
-    // ---------- 조회 ----------
-
-//    @Override
-//    public List<AdminMainpagePopupDetailDto> listAllForAdmin() {
-//        // 활성만 보려면 findAllByPopupIsActiveTrueOrderBy... 사용
-//        return adminMainpagePopupRepository.findAll().stream()
-//                .sorted((a, b) -> {
-//                    int c = Integer.compare(a.getPopupSortOrder(), b.getPopupSortOrder());
-//                    return (c != 0) ? c : a.getCreatedAt().compareTo(b.getCreatedAt());
-//                })
-//                .map(this::toItemDto)
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public List<AdminMainpagePopupDetailDto> listVisible(LocalDateTime now) {
         LocalDateTime ts = (now != null) ? now : LocalDateTime.now();
@@ -45,49 +31,6 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
                 .map(this::toItemDto)
                 .collect(Collectors.toList());
     }
-
-    // ---------- 등록/수정/정렬/삭제 ----------
-
-//    @Override
-//    @Transactional
-//    public Long create(AdminMainpagePopupDto req) {
-//        validateCreate(req);
-//
-//        int nextOrder = adminMainpagePopupRepository.findMaxSortOrderOfActive() + 10;
-//
-//        MainpagePopupEntity entity = MainpagePopupEntity.builder()
-//                .popupImageUrl(req.getPopupImageUrl())
-//                .popupLinkUrl(req.getPopupLinkUrl())
-//                .popupTarget(Objects.requireNonNullElse(req.getPopupTarget(), MainpagePopupEntity.Target._self))
-//                .popupIsActive(req.isPopupIsActive())
-//                .popupSortOrder(nextOrder)
-//                .popupStartAt(req.getPopupStartAt())
-//                .popupEndAt(req.getPopupEndAt())
-//                .build();
-//
-//        checkSchedule(entity.getPopupStartAt(), entity.getPopupEndAt());
-//
-//        adminMainpagePopupRepository.save(entity);
-//        return entity.getPopupId();
-//    }
-//
-//    @Override
-//    @Transactional
-//    public Long create(AdminMainpagePopupDto req, MultipartFile image) throws IOException {
-//        Long id = create(req); // (여기서 엔티티가 저장됨 - 이미지 URL은 아직 null이어도 OK)
-//
-//        if (image != null && !image.isEmpty()) {
-//            String category = "noti/popup/" + id;
-//            FileUploadResult r = fileService.save(image, category);
-//
-//            // 저장된 팝업 엔티티에 URL 주입
-//            MainpagePopupEntity e = getOrThrow(id);
-//            e.setPopupImageUrl(r.getUrlPath());   // 예: /uploads/noti/popup/{id}/uuid_name.jpg
-//            // 필요시: e.setUpdatedAt(LocalDateTime.now());  // @PreUpdate가 있으면 생략 가능
-//        }
-//        return id;
-//    }
-
 
     @Override
     @Transactional
@@ -131,8 +74,6 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
         if (ids == null || ids.isEmpty()) return;
         // 커스텀 쿼리 사용 (성능 좋음). 없다면 아래 루프 대체 가능.
         adminMainpagePopupRepository.bulkUpdateActive(ids, active);
-        // 대체안:
-        // repo.findAllById(ids).forEach(e -> e.setPopupIsActive(active));
     }
 
     @Override
@@ -172,14 +113,6 @@ public class AdminMainpagePopupServiceImpl implements AdminMainpagePopupService{
             throw new IllegalArgumentException("popup_end_at must be >= popup_start_at");
         }
     }
-
-//    private void validateCreate(AdminMainpagePopupDto req) {
-//        if (req == null) throw new IllegalArgumentException("CreateReq is null");
-//        // 이미지 URL은 멀티파트 경로에서 이후에 세팅하므로 필수 X
-//        // if (isBlank(req.getPopupImageUrl())) throw new IllegalArgumentException("popup_image_url is required");
-//        if (isBlank(req.getPopupLinkUrl()))  throw new IllegalArgumentException("popup_link_url is required");
-//        checkSchedule(req.getPopupStartAt(), req.getPopupEndAt());
-//    }
 
     private boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
