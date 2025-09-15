@@ -210,9 +210,23 @@ public class OrderServiceImpl implements OrderService {
 
         orderItemRepository.saveAll(orderItems);
 
-        // 5. 배송비 계산
-        BigDecimal deliveryFee = discountedTotal.compareTo(new BigDecimal("50000")) < 0
-                ? new BigDecimal("3000")
+        // 5. 배송비 계산 (상품별 기준 반영)
+        BigDecimal maxFreeDeliveryThreshold = BigDecimal.ZERO;
+        BigDecimal deliveryFeeCandidate = BigDecimal.ZERO;
+
+        // 주문 상품들 중 무료배송 기준이 가장 낮은 값 적용
+        for (OrderItemEntity item : order.getOrderItems()) {
+            AdminProductEntity product = item.getProduct();
+
+            if (maxFreeDeliveryThreshold.equals(BigDecimal.ZERO) ||
+                    product.getProductFreeDelivery().compareTo(maxFreeDeliveryThreshold) < 0) {
+                maxFreeDeliveryThreshold = product.getProductFreeDelivery();
+                deliveryFeeCandidate = product.getProductDeliveryCharge();
+            }
+        }
+
+        BigDecimal deliveryFee = discountedTotal.compareTo(maxFreeDeliveryThreshold) < 0
+                ? deliveryFeeCandidate
                 : BigDecimal.ZERO;
 
         // 6. 주문 총액 갱신
