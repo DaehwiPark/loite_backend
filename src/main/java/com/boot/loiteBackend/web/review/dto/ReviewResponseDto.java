@@ -37,5 +37,8 @@ public class ReviewResponseDto {
 
     @Schema(description = "등록된 미디어 리스트")
     private List<ReviewMediaDto> medias;
+
+    @Schema(description = "구매한 상품 옵션/사은품/추가구성품 정보")
+    private ReviewOrderItemDto orderItem;
 }
 

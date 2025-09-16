@@ -7,7 +7,11 @@ import com.boot.loiteBackend.admin.product.product.repository.AdminProductReposi
 import com.boot.loiteBackend.common.file.FileService;
 import com.boot.loiteBackend.common.file.FileUploadResult;
 import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
+import com.boot.loiteBackend.web.order.dto.OrderAdditionalResponseDto;
+import com.boot.loiteBackend.web.order.dto.OrderGiftResponseDto;
+import com.boot.loiteBackend.web.order.dto.OrderOptionResponseDto;
 import com.boot.loiteBackend.web.order.enums.OrderStatus;
+import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
 import com.boot.loiteBackend.web.order.repository.OrderRepository;
 import com.boot.loiteBackend.web.review.dto.*;
 import com.boot.loiteBackend.web.review.entity.ReviewEntity;
@@ -26,9 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +45,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final AdminProductImageRepository adminProductImageRepository;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final FileService fileService;
 
     @Override
@@ -248,6 +252,37 @@ public class ReviewServiceImpl implements ReviewService{
                     .map(AdminProductImageEntity::getImageUrl)
                     .orElse(null);
 
+            // 주문 아이템
+            ReviewOrderItemDto orderItemDto = orderItemRepository.findByOrderIdAndProductId(
+                    review.getOrderId(),
+                    review.getProduct().getProductId()
+            ).map(orderItem -> ReviewOrderItemDto.builder()
+                    .orderItemId(orderItem.getOrderItemId())
+                    .options(orderItem.getOptions().stream()
+                            .map(opt -> OrderOptionResponseDto.builder()
+                                    .optionId(opt.getProductOption().getOptionId())
+                                    .optionValue(opt.getProductOption().getOptionValue())
+                                    .additionalPrice(opt.getAdditionalPrice())
+                                    .build())
+                            .toList())
+                    .additionals(orderItem.getAdditionals().stream()
+                            .map(add -> OrderAdditionalResponseDto.builder()
+                                    .additionalId(add.getProductAdditional().getAdditional().getAdditionalId())
+                                    .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
+                                    .additionalPrice(add.getAdditionalPrice())
+                                    .quantity(add.getQuantity())
+                                    .build())
+                            .toList())
+                    .gifts(orderItem.getGifts().stream()
+                            .map(gift -> OrderGiftResponseDto.builder()
+                                    .giftId(gift.getProductGift().getGift().getGiftId())
+                                    .giftName(gift.getProductGift().getGift().getGiftName())
+                                    .quantity(gift.getQuantity())
+                                    .build())
+                            .toList())
+                    .build()
+            ).orElse(null);
+
             return ReviewUserResponseDto.builder()
                     .reviewId(review.getReviewId())
                     .productId(review.getProduct().getProductId())
@@ -259,6 +294,7 @@ public class ReviewServiceImpl implements ReviewService{
                     .userName(review.getUser().getUserName())
                     .createdAt(review.getCreatedAt())
                     .medias(mediaDtos)
+                    .orderItem(orderItemDto)
                     .build();
         });
     }
@@ -293,6 +329,36 @@ public class ReviewServiceImpl implements ReviewService{
                             .build())
                     .toList();
 
+            ReviewOrderItemDto orderItemDto = orderItemRepository.findByOrderIdAndProductId(
+                    review.getOrderId(),
+                    review.getProduct().getProductId()
+            ).map(orderItem -> ReviewOrderItemDto.builder()
+                    .orderItemId(orderItem.getOrderItemId())
+                    .options(orderItem.getOptions().stream()
+                            .map(opt -> OrderOptionResponseDto.builder()
+                                    .optionId(opt.getProductOption().getOptionId())
+                                    .optionValue(opt.getProductOption().getOptionValue())
+                                    .additionalPrice(BigDecimal.valueOf(opt.getProductOption().getOptionAdditionalPrice()))
+                                    .build())
+                            .toList())
+                    .additionals(orderItem.getAdditionals().stream()
+                            .map(add -> OrderAdditionalResponseDto.builder()
+                                    .additionalId(add.getProductAdditional().getAdditional().getAdditionalId())
+                                    .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
+                                    .additionalPrice(add.getAdditionalPrice())
+                                    .quantity(add.getQuantity())
+                                    .build())
+                            .toList())
+                    .gifts(orderItem.getGifts().stream()
+                            .map(gift -> OrderGiftResponseDto.builder()
+                                    .giftId(gift.getProductGift().getGift().getGiftId())
+                                    .giftName(gift.getProductGift().getGift().getGiftName())
+                                    .quantity(gift.getQuantity())
+                                    .build())
+                            .toList())
+                    .build()
+            ).orElse(null);
+
             return ReviewResponseDto.builder()
                     .reviewId(review.getReviewId())
                     .productId(review.getProduct().getProductId())
@@ -302,6 +368,7 @@ public class ReviewServiceImpl implements ReviewService{
                     .userName(review.getUser().getUserName())
                     .createdAt(review.getCreatedAt())
                     .medias(mediaDtos)
+                    .orderItem(orderItemDto)
                     .build();
         });
     }
@@ -353,5 +420,34 @@ public class ReviewServiceImpl implements ReviewService{
                 .reviewCount(reviewCount)
                 .build();
     }
+
+    public ReviewRatingStatsDto getReviewStats(Long productId) {
+        List<Object[]> results = reviewRepository.countReviewsByRating(productId);
+
+        Map<Integer, Long> ratingCounts = new HashMap<>();
+        long total = 0;
+
+        for (Object[] row : results) {
+            Integer rating = (Integer) row[0];
+            Long count = (Long) row[1];
+            ratingCounts.put(rating, count);
+            total += count;
+        }
+
+        Map<Integer, Integer> ratingPercents = new HashMap<>();
+        if (total > 0) {
+            for (Map.Entry<Integer, Long> entry : ratingCounts.entrySet()) {
+                int percent = (int) Math.round((entry.getValue() * 100.0) / total);
+                ratingPercents.put(entry.getKey(), percent);
+            }
+        }
+
+        return ReviewRatingStatsDto.builder()
+                .ratingCounts(ratingCounts)
+                .ratingPercents(ratingPercents)
+                .totalCount(total)
+                .build();
+    }
+
 
 }

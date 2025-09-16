@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -31,6 +32,13 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     @Query("SELECT COUNT(r) FROM ReviewEntity r " +
             "WHERE r.product.productId = :productId AND r.deleteYn = 'N'")
     Long countByProductIdAndDeleteYn(@Param("productId") Long productId);
+
+    @Query("SELECT r.rating, COUNT(r) " +
+            "FROM ReviewEntity r " +
+            "WHERE r.product.productId = :productId " +
+            "AND r.deleteYn = 'N' " +
+            "GROUP BY r.rating")
+    List<Object[]> countReviewsByRating(@Param("productId") Long productId);
 }
 
 

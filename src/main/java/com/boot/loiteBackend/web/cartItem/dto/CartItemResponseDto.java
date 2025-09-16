@@ -31,16 +31,16 @@ public class CartItemResponseDto {
     @Schema(description = "주문 수량", example = "2")
     private int quantity;
 
-    @Schema(description = "정가 (단가)", example = "299000.00")
+    @Schema(description = "정가 (단가)", example = "299000")
     private BigDecimal unitPrice;
 
-    @Schema(description = "할인가 (단가)", example = "269100.00")
+    @Schema(description = "할인가 (단가)", example = "269100")
     private BigDecimal discountedPrice;
 
     @Schema(description = "할인율 (%)", example = "10")
     private int discountRate;
 
-    @Schema(description = "총 금액", example = "299000.00")
+    @Schema(description = "총 금액", example = "299000")
     private BigDecimal totalPrice;
 
     @Schema(description = "체크 여부 (UI 선택용)", example = "true")

@@ -22,4 +22,6 @@ public interface ReviewService {
     boolean toggleHelpful(Long userId, Long reviewId);
 
     ReviewSummaryDto getReviewSummary(Long productId);
+
+    ReviewRatingStatsDto getReviewStats(Long productId);
 }
