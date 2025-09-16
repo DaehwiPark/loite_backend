@@ -20,7 +20,13 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     Optional<OrderEntity> findByOrderIdAndUserIdAndDeleteYn(Long orderId, Long userId, String deleteYn);
 
-    Page<OrderEntity> findByUserIdAndDeleteYn(Long userId, String deleteYn, Pageable pageable);
+    Page<OrderEntity> findByUserIdAndDeleteYnAndOrderStatusNot(
+            Long userId,
+            String deleteYn,
+            OrderStatus excludedStatus,
+            Pageable pageable
+    );
+
 
     boolean existsByOrderIdAndUserIdAndOrderStatus(Long orderId, Long userId, OrderStatus status);
 

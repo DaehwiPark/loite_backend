@@ -347,10 +347,26 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
-        Page<OrderEntity> orders = orderRepository.findByUserIdAndDeleteYn(userId, "N", pageable);
+        Page<OrderEntity> orders = orderRepository.findByUserIdAndDeleteYnAndOrderStatusNot(userId, "N", OrderStatus.CREATED, pageable);
 
         return orders.map(order -> {
             List<OrderItemEntity> items = orderItemRepository.findByOrder(order);
+
+            // 결제 정보 조회
+            Optional<PaymentEntity> paymentOpt = paymentRepository.findByOrderId(order.getOrderId());
+
+            String paymentMethod = null;
+            String pgProvider = null;
+            String cardCompany = null;
+            String cardBrand = null;
+
+            if (paymentOpt.isPresent()) {
+                PaymentEntity payment = paymentOpt.get();
+                paymentMethod = translatePaymentMethod(payment.getPaymentMethod());
+                pgProvider = payment.getPgProvider();
+                cardCompany = payment.getCardCompany();
+                cardBrand = payment.getCardBrand();
+            }
 
             List<OrderItemResponseDto> responseItems = items.stream()
                     .map(item -> {
@@ -416,6 +432,10 @@ public class OrderServiceImpl implements OrderService {
                     .totalAmount(order.getTotalAmount())
                     .deliveryFee(order.getDeliveryFee())
                     .payAmount(order.getTotalAmount())
+                    .paymentMethod(paymentMethod)
+                    .pgProvider(pgProvider)
+                    .cardCompany(cardCompany)
+                    .cardBrand(cardBrand)
                     .receiverName(order.getReceiverName())
                     .receiverPhone(order.getReceiverPhone())
                     .receiverAddress(order.getReceiverAddress())
@@ -425,6 +445,7 @@ public class OrderServiceImpl implements OrderService {
                     .build();
         });
     }
+
 
     @Transactional
     @Override
