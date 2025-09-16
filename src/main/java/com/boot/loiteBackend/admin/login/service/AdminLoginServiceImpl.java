@@ -38,6 +38,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     // 프로젝트 실제 코드값에 맞춰 수정하세요.
     private static final String STATUS_ACTIVE = "ACTIVE";
     private static final String ROLE_ADMIN   = "ADMIN";
+    private static final String ROLE_MANAGER = "MANAGER";
     private static final String LOGIN_TYPE_EMAIL = "EMAIL"; // TokenService에 넘기는 userLoginType
 
     @Override
@@ -52,9 +53,9 @@ public class AdminLoginServiceImpl implements AdminLoginService {
             throw new CustomException(AdminLoginErrorCode.INACTIVE_STATUS);
         }
 
-        // 관리자 권한 체크
+        // 관리자 or 매니저 권한 체크
         String roleCode = user.getUserRole() != null ? user.getUserRole().getRoleCode() : null;
-        if (roleCode == null || !ROLE_ADMIN.equalsIgnoreCase(roleCode)) {
+        if (roleCode == null || !(ROLE_ADMIN.equalsIgnoreCase(roleCode) || ROLE_MANAGER.equalsIgnoreCase(roleCode))) {
             throw new CustomException(AdminLoginErrorCode.FORBIDDEN_ROLE);
         }
 
