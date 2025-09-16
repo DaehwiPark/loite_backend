@@ -64,17 +64,49 @@ public class PaymentServiceImpl implements PaymentService {
         String statusStr = (String) portOneRes.get("status");
         PaymentStatus status = PaymentStatus.valueOf(statusStr);
 
-        // === method/provider 추출 ===
+        // 결제 수단/PG사 추출
         Map<String, Object> methodMap = (Map<String, Object>) portOneRes.get("method");
-        String provider = methodMap != null ? (String) methodMap.get("provider") : null; // KAKAOPAY, CARD 등
-        String methodType = methodMap != null ? (String) methodMap.get("type") : null;   // PaymentMethodEasyPay 등 (참고용)
+        String payMethod = null;
+        String cardCompany = null;
+        String cardBrand = null;
+        String cardCode = null;
+        String cardNumber = null;
+
+        if (methodMap != null) {
+            String type = (String) methodMap.get("type");
+
+            if ("PaymentMethodEasyPay".equals(type)) {
+                // 간편결제 (카카오페이 등)
+                payMethod = (String) methodMap.get("provider"); // "KAKAOPAY"
+            } else if ("PaymentMethodCard".equals(type)) {
+                // 카드결제
+                payMethod = "CARD";
+
+                Map<String, Object> cardMap = (Map<String, Object>) methodMap.get("card");
+                if (cardMap != null) {
+                    cardCompany = (String) cardMap.get("name");   // "카카오뱅크카드"
+                    cardBrand = (String) cardMap.get("brand");
+                    cardCode = (String) cardMap.get("bin");
+                    cardNumber = (String) cardMap.get("number"); // "53651009****700*"
+                }
+            }
+        }
+
+
+        // PG사 추출
+        Map<String, Object> channelMap = (Map<String, Object>) portOneRes.get("channel");
+        String pgProvider = channelMap != null ? (String) channelMap.get("pgProvider") : null;
 
         if (existingOpt.isPresent()) {
             // 기존 결제 row 업데이트
             payment = existingOpt.get();
             payment.setTxId((String) portOneRes.get("transactionId"));
-            payment.setPgProvider(((Map<String, Object>) portOneRes.get("channel")).get("pgProvider").toString());
-            payment.setPaymentMethod(provider);   // ✅ provider 저장
+            payment.setPgProvider(pgProvider);
+            payment.setPaymentMethod(payMethod);
+            payment.setCardCompany(cardCompany);
+            payment.setCardBrand(cardBrand);
+            payment.setCardCode(cardCode);
+            payment.setCardNumber(cardNumber);
             payment.setPaymentAmountApproved(paidAmount);
             payment.setPaymentStatus(status);
             payment.setReceiptUrl((String) portOneRes.get("receiptUrl"));
@@ -87,8 +119,12 @@ public class PaymentServiceImpl implements PaymentService {
                     .order(order)
                     .merchantUid(order.getOrderNumber())
                     .txId((String) portOneRes.get("transactionId"))
-                    .pgProvider(((Map<String, Object>) portOneRes.get("channel")).get("pgProvider").toString())
-                    .paymentMethod(provider)
+                    .pgProvider(pgProvider)
+                    .paymentMethod(payMethod)
+                    .cardCompany(cardCompany)
+                    .cardBrand(cardBrand)
+                    .cardCode(cardCode)
+                    .cardNumber(cardNumber)
                     .paymentTotalAmount(order.getTotalAmount())
                     .paymentAmountApproved(paidAmount)
                     .paymentCurrency((String) portOneRes.getOrDefault("currency", "KRW"))
@@ -106,7 +142,7 @@ public class PaymentServiceImpl implements PaymentService {
         order.setOrderStatus(status == PaymentStatus.PAID ? OrderStatus.PAID : OrderStatus.PAYMENT_FAILED);
         orderRepository.save(order);
 
-        // 6. 응답 변환 (한글 변환 포함)
+        // 6. 응답 변환
         return PaymentVerifyResponseDto.builder()
                 .orderId(order.getOrderId())
                 .orderNumber(order.getOrderNumber())

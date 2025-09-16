@@ -44,6 +44,12 @@ public class OrderResponseDto {
     @Schema(description = "PG사 (TOSS, INICIS 등)", example = "TOSSPAYMENTS")
     private String pgProvider;
 
+    @Schema(description = "카드사명", example = "카카오뱅크카드")
+    private String cardCompany;
+
+    @Schema(description = "카드 브랜드", example = "MASTER")
+    private String cardBrand;
+
     @Schema(description = "배송지 이름", example = "홍길동")
     private String receiverName;
 

@@ -260,12 +260,17 @@ public class OrderServiceImpl implements OrderService {
 
         String paymentMethod = null;
         String pgProvider = null;
+        String cardCompany = null;
+        String cardBrand = null;
 
         if (paymentOpt.isPresent()) {
             PaymentEntity payment = paymentOpt.get();
             paymentMethod = translatePaymentMethod(payment.getPaymentMethod());
             pgProvider = payment.getPgProvider();
+            cardCompany = payment.getCardCompany();
+            cardBrand = payment.getCardBrand();
         }
+
 
         List<OrderItemResponseDto> responseItems = items.stream()
                 .map(item -> {
@@ -328,6 +333,8 @@ public class OrderServiceImpl implements OrderService {
                 .payAmount(order.getTotalAmount()) // == totalAmount
                 .paymentMethod(paymentMethod)
                 .pgProvider(pgProvider)
+                .cardCompany(cardCompany)
+                .cardBrand(cardBrand)
                 .receiverName(order.getReceiverName())
                 .receiverPhone(order.getReceiverPhone())
                 .receiverAddress(order.getReceiverAddress())
@@ -336,7 +343,6 @@ public class OrderServiceImpl implements OrderService {
                 .items(responseItems)
                 .build();
     }
-
 
     @Override
     @Transactional(readOnly = true)

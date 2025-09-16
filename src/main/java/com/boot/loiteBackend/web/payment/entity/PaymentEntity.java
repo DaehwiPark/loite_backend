@@ -40,6 +40,18 @@ public class PaymentEntity {
     @Column(name = "PAYMENT_METHOD", nullable = false, length = 32)
     private String paymentMethod;
 
+    @Column(name = "CARD_COMPANY", length = 100)
+    private String cardCompany;
+
+    @Column(name = "CARD_BRAND", length = 100)
+    private String cardBrand;
+
+    @Column(name = "CARD_CODE", length = 100)
+    private String cardCode;
+
+    @Column(name = "CARD_NUMBER", length = 100)
+    private String cardNumber;
+
     @Column(name = "PAYMENT_TOTAL_AMOUNT", nullable = false, precision = 12, scale = 0)
     private BigDecimal paymentTotalAmount;
 

@@ -37,6 +37,18 @@ public class PaymentResponseDto {
     @Schema(description = "결제 상태", example = "READY")
     private PaymentStatus paymentStatus;
 
+    @Schema(description = "카드사 이름", example = "신한, 삼성 ...")
+    private String cardCompany;
+
+    @Schema(description = "카드사 브랜드", example = "BC, MASTER ...")
+    private String cardBrand;
+
+    @Schema(description = "카드사 코드", example = "1234")
+    private String cardCode;
+
+    @Schema(description = "카드 번호", example = "1234-****-****-1234")
+    private String cardNumber;
+
     @Schema(description = "영수증 URL", example = "exmaple")
     private String receiptUrl;
 
