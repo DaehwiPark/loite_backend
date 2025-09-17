@@ -19,8 +19,8 @@ public class AdminHomeMagazineBannerDto {
         @Schema(description = "배너 영상 URL", example = "https://cdn.example.com/video.mp4")
         private String videoUrl;
 
-        @Schema(description = "배너 영상 썸네일 URL", example = "https://cdn.example.com/thumb.jpg")
-        private String videoThumbnailUrl;
+        @Schema(description = "배너 썸네일 URL", example = "https://cdn.example.com/thumb.jpg")
+        private String thumbnailUrl;
 
         @Schema(description = "배너 제목", example = "심플하고 모던한 무드등")
         private String title;
@@ -46,7 +46,7 @@ public class AdminHomeMagazineBannerDto {
             return HomeMagazineBannerEntity.builder()
                     .productId(dto.getProductId())
                     .videoUrl(dto.getVideoUrl())
-                    .videoThumbnailUrl(dto.getVideoThumbnailUrl())
+                    .thumbnailUrl(dto.getThumbnailUrl())
                     .title(dto.getTitle())
                     .subtitle(dto.getSubtitle())
                     .buttonText(dto.getButtonText())
@@ -61,7 +61,7 @@ public class AdminHomeMagazineBannerDto {
             if (dto == null || entity == null) return;
             entity.setProductId(dto.getProductId());
             entity.setVideoUrl(dto.getVideoUrl());
-            entity.setVideoThumbnailUrl(dto.getVideoThumbnailUrl());
+            entity.setThumbnailUrl(dto.getThumbnailUrl());
             entity.setTitle(dto.getTitle());
             entity.setSubtitle(dto.getSubtitle());
             entity.setButtonText(dto.getButtonText());
@@ -88,7 +88,7 @@ public class AdminHomeMagazineBannerDto {
         private String videoType;
 
         private String thumbnailName;
-        private String videoThumbnailUrl;
+        private String thumbnailUrl;
         private String thumbnailPath;
         private Long thumbnailSize;
         private String thumbnailType;
@@ -115,7 +115,7 @@ public class AdminHomeMagazineBannerDto {
                     .videoType(entity.getVideoType())
 
                     .thumbnailName(entity.getThumbnailName())
-                    .videoThumbnailUrl(entity.getVideoThumbnailUrl())
+                    .thumbnailUrl(entity.getThumbnailUrl())
                     .thumbnailPath(entity.getThumbnailPath())
                     .thumbnailSize(entity.getThumbnailSize())
                     .thumbnailType(entity.getThumbnailType())

@@ -51,9 +51,9 @@ public class HomeMagazineBannerEntity {
     @Schema(description = "배너 썸네일 실제 파일명", example = "uuid_thumb.jpg")
     private String thumbnailName;
 
-    @Column(name = "HOME_MAGAZINE_BANNER_VIDEO_THUMBNAIL", length = 1024)
-    @Schema(description = "배너 영상 썸네일 URL", example = "https://cdn.example.com/thumb.jpg")
-    private String videoThumbnailUrl;
+    @Column(name = "HOME_MAGAZINE_BANNER_THUMBNAIL_URL", length = 1024)
+    @Schema(description = "배너 썸네일 URL", example = "https://cdn.example.com/thumb.jpg")
+    private String thumbnailUrl;
 
     @Column(name = "HOME_MAGAZINE_BANNER_THUMBNAIL_PATH", length = 500)
     @Schema(description = "배너 썸네일 실제 서버 경로", example = "/data/uploads/magazine-banner/thumbnail/uuid_thumb.jpg")
