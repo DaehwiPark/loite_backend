@@ -41,4 +41,13 @@ public interface AdminManagerNoticeRepository extends org.springframework.data.j
             @Param("now") LocalDateTime now,
             @Param("published") AdminManagerNoticeEntity.NoticeStatus published
     );
+
+    @Query("""
+    select n
+    from AdminManagerNoticeEntity n
+    where n.deletedAt is null
+    order by case when n.pinned = true then 0 else 1 end,
+             coalesce(n.publishedAt, n.createdAt) desc
+""")
+    Page<AdminManagerNoticeEntity> findAdminListAlive(Pageable pageable);
 }

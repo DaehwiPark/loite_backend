@@ -1,6 +1,8 @@
 package com.boot.loiteBackend.admin.manager.notice.service;
 
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeCreateRequest;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeResponse;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeUpdateRequest;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeAttachmentRepository;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeReadRepository;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeRepository;
@@ -9,10 +11,13 @@ import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeEnti
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeRead;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -84,7 +89,7 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
     @Override
     @Transactional(readOnly = true)
     public Page<AdminManagerNoticeEntity> adminList(Pageable pageable) {
-        return noticeRepo.findAll(pageable);
+        return noticeRepo.findAdminListAlive(pageable);
     }
 
     /*
@@ -217,5 +222,47 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
     @Transactional(readOnly = true)
     public List<AdminManagerNoticeAttachment> getActiveAttachments(Long noticeId) {
         return attRepo.findByNoticeIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(noticeId);
+    }
+
+    @Override
+    public AdminManagerNoticeResponse update(Long id, AdminManagerNoticeUpdateRequest req) {
+        AdminManagerNoticeEntity n = noticeRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
+
+        n.setTitle(req.title());
+        n.setContentMd(req.contentMd());
+        n.setImportance(req.importance());      // 0/1
+        n.setPinned(req.pinned());
+        n.setExpiresAt(req.expiresAt());        // null이면 만료 해제
+
+        // 필요하면 수정자 기록
+        // n.setUpdatedByAdmin(currentAdminId);
+
+        // 변경감지로 저장되고, 응답 DTO로 변환
+        return toResponse(n);
+    }
+
+    @Override
+    public AdminManagerNoticeResponse publish(Long id) {
+        AdminManagerNoticeEntity n = noticeRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
+
+        if (n.getStatus() != AdminManagerNoticeEntity.NoticeStatus.PUBLISHED) {
+            n.setStatus(AdminManagerNoticeEntity.NoticeStatus.PUBLISHED);
+            if (n.getPublishedAt() == null) {
+                n.setPublishedAt(LocalDateTime.now());
+            }
+        }
+        // 재발행 시 publishedAt을 ‘항상’ 갱신하고 싶다면 위 if 대신 아래 한 줄로:
+        // n.setPublishedAt(LocalDateTime.now());
+
+        return toResponse(n);
+    }
+
+    /** 엔티티 -> 응답 DTO */
+    private AdminManagerNoticeResponse toResponse(AdminManagerNoticeEntity n) {
+        // 빈 리스트 보장되므로 null 체크 불필요
+        var atts = attRepo.findByNoticeIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(n.getId());
+        return AdminManagerNoticeResponse.of(n, atts);
     }
 }

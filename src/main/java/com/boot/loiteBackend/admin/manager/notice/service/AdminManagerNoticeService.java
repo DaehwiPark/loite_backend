@@ -1,6 +1,8 @@
 package com.boot.loiteBackend.admin.manager.notice.service;
 
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeCreateRequest;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeResponse;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeUpdateRequest;
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeAttachment;
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeEntity;
 import org.springframework.data.domain.Page;
@@ -20,4 +22,8 @@ public interface AdminManagerNoticeService {
     void markAllRead(Long managerId);
     AdminManagerNoticeEntity getVisibleOrThrow(Long id);
     List<AdminManagerNoticeAttachment> getActiveAttachments(Long noticeId);
+
+    //update
+    AdminManagerNoticeResponse update(Long id, AdminManagerNoticeUpdateRequest req);
+    AdminManagerNoticeResponse publish(Long id);
 }

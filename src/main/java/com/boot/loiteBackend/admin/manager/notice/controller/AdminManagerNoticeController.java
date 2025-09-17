@@ -2,14 +2,17 @@ package com.boot.loiteBackend.admin.manager.notice.controller;
 
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeCreateRequest;
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeResponse;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeUpdateRequest;
 import com.boot.loiteBackend.admin.manager.notice.service.AdminManagerNoticeService;
 import com.boot.loiteBackend.config.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 // import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -94,5 +97,15 @@ public class AdminManagerNoticeController {
             // 소유자 검증이 필요하다면 @AuthenticationPrincipal CustomUserDetails me 주입해서 서비스에 전달해도 됨
     ) {
         service.softDelete(id);
+    }
+
+    /** 공지 수정(초안/게시중 구분 없이 내용 갱신) */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdminManagerNoticeResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody AdminManagerNoticeUpdateRequest request
+    ) {
+        return ResponseEntity.ok(service.update(id, request));
     }
 }
