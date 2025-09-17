@@ -11,7 +11,7 @@ public class HomeMagazineBannerDto {
 
     private Long bannerId;
     private Long productId;
-    private String videoThumbnailUrl;
+    private String thumbnailUrl;
     private String videoUrl;
     private String productName;
     private String productModelName;
@@ -27,7 +27,7 @@ public class HomeMagazineBannerDto {
     // JPQL 생성자 프로젝션용 생성자 (파라미터 순서 반드시 일치)
     public HomeMagazineBannerDto(Long bannerId,
                                  Long productId,
-                                 String videoThumbnailUrl,
+                                 String thumbnailUrl,
                                  String videoUrl,
                                  String productName,
                                  String productModelName,
@@ -37,7 +37,7 @@ public class HomeMagazineBannerDto {
                                  String buttonUrl,
                                  String image1,
                                  String image2) {
-        this.videoThumbnailUrl = videoThumbnailUrl;
+        this.thumbnailUrl = thumbnailUrl;
         this.videoUrl = videoUrl;
         this.bannerId = bannerId;
         this.productId = productId;
