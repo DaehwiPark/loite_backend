@@ -69,12 +69,17 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
      */
     @Override
     @Transactional
-    public AdminManagerNoticeEntity publish(Long noticeId, Long adminId) {
-        var n = noticeRepo.findById(noticeId).orElseThrow();
-        n.setStatus(AdminManagerNoticeEntity.NoticeStatus.PUBLISHED);
-        n.setPublishedAt(LocalDateTime.now());
+    public AdminManagerNoticeResponse publish(Long id, Long adminId) {
+        AdminManagerNoticeEntity n = noticeRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
+
+        if (n.getStatus() != AdminManagerNoticeEntity.NoticeStatus.PUBLISHED) {
+            n.setStatus(AdminManagerNoticeEntity.NoticeStatus.PUBLISHED);
+            if (n.getPublishedAt() == null) n.setPublishedAt(LocalDateTime.now());
+        }
         n.setUpdatedByAdmin(adminId);
-        return n;
+
+        return toResponse(n);  // ✅ DTO로 변환하여 반환
     }
 
     /*
@@ -221,7 +226,7 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
     @Override
     @Transactional(readOnly = true)
     public List<AdminManagerNoticeAttachment> getActiveAttachments(Long noticeId) {
-        return attRepo.findByNoticeIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(noticeId);
+        return attRepo.findByNoticeIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(noticeId); // 항상 List 반환
     }
 
     @Override
@@ -242,27 +247,23 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
         return toResponse(n);
     }
 
-    @Override
-    public AdminManagerNoticeResponse publish(Long id) {
-        AdminManagerNoticeEntity n = noticeRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));
-
-        if (n.getStatus() != AdminManagerNoticeEntity.NoticeStatus.PUBLISHED) {
-            n.setStatus(AdminManagerNoticeEntity.NoticeStatus.PUBLISHED);
-            if (n.getPublishedAt() == null) {
-                n.setPublishedAt(LocalDateTime.now());
-            }
-        }
-        // 재발행 시 publishedAt을 ‘항상’ 갱신하고 싶다면 위 if 대신 아래 한 줄로:
-        // n.setPublishedAt(LocalDateTime.now());
-
-        return toResponse(n);
-    }
-
     /** 엔티티 -> 응답 DTO */
     private AdminManagerNoticeResponse toResponse(AdminManagerNoticeEntity n) {
-        // 빈 리스트 보장되므로 null 체크 불필요
         var atts = attRepo.findByNoticeIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(n.getId());
         return AdminManagerNoticeResponse.of(n, atts);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public AdminManagerNoticeResponse getDetail(Long id) {
+        // 삭제 제외 + 상세
+        AdminManagerNoticeEntity n = noticeRepo.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found or deleted"));
+        return toResponse(n);  // DTO로 반환
+    }
+
+    public Page<AdminManagerNoticeEntity> unreadPage(Long managerId, Pageable pageable) {
+        return noticeRepo.findUnreadForManager(managerId, LocalDateTime.now(), pageable);
     }
 }

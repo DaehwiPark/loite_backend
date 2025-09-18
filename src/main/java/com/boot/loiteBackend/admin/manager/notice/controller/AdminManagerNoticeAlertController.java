@@ -1,6 +1,7 @@
 package com.boot.loiteBackend.admin.manager.notice.controller;
 
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeResponse;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerUnreadItem;
 import com.boot.loiteBackend.admin.manager.notice.service.AdminManagerNoticeService;
 import com.boot.loiteBackend.config.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/manager-notices")
@@ -25,33 +28,19 @@ public class AdminManagerNoticeAlertController {
 
     private final AdminManagerNoticeService service;
 
-    @GetMapping
+    // 최신 공지 N건 (매니저 전용, 알림 벨 전용 가벼운 응답)
+    @GetMapping("/latest")
     @PreAuthorize("hasRole('MANAGER')")
-    @Operation(
-            summary = "공지 목록 조회(매니저)",
-            description = """
-            상태가 PUBLISHED이고 삭제되지 않았으며(expired 미도래) 현재 노출 가능한 공지들을 페이지로 반환합니다.
-            정렬은 서비스 레이어 정책(예: pinned desc, publishedAt desc 등)에 따릅니다.
-            """
-    )
-    public Page<AdminManagerNoticeResponse> list(
-            @Parameter(description = "0부터 시작하는 페이지 인덱스", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기(기본 10)", example = "10")
-            @RequestParam(defaultValue = "10") int size
+    @Operation(summary = "최신 공지 N건(매니저 알림용)")
+    public List<AdminManagerNoticeResponse> latest(
+            @RequestParam(defaultValue = "5") int size
     ) {
-        var p = service.listVisible(PageRequest.of(page, size));
-        return p.map(n -> AdminManagerNoticeResponse.of(n, service.getActiveAttachments(n.getId())));
-    }
-
-    @GetMapping("/unread-count")
-    @PreAuthorize("hasRole('MANAGER')")
-    @Operation(
-            summary = "미확인 공지 수",
-            description = "로그인한 매니저 기준으로 아직 읽지 않은(PUBLISHED & 유효) 공지의 개수를 반환합니다. 헤더 벨 아이콘 뱃지에 사용하세요."
-    )
-    public long unreadCount(@AuthenticationPrincipal CustomUserDetails me) {
-        return service.countUnread(me.getUserId());
+        int pageSize = Math.min(Math.max(size, 1), 20); // 1~20 방어
+        var page = service.listVisible(PageRequest.of(0, pageSize));
+        // 알림에서는 첨부 불필요 → 빈 리스트로 변환해 부하 줄임
+        return page.getContent().stream()
+                .map(n -> AdminManagerNoticeResponse.of(n, java.util.List.of()))
+                .toList();
     }
 
     @PostMapping("/{id}/read")
@@ -77,14 +66,28 @@ public class AdminManagerNoticeAlertController {
         service.markAllRead(me.getUserId());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/unread")
+    @PreAuthorize("hasRole('MANAGER')")
+    @Operation(summary = "읽지 않은 공지 목록(라이트)", description = "벨 드롭다운용: id, title, time, importance만 반환")
+    public Page<AdminManagerUnreadItem> unread(
+            @AuthenticationPrincipal CustomUserDetails me,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        var p = service.unreadPage(me.getUserId(), PageRequest.of(page, size));
+        return p.map(n -> {
+            var t = n.getPublishedAt() != null ? n.getPublishedAt() : n.getCreatedAt();
+            return AdminManagerUnreadItem.of(n.getId(), n.getTitle(), t, n.getImportance());
+        });
+    }
+
+    @GetMapping("/unread-count")
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
-            summary = "공지 상세 조회",
-            description = "공지 상세 내용과 첨부 정보를 반환합니다. 반환 성공 후 클라이언트에서 `/read` 호출로 읽음 처리하는 흐름을 권장합니다."
+            summary = "미확인 공지 수",
+            description = "로그인한 매니저 기준으로 아직 읽지 않은(PUBLISHED & 유효) 공지의 개수를 반환합니다. 헤더 벨 아이콘 뱃지에 사용하세요."
     )
-    public AdminManagerNoticeResponse detail(@PathVariable Long id) {
-        var n = service.getVisibleOrThrow(id);
-        return AdminManagerNoticeResponse.of(n, service.getActiveAttachments(id));
+    public long unreadCount(@AuthenticationPrincipal CustomUserDetails me) {
+        return service.countUnread(me.getUserId());
     }
 }

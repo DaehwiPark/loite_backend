@@ -13,7 +13,7 @@ import java.util.List;
 public interface AdminManagerNoticeService {
 
     AdminManagerNoticeEntity createDraft(Long adminId, AdminManagerNoticeCreateRequest req);
-    AdminManagerNoticeEntity publish(Long noticeId, Long adminId);
+    AdminManagerNoticeResponse publish(Long id, Long adminId);
     Page<AdminManagerNoticeEntity> adminList(Pageable pageable);
     void softDelete(Long noticeId);
     Page<AdminManagerNoticeEntity> listVisible(Pageable pageable);
@@ -25,5 +25,7 @@ public interface AdminManagerNoticeService {
 
     //update
     AdminManagerNoticeResponse update(Long id, AdminManagerNoticeUpdateRequest req);
-    AdminManagerNoticeResponse publish(Long id);
+    AdminManagerNoticeResponse getDetail(Long id);
+
+    Page<AdminManagerNoticeEntity> unreadPage(Long managerId, Pageable pageable);
 }

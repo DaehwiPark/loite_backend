@@ -29,16 +29,20 @@ public class AdminManagerNoticeResponse {
     }
 
     public static AdminManagerNoticeResponse of(AdminManagerNoticeEntity n, List<AdminManagerNoticeAttachment> atts) {
+        var safeAtts   = (atts != null) ? atts : java.util.List.<AdminManagerNoticeAttachment>of();
+        var safeStatus = (n.getStatus() != null) ? n.getStatus().name() : "DRAFT"; // 혹시 모를 null 대비
+
         return AdminManagerNoticeResponse.builder()
                 .id(n.getId())
                 .title(n.getTitle())
                 .contentMd(n.getContentMd())
                 .importance(n.getImportance())
                 .pinned(n.getPinned())
-                .status(n.getStatus().name())
+                .status(safeStatus)
                 .publishedAt(n.getPublishedAt())
                 .expiresAt(n.getExpiresAt())
-                .attachments(atts.stream().map(a ->
+                //            ⬇⬇⬇ 여기서 safeAtts 사용!
+                .attachments(safeAtts.stream().map(a ->
                         AttachmentDto.builder()
                                 .id(a.getId())
                                 .url(a.getFileUrl())

@@ -7,7 +7,6 @@ import com.boot.loiteBackend.admin.manager.notice.service.AdminManagerNoticeServ
 import com.boot.loiteBackend.config.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-// import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,12 +59,21 @@ public class AdminManagerNoticeController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails me
     ) {
-        var n = service.publish(id, me.getUserId());
-        return AdminManagerNoticeResponse.of(n, service.getActiveAttachments(n.getId()));
+        return service.publish(id, me.getUserId());  // 깔끔
+    }
+
+    @GetMapping("/{id}/detail")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @Operation(
+            summary = "공지 상세 조회",
+            description = "공지 상세 내용과 첨부 정보를 반환합니다. 반환 성공 후 클라이언트에서 `/read` 호출로 읽음 처리하는 흐름을 권장합니다."
+    )
+    public AdminManagerNoticeResponse detail(@PathVariable Long id) {
+        return service.getDetail(id);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @Operation(
             summary = "공지 목록(ADMIN)",
             description = """
@@ -83,7 +91,7 @@ public class AdminManagerNoticeController {
         return p.map(n -> AdminManagerNoticeResponse.of(n, service.getActiveAttachments(n.getId())));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "공지 소프트 삭제",

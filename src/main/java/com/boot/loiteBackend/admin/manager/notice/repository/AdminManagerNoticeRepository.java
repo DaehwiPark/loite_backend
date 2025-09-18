@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface AdminManagerNoticeRepository extends org.springframework.data.jpa.repository.JpaRepository<AdminManagerNoticeEntity, Long> {
 
@@ -50,4 +51,26 @@ public interface AdminManagerNoticeRepository extends org.springframework.data.j
              coalesce(n.publishedAt, n.createdAt) desc
 """)
     Page<AdminManagerNoticeEntity> findAdminListAlive(Pageable pageable);
+
+    Optional<AdminManagerNoticeEntity> findByIdAndDeletedAtIsNull(Long id);
+
+    @Query("""
+    select n
+      from AdminManagerNoticeEntity n
+     where n.deletedAt is null
+       and n.status = 'PUBLISHED'
+       and (n.publishedAt is null or n.publishedAt <= :now)
+       and (n.expiresAt is null or n.expiresAt > :now)
+       and not exists (
+            select 1
+              from AdminManagerNoticeRead r
+             where r.notice.id = n.id
+               and r.managerId   = :managerId
+               and r.deletedAt is null
+       )
+     order by n.pinned desc, n.importance desc, n.publishedAt desc
+  """)
+    Page<AdminManagerNoticeEntity> findUnreadForManager(@Param("managerId") Long managerId,
+                                             @Param("now") LocalDateTime now,
+                                             Pageable pageable);
 }

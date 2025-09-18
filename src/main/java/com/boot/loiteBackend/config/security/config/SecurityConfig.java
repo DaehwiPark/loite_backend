@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,6 +25,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -57,6 +59,8 @@ public class SecurityConfig {
 
                         // 관리자 전용 API
                         .requestMatchers("/api/admin/**").permitAll() //.hasRole("ADMIN")
+                        .requestMatchers("/api/admin/manager/**").permitAll() //.hasRole("MANAGER")
+                        .requestMatchers("/api/admin/notices").permitAll() //.hasAnyRole("ADMIN", "MANAGER")
 
                         // 그 외 전부 인증 필요
                         .anyRequest().authenticated()
