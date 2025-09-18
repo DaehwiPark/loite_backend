@@ -17,7 +17,7 @@ public interface ReviewService {
 
     void deleteReview(Long userId, Long reviewId);
 
-    Page<ReviewResponseDto> getReviewsByProduct(Long productId,String sortType, String filterType, Pageable pageable);
+    Page<ReviewResponseDto> getReviewsByProduct(Long productId, String sortType, String filterType, Pageable pageable);
 
     boolean toggleHelpful(Long userId, Long reviewId);
 
