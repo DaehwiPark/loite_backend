@@ -21,7 +21,8 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     Page<ReviewEntity> findByUser_UserIdAndDeleteYn(Long userId, String deleteYn, Pageable pageable);
 
     // 주문 단위 리뷰 중복 체크 (주문 1건당 리뷰 1개)
-    boolean existsByOrderIdAndDeleteYn(Long orderId, String deleteYn);
+    boolean existsByOrderIdAndProduct_ProductIdAndDeleteYn(Long orderId, Long productId, String deleteYn);
+
 
     // 상품 평균 평점
     @Query("SELECT COALESCE(AVG(r.rating), 0) FROM ReviewEntity r " +
