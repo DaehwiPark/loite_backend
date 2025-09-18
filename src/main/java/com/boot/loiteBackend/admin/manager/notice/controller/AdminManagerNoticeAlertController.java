@@ -68,17 +68,24 @@ public class AdminManagerNoticeAlertController {
 
     @GetMapping("/unread")
     @PreAuthorize("hasRole('MANAGER')")
-    @Operation(summary = "읽지 않은 공지 목록(라이트)", description = "벨 드롭다운용: id, title, time, importance만 반환")
-    public Page<AdminManagerUnreadItem> unread(
+    @Operation(summary = "읽지 않은 공지 목록", description = "해당 매니저가 아직 읽지 않은 공지들만 페이지로 반환합니다.")
+    public Page<AdminManagerNoticeResponse> unread(
             @AuthenticationPrincipal CustomUserDetails me,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
         var p = service.unreadPage(me.getUserId(), PageRequest.of(page, size));
-        return p.map(n -> {
-            var t = n.getPublishedAt() != null ? n.getPublishedAt() : n.getCreatedAt();
-            return AdminManagerUnreadItem.of(n.getId(), n.getTitle(), t, n.getImportance());
-        });
+        return p.map(n -> AdminManagerNoticeResponse.of(n, service.getActiveAttachments(n.getId())));
+    }
+
+    @GetMapping("/unreadLight")
+    @PreAuthorize("hasRole('MANAGER')")
+    public Page<AdminManagerUnreadItem> unreadLight(
+            @AuthenticationPrincipal CustomUserDetails me,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        return service.unreadPageLight(me.getUserId(), PageRequest.of(page, size));
     }
 
     @GetMapping("/unread-count")

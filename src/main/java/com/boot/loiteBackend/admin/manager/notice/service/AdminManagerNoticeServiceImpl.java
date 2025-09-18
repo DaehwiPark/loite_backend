@@ -3,6 +3,7 @@ package com.boot.loiteBackend.admin.manager.notice.service;
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeCreateRequest;
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeResponse;
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeUpdateRequest;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerUnreadItem;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeAttachmentRepository;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeReadRepository;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeRepository;
@@ -263,7 +264,12 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
         return toResponse(n);  // DTO로 반환
     }
 
+    @Override
     public Page<AdminManagerNoticeEntity> unreadPage(Long managerId, Pageable pageable) {
         return noticeRepo.findUnreadForManager(managerId, LocalDateTime.now(), pageable);
+    }
+
+    public Page<AdminManagerUnreadItem> unreadPageLight(Long managerId, Pageable pageable) {
+        return noticeRepo.findUnreadForManagerLight(managerId, LocalDateTime.now(), pageable);
     }
 }

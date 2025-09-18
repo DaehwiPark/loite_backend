@@ -3,6 +3,7 @@ package com.boot.loiteBackend.admin.manager.notice.service;
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeCreateRequest;
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeResponse;
 import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerNoticeUpdateRequest;
+import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerUnreadItem;
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeAttachment;
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeEntity;
 import org.springframework.data.domain.Page;
@@ -28,4 +29,5 @@ public interface AdminManagerNoticeService {
     AdminManagerNoticeResponse getDetail(Long id);
 
     Page<AdminManagerNoticeEntity> unreadPage(Long managerId, Pageable pageable);
+    Page<AdminManagerUnreadItem> unreadPageLight(Long managerId, Pageable pageable);
 }
