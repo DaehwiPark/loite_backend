@@ -26,22 +26,19 @@ public class ReviewPublicController {
 
     @Operation(summary = "상품별 리뷰 목록 조회", description = "특정 상품에 대한 리뷰 목록과 별점 통계를 조회합니다. (삭제되지 않은 리뷰만)")
     @GetMapping("/product/{productId}")
-    public ResponseEntity<ReviewListResponseDto> getProductReviews(
+    public ResponseEntity<Page<ReviewResponseDto>> getProductReviews(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 기준 (베스트순, 최신순, 평점 높은순, 평점 낮은순)", example = "베스트순")
-            @RequestParam(defaultValue = "베스트순") String sortType
+            @RequestParam(defaultValue = "베스트순") String sortType,
+            @Parameter(description = "리뷰 필터 (전체, 일반상품평, 포토상품평, 동영상상품평)", example = "전체")
+            @RequestParam(defaultValue = "전체") String filterType
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ReviewResponseDto> reviews = reviewService.getReviewsByProduct(productId, sortType, pageable);
 
-        ReviewRatingStatsDto stats = reviewService.getReviewStats(productId);
-
-        ReviewListResponseDto response = ReviewListResponseDto.builder()
-                .reviews(reviews)
-                .stats(stats)
-                .build();
+        Page<ReviewResponseDto> response =
+                reviewService.getReviewsByProduct(productId, sortType, filterType, pageable);
 
         return ResponseEntity.ok(response);
     }

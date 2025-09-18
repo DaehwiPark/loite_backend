@@ -305,7 +305,9 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public Page<ReviewResponseDto> getReviewsByProduct(Long productId, String sortType, Pageable pageable) {
+    public Page<ReviewResponseDto> getReviewsByProduct(Long productId, String sortType, String filterType, Pageable pageable) {
+
+        // 정렬 조건
         Sort sort;
         switch (sortType.toLowerCase()) {
             case "최신순":
@@ -323,7 +325,22 @@ public class ReviewServiceImpl implements ReviewService{
         }
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        Page<ReviewEntity> reviews = reviewRepository.findByProduct_ProductIdAndDeleteYn(productId, "N", sortedPageable);
+        // 필터 조건
+        Page<ReviewEntity> reviews;
+        switch (filterType.toLowerCase()) {
+            case "포토상품평":
+                reviews = reviewRepository.findPhotoReviews(productId, sortedPageable);
+                break;
+            case "동영상상품평":
+                reviews = reviewRepository.findVideoReviews(productId, sortedPageable);
+                break;
+            case "일반상품평":
+                reviews = reviewRepository.findTextOnlyReviews(productId, sortedPageable);
+                break;
+            default: // 전체
+                reviews = reviewRepository.findByProduct_ProductIdAndDeleteYn(productId, "N", sortedPageable);
+                break;
+        }
 
         return reviews.map(review -> {
             List<ReviewMediaDto> mediaDtos = reviewMediaRepository.findByReview(review).stream()

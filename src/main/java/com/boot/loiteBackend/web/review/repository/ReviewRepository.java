@@ -40,6 +40,30 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
             "AND r.deleteYn = 'N' " +
             "GROUP BY r.rating")
     List<Object[]> countReviewsByRating(@Param("productId") Long productId);
+
+    // 포토 상품평 (IMAGE 첨부된 리뷰만)
+    @Query("SELECT DISTINCT r FROM ReviewEntity r " +
+            "JOIN r.medias m " +
+            "WHERE r.product.productId = :productId " +
+            "AND r.deleteYn = 'N' " +
+            "AND m.mediaType = 'IMAGE'")
+    Page<ReviewEntity> findPhotoReviews(@Param("productId") Long productId, Pageable pageable);
+
+    // 동영상 상품평 (VIDEO 첨부된 리뷰만)
+    @Query("SELECT DISTINCT r FROM ReviewEntity r " +
+            "JOIN r.medias m " +
+            "WHERE r.product.productId = :productId " +
+            "AND r.deleteYn = 'N' " +
+            "AND m.mediaType = 'VIDEO'")
+    Page<ReviewEntity> findVideoReviews(@Param("productId") Long productId, Pageable pageable);
+
+    // 일반 상품평 (첨부파일 없는 리뷰만)
+    @Query("SELECT r FROM ReviewEntity r " +
+            "WHERE r.product.productId = :productId " +
+            "AND r.deleteYn = 'N' " +
+            "AND NOT EXISTS (SELECT 1 FROM ReviewMediaEntity m WHERE m.review = r)")
+    Page<ReviewEntity> findTextOnlyReviews(@Param("productId") Long productId, Pageable pageable);
+
 }
 
 
