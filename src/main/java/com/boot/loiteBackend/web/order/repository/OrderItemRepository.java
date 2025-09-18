@@ -15,6 +15,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItemEntity, Long
     @Query("SELECT oi FROM OrderItemEntity oi " +
             "WHERE oi.order.orderId = :orderId " +
             "AND oi.product.productId = :productId")
-    Optional<OrderItemEntity> findByOrderIdAndProductId(@Param("orderId") Long orderId, @Param("productId") Long productId);
+    List<OrderItemEntity> findByOrderIdAndProductId(@Param("orderId") Long orderId, @Param("productId") Long productId);
 
 }
