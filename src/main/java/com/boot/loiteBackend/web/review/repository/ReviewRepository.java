@@ -21,7 +21,8 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     Page<ReviewEntity> findByUser_UserIdAndDeleteYn(Long userId, String deleteYn, Pageable pageable);
 
     // 주문 단위 리뷰 중복 체크 (주문 1건당 리뷰 1개)
-    boolean existsByOrderIdAndDeleteYn(Long orderId, String deleteYn);
+    boolean existsByOrderIdAndProduct_ProductIdAndDeleteYn(Long orderId, Long productId, String deleteYn);
+
 
     // 상품 평균 평점
     @Query("SELECT COALESCE(AVG(r.rating), 0) FROM ReviewEntity r " +
@@ -39,6 +40,30 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
             "AND r.deleteYn = 'N' " +
             "GROUP BY r.rating")
     List<Object[]> countReviewsByRating(@Param("productId") Long productId);
+
+    // 포토 상품평 (IMAGE 첨부된 리뷰만)
+    @Query("SELECT DISTINCT r FROM ReviewEntity r " +
+            "JOIN r.medias m " +
+            "WHERE r.product.productId = :productId " +
+            "AND r.deleteYn = 'N' " +
+            "AND m.mediaType = 'IMAGE'")
+    Page<ReviewEntity> findPhotoReviews(@Param("productId") Long productId, Pageable pageable);
+
+    // 동영상 상품평 (VIDEO 첨부된 리뷰만)
+    @Query("SELECT DISTINCT r FROM ReviewEntity r " +
+            "JOIN r.medias m " +
+            "WHERE r.product.productId = :productId " +
+            "AND r.deleteYn = 'N' " +
+            "AND m.mediaType = 'VIDEO'")
+    Page<ReviewEntity> findVideoReviews(@Param("productId") Long productId, Pageable pageable);
+
+    // 일반 상품평 (첨부파일 없는 리뷰만)
+    @Query("SELECT r FROM ReviewEntity r " +
+            "WHERE r.product.productId = :productId " +
+            "AND r.deleteYn = 'N' " +
+            "AND NOT EXISTS (SELECT 1 FROM ReviewMediaEntity m WHERE m.review = r)")
+    Page<ReviewEntity> findTextOnlyReviews(@Param("productId") Long productId, Pageable pageable);
+
 }
 
 

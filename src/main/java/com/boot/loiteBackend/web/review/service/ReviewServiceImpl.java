@@ -10,6 +10,7 @@ import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.order.dto.OrderAdditionalResponseDto;
 import com.boot.loiteBackend.web.order.dto.OrderGiftResponseDto;
 import com.boot.loiteBackend.web.order.dto.OrderOptionResponseDto;
+import com.boot.loiteBackend.web.order.entity.OrderItemEntity;
 import com.boot.loiteBackend.web.order.enums.OrderStatus;
 import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
 import com.boot.loiteBackend.web.order.repository.OrderRepository;
@@ -76,7 +77,7 @@ public class ReviewServiceImpl implements ReviewService{
         }
 
         // 5. 중복 리뷰 방지 (주문 1건당 리뷰 1개)
-        if (reviewRepository.existsByOrderIdAndDeleteYn(orderId, "N")) {
+        if (reviewRepository.existsByOrderIdAndProduct_ProductIdAndDeleteYn(orderId, requestDto.getProductId(), "N")) {
             throw new IllegalStateException("이미 해당 주문에 대한 리뷰가 존재합니다. 수정 또는 삭제만 가능합니다.");
         }
 
@@ -253,35 +254,39 @@ public class ReviewServiceImpl implements ReviewService{
                     .orElse(null);
 
             // 주문 아이템
-            ReviewOrderItemDto orderItemDto = orderItemRepository.findByOrderIdAndProductId(
+            List<OrderItemEntity> orderItems = orderItemRepository.findByOrderIdAndProductId(
                     review.getOrderId(),
                     review.getProduct().getProductId()
-            ).map(orderItem -> ReviewOrderItemDto.builder()
-                    .orderItemId(orderItem.getOrderItemId())
-                    .options(orderItem.getOptions().stream()
-                            .map(opt -> OrderOptionResponseDto.builder()
-                                    .optionId(opt.getProductOption().getOptionId())
-                                    .optionValue(opt.getProductOption().getOptionValue())
-                                    .additionalPrice(opt.getAdditionalPrice())
-                                    .build())
-                            .toList())
-                    .additionals(orderItem.getAdditionals().stream()
-                            .map(add -> OrderAdditionalResponseDto.builder()
-                                    .additionalId(add.getProductAdditional().getAdditional().getAdditionalId())
-                                    .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
-                                    .additionalPrice(add.getAdditionalPrice())
-                                    .quantity(add.getQuantity())
-                                    .build())
-                            .toList())
-                    .gifts(orderItem.getGifts().stream()
-                            .map(gift -> OrderGiftResponseDto.builder()
-                                    .giftId(gift.getProductGift().getGift().getGiftId())
-                                    .giftName(gift.getProductGift().getGift().getGiftName())
-                                    .quantity(gift.getQuantity())
-                                    .build())
-                            .toList())
-                    .build()
-            ).orElse(null);
+            );
+
+            List<ReviewOrderItemDto> orderItemDtos = orderItems.stream()
+                    .map(orderItem -> ReviewOrderItemDto.builder()
+                            .orderItemId(orderItem.getOrderItemId())
+                            .options(orderItem.getOptions().stream()
+                                    .map(opt -> OrderOptionResponseDto.builder()
+                                            .optionId(opt.getProductOption().getOptionId())
+                                            .optionValue(opt.getProductOption().getOptionValue())
+                                            .additionalPrice(BigDecimal.valueOf(opt.getProductOption().getOptionAdditionalPrice()))
+                                            .build())
+                                    .toList())
+                            .additionals(orderItem.getAdditionals().stream()
+                                    .map(add -> OrderAdditionalResponseDto.builder()
+                                            .additionalId(add.getProductAdditional().getAdditional().getAdditionalId())
+                                            .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
+                                            .additionalPrice(add.getAdditionalPrice())
+                                            .quantity(add.getQuantity())
+                                            .build())
+                                    .toList())
+                            .gifts(orderItem.getGifts().stream()
+                                    .map(gift -> OrderGiftResponseDto.builder()
+                                            .giftId(gift.getProductGift().getGift().getGiftId())
+                                            .giftName(gift.getProductGift().getGift().getGiftName())
+                                            .quantity(gift.getQuantity())
+                                            .build())
+                                    .toList())
+                            .build()
+                    )
+                    .toList();
 
             return ReviewUserResponseDto.builder()
                     .reviewId(review.getReviewId())
@@ -294,13 +299,15 @@ public class ReviewServiceImpl implements ReviewService{
                     .userName(review.getUser().getUserName())
                     .createdAt(review.getCreatedAt())
                     .medias(mediaDtos)
-                    .orderItem(orderItemDto)
+                    .orderItems(orderItemDtos)
                     .build();
         });
     }
 
     @Override
-    public Page<ReviewResponseDto> getReviewsByProduct(Long productId, String sortType, Pageable pageable) {
+    public Page<ReviewResponseDto> getReviewsByProduct(Long productId, String sortType, String filterType, Pageable pageable) {
+
+        // 정렬 조건
         Sort sort;
         switch (sortType.toLowerCase()) {
             case "최신순":
@@ -318,7 +325,22 @@ public class ReviewServiceImpl implements ReviewService{
         }
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        Page<ReviewEntity> reviews = reviewRepository.findByProduct_ProductIdAndDeleteYn(productId, "N", sortedPageable);
+        // 필터 조건
+        Page<ReviewEntity> reviews;
+        switch (filterType.toLowerCase()) {
+            case "포토상품평":
+                reviews = reviewRepository.findPhotoReviews(productId, sortedPageable);
+                break;
+            case "동영상상품평":
+                reviews = reviewRepository.findVideoReviews(productId, sortedPageable);
+                break;
+            case "일반상품평":
+                reviews = reviewRepository.findTextOnlyReviews(productId, sortedPageable);
+                break;
+            default: // 전체
+                reviews = reviewRepository.findByProduct_ProductIdAndDeleteYn(productId, "N", sortedPageable);
+                break;
+        }
 
         return reviews.map(review -> {
             List<ReviewMediaDto> mediaDtos = reviewMediaRepository.findByReview(review).stream()
@@ -329,35 +351,40 @@ public class ReviewServiceImpl implements ReviewService{
                             .build())
                     .toList();
 
-            ReviewOrderItemDto orderItemDto = orderItemRepository.findByOrderIdAndProductId(
+            List<OrderItemEntity> orderItems = orderItemRepository.findByOrderIdAndProductId(
                     review.getOrderId(),
                     review.getProduct().getProductId()
-            ).map(orderItem -> ReviewOrderItemDto.builder()
-                    .orderItemId(orderItem.getOrderItemId())
-                    .options(orderItem.getOptions().stream()
-                            .map(opt -> OrderOptionResponseDto.builder()
-                                    .optionId(opt.getProductOption().getOptionId())
-                                    .optionValue(opt.getProductOption().getOptionValue())
-                                    .additionalPrice(BigDecimal.valueOf(opt.getProductOption().getOptionAdditionalPrice()))
-                                    .build())
-                            .toList())
-                    .additionals(orderItem.getAdditionals().stream()
-                            .map(add -> OrderAdditionalResponseDto.builder()
-                                    .additionalId(add.getProductAdditional().getAdditional().getAdditionalId())
-                                    .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
-                                    .additionalPrice(add.getAdditionalPrice())
-                                    .quantity(add.getQuantity())
-                                    .build())
-                            .toList())
-                    .gifts(orderItem.getGifts().stream()
-                            .map(gift -> OrderGiftResponseDto.builder()
-                                    .giftId(gift.getProductGift().getGift().getGiftId())
-                                    .giftName(gift.getProductGift().getGift().getGiftName())
-                                    .quantity(gift.getQuantity())
-                                    .build())
-                            .toList())
-                    .build()
-            ).orElse(null);
+            );
+
+            List<ReviewOrderItemDto> orderItemDtos = orderItems.stream()
+                    .map(orderItem -> ReviewOrderItemDto.builder()
+                            .orderItemId(orderItem.getOrderItemId())
+                            .options(orderItem.getOptions().stream()
+                                    .map(opt -> OrderOptionResponseDto.builder()
+                                            .optionId(opt.getProductOption().getOptionId())
+                                            .optionValue(opt.getProductOption().getOptionValue())
+                                            .additionalPrice(BigDecimal.valueOf(opt.getProductOption().getOptionAdditionalPrice()))
+                                            .build())
+                                    .toList())
+                            .additionals(orderItem.getAdditionals().stream()
+                                    .map(add -> OrderAdditionalResponseDto.builder()
+                                            .additionalId(add.getProductAdditional().getAdditional().getAdditionalId())
+                                            .additionalName(add.getProductAdditional().getAdditional().getAdditionalName())
+                                            .additionalPrice(add.getAdditionalPrice())
+                                            .quantity(add.getQuantity())
+                                            .build())
+                                    .toList())
+                            .gifts(orderItem.getGifts().stream()
+                                    .map(gift -> OrderGiftResponseDto.builder()
+                                            .giftId(gift.getProductGift().getGift().getGiftId())
+                                            .giftName(gift.getProductGift().getGift().getGiftName())
+                                            .quantity(gift.getQuantity())
+                                            .build())
+                                    .toList())
+                            .build()
+                    )
+                    .toList();
+
 
             return ReviewResponseDto.builder()
                     .reviewId(review.getReviewId())
@@ -368,7 +395,7 @@ public class ReviewServiceImpl implements ReviewService{
                     .userName(review.getUser().getUserName())
                     .createdAt(review.getCreatedAt())
                     .medias(mediaDtos)
-                    .orderItem(orderItemDto)
+                    .orderItems(orderItemDtos)
                     .build();
         });
     }
