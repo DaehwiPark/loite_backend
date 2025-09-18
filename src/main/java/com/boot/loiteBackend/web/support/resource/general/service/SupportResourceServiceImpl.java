@@ -74,6 +74,7 @@ public class SupportResourceServiceImpl implements SupportResourceService {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                    .header("X-Filename", encodedFileName)
                     .body(resource);
 
         } catch (MalformedURLException e) {
