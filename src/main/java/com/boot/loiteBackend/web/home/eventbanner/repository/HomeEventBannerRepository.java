@@ -19,9 +19,7 @@ public interface HomeEventBannerRepository extends JpaRepository<HomeEventBanner
                AND b.default_slot IN (1,2)
                AND (b.start_at IS NULL OR b.start_at <= :now)
                AND (b.end_at   IS NULL OR :now <= b.end_at)
-
             UNION ALL
-
             -- 2순위: 기본 배너(default_yn='Y')
             SELECT b.*, 2 AS pri
               FROM tb_home_event_banner b

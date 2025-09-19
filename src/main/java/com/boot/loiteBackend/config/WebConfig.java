@@ -1,26 +1,20 @@
 package com.boot.loiteBackend.config;
 
 import com.boot.loiteBackend.common.file.FileStorageProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
     private final FileStorageProperties fileProps;
-
-    public WebConfig(FileStorageProperties fileProps) {
-        this.fileProps = fileProps;
-    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -46,6 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
         if (raw == null || raw.isBlank()) {
             throw new IllegalStateException("file.upload-dir is not set");
         }
+
         // 눈에 안 보이는 공백/제어문자 제거
         String cleaned = raw.trim();
 
@@ -62,4 +57,5 @@ public class WebConfig implements WebMvcConfigurer {
 
         System.out.println("[Static] " + pattern + " -> " + location + " (raw='" + raw + "')");
     }
+
 }
