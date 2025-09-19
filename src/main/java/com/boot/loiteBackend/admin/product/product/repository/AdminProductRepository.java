@@ -41,4 +41,15 @@ public interface AdminProductRepository extends JpaRepository<AdminProductEntity
           AND p.productCategory.categoryPath IN :paths
     """)
     Page<AdminProductEntity> findListByCategoryPaths(@Param("paths") List<String> paths, Pageable pageable);
+
+    @Query("""
+        SELECT p FROM AdminProductEntity p
+        LEFT JOIN ReviewEntity r ON p.productId = r.product.productId
+        WHERE p.productCategory.categoryPath IN :paths
+        AND p.deleteYn = 'N'
+        GROUP BY p
+        ORDER BY COUNT(r.reviewId) DESC
+    """)
+    Page<AdminProductEntity> findListOrderByReviewCount(@Param("paths") List<String> paths, Pageable pageable);
+
 }

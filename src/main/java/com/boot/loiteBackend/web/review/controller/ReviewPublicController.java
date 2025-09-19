@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.web.review.controller;
 
+import com.boot.loiteBackend.config.security.CustomUserDetails;
 import com.boot.loiteBackend.web.review.dto.ReviewListResponseDto;
 import com.boot.loiteBackend.web.review.dto.ReviewRatingStatsDto;
 import com.boot.loiteBackend.web.review.dto.ReviewResponseDto;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,10 +35,12 @@ public class ReviewPublicController {
             @Parameter(description = "정렬 기준 (베스트순, 최신순, 평점 높은순, 평점 낮은순)", example = "베스트순")
             @RequestParam(defaultValue = "베스트순") String sortType,
             @Parameter(description = "리뷰 필터 (전체, 일반, 포토, 동영상)", example = "전체")
-            @RequestParam(defaultValue = "전체") String filterType
+            @RequestParam(defaultValue = "전체") String filterType,
+            @AuthenticationPrincipal CustomUserDetails loginUser
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ReviewResponseDto> reviews = reviewService.getReviewsByProduct(productId, sortType, filterType, pageable);
+        Long currentUserId = (loginUser != null) ? loginUser.getUserId() : null;
+        Page<ReviewResponseDto> reviews = reviewService.getReviewsByProduct(productId, sortType, filterType, currentUserId, pageable);
 
         ReviewRatingStatsDto stats = reviewService.getReviewStats(productId);
 

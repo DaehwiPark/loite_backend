@@ -11,7 +11,7 @@ import java.util.List;
 public interface ProductService {
     List<ProductMainResponseDto> getMainProducts();
 
-    Page<ProductListResponseDto> getListProducts(String categoryPath, Pageable pageable);
+    Page<ProductListResponseDto> getListProducts(String categoryPath, String sortType, Pageable pageable);
 
     ProductDetailResponseDto getDetailProducts(Long productId);
 }

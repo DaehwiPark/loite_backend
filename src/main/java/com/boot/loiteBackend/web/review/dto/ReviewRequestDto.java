@@ -14,11 +14,14 @@ import java.util.List;
 @Schema(description = "리뷰 등록 요청 DTO")
 public class ReviewRequestDto {
 
-    @Schema(description = "상품 ID", example = "1")
-    private Long productId;
+    /*@Schema(description = "상품 ID", example = "1")
+    private Long productId;*/
 
     @Schema(description = "주문 ID (선택)", example = "160")
     private Long orderId;
+
+    @Schema(description = "주문 아이템 ID", example = "1")
+    private Long orderItemId;
 
     @Schema(description = "리뷰 별점 (1~5)", example = "5")
     private int rating;

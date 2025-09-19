@@ -5,6 +5,7 @@ import com.boot.loiteBackend.web.product.dto.ProductListResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductMainResponseDto;
 import com.boot.loiteBackend.web.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -36,8 +37,10 @@ public class ProductController {
     @GetMapping("/list")
     public ResponseEntity<Page<ProductListResponseDto>> getListProducts(
             @RequestParam String categoryPath,
+            @Parameter(description = "정렬 기준 (베스트순, 신상품순, 높은조회순, 리뷰많은순, 낮은가격순, 높은가격순)")
+            @RequestParam(defaultValue = "베스트순") String sortType,
             @ParameterObject @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(productService.getListProducts(categoryPath, pageable));
+        return ResponseEntity.ok(productService.getListProducts(categoryPath, sortType, pageable));
     }
 
     @Operation(summary = "상품상세 페이지 상품정보 조회", description = "상품상세 페이지 상품정보를 조회합니다.")
