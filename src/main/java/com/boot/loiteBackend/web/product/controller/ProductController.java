@@ -39,7 +39,7 @@ public class ProductController {
             @RequestParam String categoryPath,
             @Parameter(description = "정렬 기준 (베스트순, 신상품순, 높은조회순, 리뷰많은순, 낮은가격순, 높은가격순)")
             @RequestParam(defaultValue = "베스트순") String sortType,
-            @ParameterObject @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 12) Pageable pageable) {
         return ResponseEntity.ok(productService.getListProducts(categoryPath, sortType, pageable));
     }
 
