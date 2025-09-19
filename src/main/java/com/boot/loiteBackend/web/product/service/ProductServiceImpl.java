@@ -103,6 +103,10 @@ public class ProductServiceImpl implements ProductService {
                 productPage = productRepository.findListByCategoryPaths(paths,
                         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "salesCount")));
                 break;
+            case "높은조회순":
+                productPage = productRepository.findListByCategoryPaths(paths,
+                        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "viewCount")));
+                break;
             default:
                 throw new IllegalArgumentException("지원하지 않는 정렬 타입: " + sortType);
         }
