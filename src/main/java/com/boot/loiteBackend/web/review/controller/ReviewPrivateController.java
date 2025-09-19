@@ -1,10 +1,7 @@
 package com.boot.loiteBackend.web.review.controller;
 
 import com.boot.loiteBackend.config.security.CustomUserDetails;
-import com.boot.loiteBackend.web.review.dto.ReviewRequestDto;
-import com.boot.loiteBackend.web.review.dto.ReviewResponseDto;
-import com.boot.loiteBackend.web.review.dto.ReviewUpdateRequestDto;
-import com.boot.loiteBackend.web.review.dto.ReviewUserResponseDto;
+import com.boot.loiteBackend.web.review.dto.*;
 import com.boot.loiteBackend.web.review.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -74,6 +71,17 @@ public class ReviewPrivateController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "리뷰 신고", description = "사용자가 특정 리뷰를 신고합니다.")
+    @PostMapping("/report")
+    public ResponseEntity<String> reportReview(
+            @AuthenticationPrincipal CustomUserDetails loginUser,
+            @RequestBody ReviewReportRequestDto requestDto
+    ) {
+        reviewService.reportReview(loginUser.getUserId(), requestDto);
+        return ResponseEntity.ok("리뷰가 신고되었습니다.");
+    }
+
 
 }
 

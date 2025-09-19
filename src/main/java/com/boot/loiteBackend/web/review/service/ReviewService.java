@@ -24,4 +24,6 @@ public interface ReviewService {
     ReviewSummaryDto getReviewSummary(Long productId);
 
     ReviewRatingStatsDto getReviewStats(Long productId);
+
+    void reportReview(Long userId, ReviewReportRequestDto requestDto);
 }

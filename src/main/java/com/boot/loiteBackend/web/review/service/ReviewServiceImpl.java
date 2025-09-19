@@ -19,8 +19,10 @@ import com.boot.loiteBackend.web.review.dto.*;
 import com.boot.loiteBackend.web.review.entity.ReviewEntity;
 import com.boot.loiteBackend.web.review.entity.ReviewHelpfulEntity;
 import com.boot.loiteBackend.web.review.entity.ReviewMediaEntity;
+import com.boot.loiteBackend.web.review.entity.ReviewReportEntity;
 import com.boot.loiteBackend.web.review.repository.ReviewHelpfulRepository;
 import com.boot.loiteBackend.web.review.repository.ReviewMediaRepository;
+import com.boot.loiteBackend.web.review.repository.ReviewReportRepository;
 import com.boot.loiteBackend.web.review.repository.ReviewRepository;
 import com.boot.loiteBackend.web.user.general.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final ReviewRepository reviewRepository;
     private final ReviewMediaRepository reviewMediaRepository;
     private final ReviewHelpfulRepository reviewHelpfulRepository;
+    private final ReviewReportRepository reviewReportRepository;
     private final AdminProductRepository adminProductRepository;
     private final AdminProductImageRepository adminProductImageRepository;
     private final UserRepository userRepository;
@@ -479,5 +482,30 @@ public class ReviewServiceImpl implements ReviewService{
                 .build();
     }
 
+    @Override
+    @Transactional
+    public void reportReview(Long userId, ReviewReportRequestDto requestDto) {
+        ReviewEntity review = reviewRepository.findById(requestDto.getReviewId())
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+
+        if (review.getUser().getUserId().equals(userId)) {
+            throw new IllegalStateException("자신이 작성한 리뷰는 신고할 수 없습니다.");
+        }
+
+        if (reviewReportRepository.existsByReview_ReviewIdAndUser_UserId(review.getReviewId(), user.getUserId())) {
+            throw new IllegalStateException("이미 이 리뷰를 신고하였습니다.");
+        }
+
+        ReviewReportEntity report = ReviewReportEntity.builder()
+                .review(review)
+                .user(user)
+                .reason(requestDto.getReason())
+                .build();
+
+        reviewReportRepository.save(report);
+    }
 
 }
