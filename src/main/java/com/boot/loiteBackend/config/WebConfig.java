@@ -3,6 +3,7 @@ package com.boot.loiteBackend.config;
 import com.boot.loiteBackend.common.file.FileStorageProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -36,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS","HEAD")
                 .allowedHeaders("*")
                 .allowCredentials(true)
-                .exposedHeaders("Authorization", "content-disposition");
+                .exposedHeaders("Authorization", "X-Filename");
     }
 
     @Override
