@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface ReviewHelpfulRepository extends JpaRepository<ReviewHelpfulEntity, Long> {
     Optional<ReviewHelpfulEntity> findByReview_ReviewIdAndUser_UserId(Long reviewId, Long userId);
+
+    boolean existsByReview_ReviewIdAndUser_UserId(Long reviewId, Long userId);
 }
