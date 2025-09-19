@@ -129,11 +129,12 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
     @Transactional(readOnly = true)
     public Page<AdminManagerNoticeEntity> listVisible(Pageable pageable) {
         return noticeRepo.findVisible(
-                pageable,
                 LocalDateTime.now(),
-                AdminManagerNoticeEntity.NoticeStatus.PUBLISHED
+                AdminManagerNoticeEntity.NoticeStatus.PUBLISHED,
+                pageable
         );
     }
+
 
     /*
       특정 MANAGER 기준으로 아직 읽지 않은 공지의 개수를 반환한다.

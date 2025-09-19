@@ -80,6 +80,10 @@ public class AdminManagerNoticeAlertController {
 
     @GetMapping("/unreadLight")
     @PreAuthorize("hasRole('MANAGER')")
+    @Operation(
+            summary = "미확인 공지 가벼운 리스트",
+            description = "로그인한 매니저 기준으로 아직 읽지 않은 공지에 대한 제목, id, 시간만 반환. 알림 내용에 보일 내용."
+    )
     public Page<AdminManagerUnreadItem> unreadLight(
             @AuthenticationPrincipal CustomUserDetails me,
             @RequestParam(defaultValue = "0") int page,

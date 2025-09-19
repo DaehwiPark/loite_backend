@@ -117,6 +117,20 @@ public class AdminManagerNoticeController {
         return p.map(n -> AdminManagerNoticeResponse.of(n, service.getActiveAttachments(n.getId())));
     }
 
+    // ===== MANAGER 전용 목록 (보이는 공지만) =====
+    @GetMapping("/manager-visible")
+    @PreAuthorize("hasRole('MANAGER')")
+    @Operation(summary = "공지 목록(MANAGER)", description = "MANAGER는 현재 보이는 공지만 조회(PUBLISHED & not deleted & not expired)")
+    public Page<AdminManagerNoticeResponse> listForManager(
+            @RequestParam(defaultValue="0") int page,
+            @RequestParam(defaultValue="10") int size
+    ) {
+        var p = service.listVisible(PageRequest.of(page, size));
+        return p.map(n -> AdminManagerNoticeResponse.of(n, java.util.List.of())); // 첨부는 생략
+    }
+
+
+
     @DeleteMapping("/{id}/delete")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(

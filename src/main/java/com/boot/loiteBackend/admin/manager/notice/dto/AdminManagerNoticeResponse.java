@@ -18,6 +18,9 @@ public class AdminManagerNoticeResponse {
     private String status;
     private LocalDateTime publishedAt;
     private LocalDateTime expiresAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     private List<AttachmentDto> attachments;
 
     @Getter @Builder
@@ -41,7 +44,8 @@ public class AdminManagerNoticeResponse {
                 .status(safeStatus)
                 .publishedAt(n.getPublishedAt())
                 .expiresAt(n.getExpiresAt())
-                //            ⬇⬇⬇ 여기서 safeAtts 사용!
+                .createdAt(n.getCreatedAt())
+                .updatedAt(n.getUpdatedAt())
                 .attachments(safeAtts.stream().map(a ->
                         AttachmentDto.builder()
                                 .id(a.getId())
@@ -50,6 +54,23 @@ public class AdminManagerNoticeResponse {
                                 .sizeBytes(a.getFileSizeBytes())
                                 .build()
                 ).toList())
+                .build();
+    }
+
+    // 매니저 목록처럼 첨부를 비워 보낼 때 쓸 라이트 버전
+    public static AdminManagerNoticeResponse ofLite(AdminManagerNoticeEntity n) {
+        return AdminManagerNoticeResponse.builder()
+                .id(n.getId())
+                .title(n.getTitle())
+                .contentMd(n.getContentMd())
+                .importance(n.getImportance())
+                .pinned(n.getPinned())
+                .status(n.getStatus() == null ? null : n.getStatus().name())
+                .publishedAt(n.getPublishedAt())
+                .expiresAt(n.getExpiresAt())
+                .createdAt(n.getCreatedAt())
+                .updatedAt(n.getUpdatedAt())
+                .attachments(java.util.List.of())
                 .build();
     }
 }

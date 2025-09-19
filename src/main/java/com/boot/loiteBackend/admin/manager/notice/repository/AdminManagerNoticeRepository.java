@@ -13,19 +13,20 @@ import java.util.Optional;
 public interface AdminManagerNoticeRepository extends org.springframework.data.jpa.repository.JpaRepository<AdminManagerNoticeEntity, Long> {
 
     @Query("""
-        select n
-        from AdminManagerNoticeEntity n
-        where n.status = :published
-          and n.deletedAt is null
-          and (n.expiresAt is null or n.expiresAt > :now)
-        order by case when n.pinned = true then 0 else 1 end,
-                 coalesce(n.publishedAt, n.createdAt) desc
+    select n
+      from AdminManagerNoticeEntity n
+     where n.deletedAt is null
+       and n.status = :published
+       and (n.publishedAt is null or n.publishedAt <= :now) 
+       and (n.expiresAt  is null or n.expiresAt  >  :now)
+     order by case when n.pinned = true then 0 else 1 end,
+              coalesce(n.publishedAt, n.createdAt) desc
     """)
-    Page<AdminManagerNoticeEntity> findVisible(
-            Pageable pageable,
-            @Param("now") LocalDateTime now,
-            @Param("published") AdminManagerNoticeEntity.NoticeStatus published
-    );
+        Page<AdminManagerNoticeEntity> findVisible(
+                @Param("now") LocalDateTime now,
+                @Param("published") AdminManagerNoticeEntity.NoticeStatus published,
+                Pageable pageable  // Pageable은 마지막
+        );
 
     @Query("""
         select count(n)
