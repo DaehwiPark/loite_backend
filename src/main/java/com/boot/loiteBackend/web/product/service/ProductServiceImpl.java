@@ -20,10 +20,7 @@ import com.boot.loiteBackend.web.product.dto.ProductListResponseDto;
 import com.boot.loiteBackend.web.product.dto.ProductMainResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -72,20 +69,43 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductListResponseDto> getListProducts(String categoryPath, Pageable pageable) {
+    public Page<ProductListResponseDto> getListProducts(String categoryPath, String sortType, Pageable pageable) {
         // 1. 부모 카테고리 찾기
         AdminProductCategoryEntity parent = adminProductCategoryRepository.findByCategoryPathAndDeleteYn(categoryPath, "N")
                 .orElseThrow(() -> new EntityNotFoundException("카테고리 없음: " + categoryPath));
 
-        // 2. 부모 + 자식 카테고리 path 리스트 만들기
+        // 2. 부모 + 자식 카테고리 path 리스트
         List<String> paths = new ArrayList<>();
         paths.add(parent.getCategoryPath());
 
         List<AdminProductCategoryEntity> children = adminProductCategoryRepository.findByCategoryParentIdAndDeleteYn(parent, "N");
         paths.addAll(children.stream().map(AdminProductCategoryEntity::getCategoryPath).toList());
 
-        // 3. 상품 조회 (IN 조건)
-        Page<AdminProductEntity> productPage = productRepository.findListByCategoryPaths(paths, pageable);
+        // 3. 정렬 방식 선택
+        Page<AdminProductEntity> productPage;
+        switch (sortType) {
+            case "리뷰많은순":
+                productPage = productRepository.findListOrderByReviewCount(paths, pageable);
+                break;
+            case "신상품순":
+                productPage = productRepository.findListByCategoryPaths(paths,
+                        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "createdAt")));
+                break;
+            case "낮은가격순":
+                productPage = productRepository.findListByCategoryPaths(paths,
+                        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "discountedPrice")));
+                break;
+            case "높은가격순":
+                productPage = productRepository.findListByCategoryPaths(paths,
+                        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "discountedPrice")));
+                break;
+            case "베스트순":
+                productPage = productRepository.findListByCategoryPaths(paths,
+                        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "salesCount")));
+                break;
+            default:
+                throw new IllegalArgumentException("지원하지 않는 정렬 타입: " + sortType);
+        }
 
         // 4. DTO 변환
         List<ProductListResponseDto> dtoList = productPage.getContent().stream()
@@ -116,6 +136,7 @@ public class ProductServiceImpl implements ProductService {
 
         return new PageImpl<>(dtoList, pageable, productPage.getTotalElements());
     }
+
 
     @Override
     public ProductDetailResponseDto getDetailProducts(Long productId) {
