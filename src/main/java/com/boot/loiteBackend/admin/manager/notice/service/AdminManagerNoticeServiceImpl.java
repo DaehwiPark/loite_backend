@@ -7,6 +7,7 @@ import com.boot.loiteBackend.admin.manager.notice.dto.AdminManagerUnreadItem;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeAttachmentRepository;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeReadRepository;
 import com.boot.loiteBackend.admin.manager.notice.repository.AdminManagerNoticeRepository;
+import com.boot.loiteBackend.common.file.FileService;
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeAttachment;
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeEntity;
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeRead;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,7 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
     private final AdminManagerNoticeRepository noticeRepo;
     private final AdminManagerNoticeReadRepository readRepo;
     private final AdminManagerNoticeAttachmentRepository attRepo;
+    private final FileService fileService;
 
     /* ================== ADMIN ================== */
 
@@ -271,5 +274,55 @@ public class AdminManagerNoticeServiceImpl implements AdminManagerNoticeService 
 
     public Page<AdminManagerUnreadItem> unreadPageLight(Long managerId, Pageable pageable) {
         return noticeRepo.findUnreadForManagerLight(managerId, LocalDateTime.now(), pageable);
+    }
+
+    @Transactional
+    public AdminManagerNoticeResponse createWithAttachments(
+            Long adminId,
+            AdminManagerNoticeCreateRequest req,
+            List<MultipartFile> files,
+            boolean publish
+    ) {
+        var n = AdminManagerNoticeEntity.builder()
+                .title(req.getTitle())
+                .contentMd(req.getContentMd())
+                .importance(req.getImportance() == null ? 0 : req.getImportance())
+                .pinned(Boolean.TRUE.equals(req.getPinned()))
+                .status(publish ? AdminManagerNoticeEntity.NoticeStatus.PUBLISHED : AdminManagerNoticeEntity.NoticeStatus.DRAFT)
+                .expiresAt(req.getExpiresAt())
+                .createdByAdmin(adminId)
+                .build();
+        if (publish) {
+            n.setPublishedAt(java.time.LocalDateTime.now());
+        }
+        noticeRepo.save(n);
+
+        // 파일 저장(보상삭제 포함)
+        var created = new java.util.ArrayList<java.nio.file.Path>();
+        try {
+            int sort = 0;
+            for (var f : files) {
+                if (f == null || f.isEmpty()) continue;
+                var r = fileService.save(f, "notice/" + n.getId());
+                created.add(java.nio.file.Paths.get(r.getPhysicalPath()));
+                attRepo.save(
+                        com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeAttachment.builder()
+                                .noticeId(n.getId())
+                                .fileUrl(r.getUrlPath())
+                                .filePath(r.getPhysicalPath())
+                                .originalName(f.getOriginalFilename())
+                                .mimeType(f.getContentType())
+                                .fileSizeBytes(f.getSize())
+                                .sortOrder(sort++)
+                                .build()
+                );
+            }
+        } catch (Exception e) {
+            for (var p : created) try { java.nio.file.Files.deleteIfExists(p); } catch (Exception ignore) {}
+            throw (e instanceof RuntimeException re) ? re : new RuntimeException(e);
+        }
+
+        var atts = attRepo.findByNoticeIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(n.getId());
+        return AdminManagerNoticeResponse.of(n, atts);
     }
 }

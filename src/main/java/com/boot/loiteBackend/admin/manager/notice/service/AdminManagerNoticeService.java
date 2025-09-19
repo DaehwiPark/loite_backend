@@ -8,6 +8,7 @@ import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeAtta
 import com.boot.loiteBackend.domain.manager.notice.entity.AdminManagerNoticeEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,4 +31,10 @@ public interface AdminManagerNoticeService {
 
     Page<AdminManagerNoticeEntity> unreadPage(Long managerId, Pageable pageable);
     Page<AdminManagerUnreadItem> unreadPageLight(Long managerId, Pageable pageable);
+    AdminManagerNoticeResponse createWithAttachments(
+            Long adminId,
+            AdminManagerNoticeCreateRequest req,
+            List<MultipartFile> files,
+            boolean publish
+    );
 }

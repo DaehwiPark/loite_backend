@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin/notices")
@@ -28,7 +30,10 @@ public class AdminManagerNoticeController {
 
     private final AdminManagerNoticeService service;
 
-    @PostMapping
+    @PostMapping(
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "공지 초안 생성",
@@ -38,13 +43,34 @@ public class AdminManagerNoticeController {
             반환 값은 생성된 공지와 현재 첨부(없으면 빈 배열)입니다.
             """
     )
-    public AdminManagerNoticeResponse createDraft(
-            @RequestBody AdminManagerNoticeCreateRequest req,
+    /** 1) 기존 JSON 전용: 첨부 없음 */
+    public AdminManagerNoticeResponse createDraftJson(
+            @RequestBody AdminManagerNoticeCreateRequest payload,
             @AuthenticationPrincipal CustomUserDetails me
     ) {
-        var n = service.createDraft(me.getUserId(), req);
-        return AdminManagerNoticeResponse.of(n, service.getActiveAttachments(n.getId()));
+        return service.createWithAttachments(me.getUserId(), payload, java.util.List.of(), false);
     }
+
+    /** 2) 멀티파트: 첨부 O/X 모두 가능 + 선택 발행 */
+    @PostMapping(
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @PreAuthorize("hasRole('ADMIN')")
+    public AdminManagerNoticeResponse createWithAttachmentsMultipart(
+            @RequestPart("payload") AdminManagerNoticeCreateRequest payload,
+            @RequestPart(name = "file", required = false) java.util.List<org.springframework.web.multipart.MultipartFile> files,
+            @RequestParam(name = "publish", defaultValue = "false") boolean publish,
+            @AuthenticationPrincipal CustomUserDetails me
+    ) {
+        return service.createWithAttachments(
+                me.getUserId(),
+                payload,
+                (files == null ? java.util.List.of() : files),
+                publish
+        );
+    }
+
 
     @PostMapping("/{id}/publish")
     @PreAuthorize("hasRole('ADMIN')")
