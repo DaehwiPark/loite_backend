@@ -1,5 +1,6 @@
 package com.boot.loiteBackend.admin.support.resource.dto;
 
+import com.boot.loiteBackend.admin.product.product.entity.AdminProductEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
