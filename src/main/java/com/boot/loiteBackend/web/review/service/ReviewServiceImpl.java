@@ -407,11 +407,11 @@ public class ReviewServiceImpl implements ReviewService{
     @Transactional
     public boolean toggleHelpful(Long userId, Long reviewId) {
         ReviewEntity review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("리뷰가 존재하지 않습니다."));
 
-        if (review.getUser().getUserId().equals(userId)) {
+        /*if (review.getUser().getUserId().equals(userId)) {
             throw new IllegalStateException("본인 리뷰에는 도움돼요를 누를 수 없습니다.");
-        }
+        }*/
 
         Optional<ReviewHelpfulEntity> existing = reviewHelpfulRepository.findByReview_ReviewIdAndUser_UserId(reviewId, userId);
 
