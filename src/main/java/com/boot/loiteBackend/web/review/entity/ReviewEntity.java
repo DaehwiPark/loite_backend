@@ -34,6 +34,9 @@ public class ReviewEntity {
     @Column(name = "ORDER_ID")
     private Long orderId;
 
+    @Column(name = "ORDER_ITEM_ID")
+    private Long orderItemId;
+
     @Column(name = "REVIEW_RATING", nullable = false)
     private int rating;
 

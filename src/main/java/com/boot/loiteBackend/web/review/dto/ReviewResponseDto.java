@@ -20,11 +20,17 @@ public class ReviewResponseDto {
     @Schema(description = "상품 ID", example = "101")
     private Long productId;
 
+    @Schema(description = "상품 이름", example = "name")
+    private String productName;
+
     @Schema(description = "별점", example = "5")
     private int rating;
 
     @Schema(description = "도움되요 수", example = "5")
     private int helpfulCount;
+
+    @Schema(description = "도움되요 클릭 여부", example = "true")
+    private boolean helpfulAdded;
 
     @Schema(description = "리뷰 내용", example = "아주 만족스러운 제품입니다.")
     private String content;

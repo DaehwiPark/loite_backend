@@ -10,6 +10,7 @@ import com.boot.loiteBackend.domain.user.general.entity.UserEntity;
 import com.boot.loiteBackend.web.order.dto.OrderAdditionalResponseDto;
 import com.boot.loiteBackend.web.order.dto.OrderGiftResponseDto;
 import com.boot.loiteBackend.web.order.dto.OrderOptionResponseDto;
+import com.boot.loiteBackend.web.order.entity.OrderEntity;
 import com.boot.loiteBackend.web.order.entity.OrderItemEntity;
 import com.boot.loiteBackend.web.order.enums.OrderStatus;
 import com.boot.loiteBackend.web.order.repository.OrderItemRepository;
@@ -52,40 +53,36 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public ReviewResponseDto createReview(Long userId, ReviewRequestDto requestDto, List<MultipartFile> files) {
 
-        // 1. 상품 검증
-        AdminProductEntity product = adminProductRepository.findById(requestDto.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("상품 없음"));
+        // 1. 주문 아이템 조회
+        OrderItemEntity orderItem = orderItemRepository.findById(requestDto.getOrderItemId())
+                .orElseThrow(() -> new IllegalArgumentException("주문 아이템 없음"));
 
-        // 2. 유저 검증
+        // 2. 주문서와 상품 가져오기
+        OrderEntity order = orderItem.getOrder();
+        AdminProductEntity product = orderItem.getProduct();
+
+        // 3. 유저 검증
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
-        // 3. orderId 결정 (마이페이지에서 오면 그대로, 상품 상세에서 오면 최근 결제건 찾기)
-        Long orderId = requestDto.getOrderId();
-        if (orderId == null) {
-            orderId = orderRepository.findMostRecentPaidOrderIdByUserIdAndProductId(
-                    userId,
-                    requestDto.getProductId(),
-                    OrderStatus.PAID
-            ).orElseThrow(() -> new IllegalStateException("해당 상품 구매 내역이 없어 리뷰 작성 불가합니다."));
-        }
-
         // 4. 결제 완료 여부 검증
-        boolean validOrder = orderRepository.existsByOrderIdAndUserIdAndOrderStatus(orderId, userId, OrderStatus.PAID);
+        boolean validOrder = orderRepository.existsByOrderIdAndUserIdAndOrderStatus(
+                order.getOrderId(), userId, OrderStatus.PAID);
         if (!validOrder) {
             throw new IllegalStateException("결제 완료된 주문만 리뷰 작성이 가능합니다.");
         }
 
-        // 5. 중복 리뷰 방지 (주문 1건당 리뷰 1개)
-        if (reviewRepository.existsByOrderIdAndProduct_ProductIdAndDeleteYn(orderId, requestDto.getProductId(), "N")) {
-            throw new IllegalStateException("이미 해당 주문에 대한 리뷰가 존재합니다. 수정 또는 삭제만 가능합니다.");
+        // 5. 중복 리뷰 방지 (주문 아이템 단위로)
+        if (reviewRepository.existsByOrderItemIdAndDeleteYn(requestDto.getOrderItemId(), "N")) {
+            throw new IllegalStateException("이미 해당 주문 상품에 대한 리뷰가 존재합니다. 수정 또는 삭제만 가능합니다.");
         }
 
         // 6. 리뷰 저장
         ReviewEntity review = ReviewEntity.builder()
                 .product(product)
                 .user(user)
-                .orderId(orderId)
+                .orderId(order.getOrderId())
+                .orderItemId(orderItem.getOrderItemId())
                 .rating(requestDto.getRating())
                 .content(requestDto.getContent())
                 .activeYn("Y")
@@ -305,7 +302,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public Page<ReviewResponseDto> getReviewsByProduct(Long productId, String sortType, String filterType, Pageable pageable) {
+    public Page<ReviewResponseDto> getReviewsByProduct(Long productId, String sortType, String filterType, Long currentUserId, Pageable pageable) {
 
         // 정렬 조건
         Sort sort;
@@ -385,13 +382,19 @@ public class ReviewServiceImpl implements ReviewService{
                     )
                     .toList();
 
+            boolean helpfulAdded = false;
+            if (currentUserId != null) { // 로그인 사용자일 때만 체크
+                helpfulAdded = reviewHelpfulRepository.existsByReview_ReviewIdAndUser_UserId(review.getReviewId(), currentUserId);
+            }
 
             return ReviewResponseDto.builder()
                     .reviewId(review.getReviewId())
                     .productId(review.getProduct().getProductId())
+                    .productName(review.getProduct().getProductName())
                     .rating(review.getRating())
                     .content(review.getContent())
                     .helpfulCount(review.getHelpfulCount())
+                    .helpfulAdded(helpfulAdded)
                     .userName(review.getUser().getUserName())
                     .createdAt(review.getCreatedAt())
                     .medias(mediaDtos)
